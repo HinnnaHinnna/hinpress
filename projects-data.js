@@ -201,8 +201,8 @@ const rawProjects = [
       '한국타이포그라피협회 전시 19 《그리드쉬프트》 출품 작업. &lt;U+0338 : 슬러의 대모험&gt;은 둘 이상의 대상을 대등하게 이어 주는 접속 조사 “~와”와 동일한 의미인 단어들를 조합해 만든 단 하나의 글자이다. 작업의 소재로 접속 조사 “와”를 사용한 이유는 글자들의 전시이자, 문장, 음률인 《그리드쉬프트》 속에서 다른 작업을 대등하게 이어주는 조사의 역할을 의도했기 때문이다. 작업 전 전시팀에서 제시한 Gridshift-Joyul.wav를 들었을 때 게임 음악을 연상했다. 픽셀 게임 <슈퍼마리오>에서 주인공 슈퍼마리오가 벽돌 위를 점프하며 게임을 전개하듯 ‘그리드쉬프트’라는 문장이자 음률을 이어가는 요소가 되고자 한다.',
     category: 'Graphic Design',
     client: ['한국타이포그라피협회'],
-    imageFolder: 'image/2024/그리드',
-    imageBaseName: '그리드',
+    imageFolder: 'image/2024/grid',
+    imageBaseName: 'grid',
     imageCount: 1,
     imageExt: 'jpg',
     padLength: 2
