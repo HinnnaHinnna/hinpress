@@ -59,11 +59,8 @@ const rawProjects = [
       '매체를 소재로 한 논문이라서 표지 컨셉은 블랙미러이다. 표지의 에폭시로 칠한 부분은 내지의 본문 그리드에 해당된다. 내지에는 코딩에서 쓰는 코드를 디자인 요소로 체계를 탐구한 연구 기록이다. 중심으로 한 그래픽 디자인 시리즈입니다. 글자의 형태와 배열을 통해 시각적 리듬과 균형을 탐구했습니다. 정체 활자를 가로로 잘게 나눈 다음 조각들을 일정 간격으로 옮겨 글자 전체가 기울어진 느낌이 들게 했습니다.',
     category: 'Graphic Design',
     client: ['개인 작업, 서울시립대학교 디자인석사청구'],
-
-    // 🔽 이미지 경로 자동 생성을 위한 정보들
-    // 실제 파일 위치: image/2024/논문/논문_00.jpg, _01.jpg, _02.jpg ...
-    imageFolder: 'image/2024/논문',
-    imageBaseName: '논문',
+    imageFolder: 'image/2024/write',
+    imageBaseName: 'write',
     imageCount: 16,        // 논문_00.jpg ~ 논문_02.jpg → 3장
     imageExt: 'jpg',      // 확장자
     padLength: 2          // 00, 01, 02...
@@ -96,8 +93,8 @@ const rawProjects = [
       '『아카이브 프리즘』이라는 계간지 리뉴얼이다. 특히 첫 호는 10년마다 한국영화 100선을 선발하여 기록하는 책이다. 표지에는 100선에 해당하는 영화들이 텍스트로 쓰여 있다. 이 부분은 『아카이브 프리즘』의 아카이브를, 배면 컬러는 암시적 프리즘을 의미한다. 매 호마다 배면 컬러 색이 달라진다.',
     category: 'Graphic Design',
     client: ['한국영상자료원, box8'],
-    imageFolder: 'image/2024/아카이브프리즘',
-    imageBaseName: '아카이브프리즘',
+    imageFolder: 'image/2024/achive',
+    imageBaseName: 'achive',
     imageCount: 19,
     imageExt: 'jpg',
     padLength: 2
@@ -113,11 +110,8 @@ const rawProjects = [
       '충무로영화제-감독주간에서 발행한 박찬욱 감독 데뷔 30주년 기념도서이다. 박찬욱 감독의 외롭고 화려한 영화 인생을 하드보일드 추리 소설 세계관에 대입했다. 책표지는 2중 구조인데 겉표지는 권총집을 연상하게 하는 검은 인조가죽을 사용했고 오른쪽 면으로 책 배면을 덮는 구조이다. 2개의 책등이 생기는데, 오른쪽 면의 가죽 표지 책등에는 박찬욱 감독이 감독한 22개의 영화 영문 제목이 형압으로 눌려있다. 왼쪽 면의 노출 책등은 원래 실 제본선을 취소선으로 활용해, 본문 제목 중 남의 영화와도 내 영화와도 달라야 했다는 감독의 말을 인용한 Like no other, even like no myself라는 영문 문장으로 디자인하려 했다. 그런데 제작 과정 중 문제가 생겨 현재의 영화 대사 버전으로 바꾸었다. 아쉬워서 이 게시물 마지막에 추가했다. 내지 종이 3종, 별색 3개, 노출 제본, 2개의 책등을 사용했다.',
     category: 'Graphic Design',
     client: ['한국영상자료원, box8'],
-    // 예시: image/2024/아카이브프리즘/아카이브프리즘_00.jpg ~ 05.jpg
-    // 📌 방금 만든 PDF→JPG 파일도 여기로 옮겨서
-    //    이름을 맞춰주면 됨.
-    imageFolder: 'image/2024/박찬욱',
-    imageBaseName: '박찬욱',
+    imageFolder: 'image/2024/chanwook',
+    imageBaseName: 'chanwook',
     imageCount: 22,    // 아카이브프리즘_00.jpg ~ _05.jpg 라고 가정
     imageExt: 'jpg',
     padLength: 2
@@ -218,8 +212,8 @@ const rawProjects = [
       '기존 딩벳 폰트가 대부분 규칙성이 없음에서 착안, 한글의 규칙성을 딩벳 폰트에 적용했다. 스마일 형태를 유지하면서 초성은 스마일의 실루엣, 중성은 기울기, 종성은 스마일 속 눈의 형태를 한글의 초, 중, 종성 규칙을 따랐다. 초성과 중성에 들어가는 도형은 ●, ■, ⬟, ⬢, ▲이며 각각 여린 입천장 소리(ㄱ,ㄲ,ㅋ,ㅇ), 잇몸 소리(ㄴ, ㄷ, ㄸ, ㅌ, ㄹ, ㅅ, ㅆ), 입술 소리(ㅂ, ㅃ, ㅍ, ㅁ), 쎈 입천장 소리(ㅈ, ㅉ, ㅊ), 목청 소리(ㅎ)를 의미한다. ',
     category: 'Graphic Design',
     client: '개인작업, 과제',
-    imageFolder: 'image/2024/스마일',
-    imageBaseName: '스마일',
+    imageFolder: 'image/2024/smile',
+    imageBaseName: 'smile',
     imageCount: 14,
     imageExt: 'jpg',
     padLength: 2
@@ -252,8 +246,8 @@ const rawProjects = [
       '국립민속박물관 전시 도록 시안',
     category: 'Graphic Design',
     client: ['국립민속박물관'],
-    imageFolder: 'image/2024/일생',
-    imageBaseName: '일생',
+    imageFolder: 'image/2024/onelife',
+    imageBaseName: 'onelife',
     imageCount: 2,
     imageExt: 'jpg',
     padLength: 2
