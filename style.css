@@ -1,0 +1,580 @@
+/* =============================== 기본 리셋 =============================== */
+:root {
+  /* 메인 배경(white) */
+  --color-bg-main: #ffffff;
+  /* 메인 브랜드 컬러 (지금 쓰는 형광 연두) */
+  --color-brand: #fcfe7d;
+  /* 포트폴리오 배경 */
+  --color-portfolio-bg: #000000;
+  --color-desc-bg: #fcfe7d;
+  /* + 옵션: 중립 색 (검정/회색) - 꼭 변수를 안 써도 되지만, 통일하고 싶으면 이렇게 */
+  --color-text-main: #000000;
+  --color-main-gray: rgb(244, 239, 239);
+  --color-muted: #0008ff;
+  --color-arrow: rgb(223, 0, 0)
+    /* 🔹 상단 바/마퀴 공통 시스템 */
+    --bar-height: 1.6rem;
+  --bar-font-size: 0.8rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.gothic-a1-extralight {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.gothic-a1-light {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.gothic-a1-regular {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.gothic-a1-medium {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.inter-uniquifier {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: weight;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, "Gothic A1";
+  font-weight: 300;
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* =============================== 상단 바 =============================== */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--bar-height);
+  background: var(--color-brand);
+  border-bottom: 0px solid var(--color-bg-main);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 300;
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+}
+
+/* 메인 페이지에서 숨김 */
+.top-bar.hidden {
+  transform: translateY(-100%);
+}
+
+.top-bar-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+/* 왼쪽 메뉴 */
+.top-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.top-nav-item {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.top-nav-item:hover {
+  opacity: 0.6;
+}
+
+.top-nav-item,
+#top-logo {
+  font-family: "Gothic A1", sans-serif;
+  font-size: var(--bar-font-size);
+  font-weight: 500;
+  line-height: 1;
+  /* ▼ 추가: 버튼/로고 자체를 flex 박스로 만들어서 안의 텍스트를 가운데 정렬 */
+  display: flex;
+  align-items: center;
+  height: var(--bar-height);
+  /* 바 높이랑 동일하게 */
+}
+
+
+/* 중앙 로고의 위치만 별도로 */
+#top-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* =============================== 페이지 공통 =============================== */
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.page.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* =============================== 메인 페이지 =============================== */
+#main-page {
+  background: var(--color-main-gray);
+}
+
+.title-container {
+  position: absolute;
+  top: 0rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 0 1rem;
+  width: 100%;
+  text-align: left;
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 300;
+}
+
+.main-desc {
+  margin: 0.75rem auto 0;
+  width: 40vw;
+  line-height: 1.8;
+  font-size: 13px;
+  word-break: keep-all;
+}
+
+/* 기존 main-title 스타일 유지 */
+#main-title {
+  white-space: nowrap;
+  font-size: min(24vw, 60vh);
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+/* Press만 다른 폰트/스타일 */
+#main-title .press-text {
+  font-family: "Inter", sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+#main-title:hover {
+  opacity: 0.8;
+}
+
+/* 상단 흐르는 글 + 패들 바 */
+.marquee-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  /* 화면 가로 전체 */
+  height: var(--bar-height);
+  overflow: hidden;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-brand);
+}
+
+/* 🔹 마퀴 바 흔들림 효과: JS에서 .shake 클래스를 잠깐 붙였다 떼는 방식 */
+.marquee-bar.shake {
+  /* 이전: 0.25s → 조금 더 거칠게 느껴지게 0.45s */
+  animation: barShake 0.45s cubic-bezier(0.45, 0.1, 0.45, 1.4);
+}
+
+
+/* 바 자체가 좌우로 살짝 흔들리는 키프레임 (텍스트 흐름은 .marquee-inner에서 따로 진행됨) */
+@keyframes barShake {
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-6px);
+  }
+
+  80% {
+    transform: translateX(3px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.marquee-inner {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: marquee 70s linear infinite;
+}
+
+.marquee-text {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 300;
+  font-size: var(--bar-font-size);
+  line-height: 1;
+  word-break: keep-all;
+  padding-right: 4rem;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* =============================== 포트폴리오 페이지 =============================== */
+#portfolio-page {
+  background: var(--color-portfolio-bg);
+  overflow-y: auto;
+}
+
+/* 섬네일 컨테이너 */
+#thumbnails-container {
+  position: relative;
+  width: 100%;
+  padding: 4.5rem 1rem 1rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3em;
+}
+
+.thumbnail {
+  cursor: pointer;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  width: 260px;
+  /* 썸네일 가로폭만 고정 */
+}
+
+.thumbnail:hover {
+  opacity: 0.7;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: auto;
+  /* 비율 유지 */
+  object-fit: contain;
+  display: block;
+}
+
+/* =============================== 상세 페이지 =============================== */
+#detail-page {
+  background: var(--color-desc-bg);
+  overflow-y: auto;
+  padding-left: 10vw;
+  padding-right: 10vw;
+  font-weight: 400;
+}
+
+/* ← → 네비게이션 */
+.detail-nav {
+  position: fixed;
+  top: 4.5rem;
+  /* 상단바 바로 아래 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+  font-size: 28px;
+  z-index: 210;
+  color: var(--color-muted);
+}
+
+.detail-nav span {
+  cursor: pointer;
+  user-select: none;
+  color: var(--color-arrow);
+  padding-right: 10px;
+}
+
+.detail-nav span:hover {
+  opacity: 0.6;
+}
+
+/* 비활성(첫/마지막) 상태 */
+.detail-nav span.disabled {
+  color: var(--color-brand);
+  cursor: default;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* =============================== 상세 내용 (데스크탑 레이아웃) =============================== */
+.detail-content {
+  display: grid;
+  grid-template-columns: 300px 300px;
+  column-gap: 2rem;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 7rem 1rem 2rem 1rem;
+}
+
+/* 왼쪽: 첫 번째 이미지 */
+.detail-main-image {
+  grid-column: 2 / 5;
+  grid-row: 1 / 3;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.detail-main-image img {
+  width: 300px;
+  height: auto;
+  display: block;
+  margin-bottom: 2rem;
+}
+
+/* 오른쪽 상단: 텍스트 */
+.detail-info {
+  grid-column: 1 / 5;
+  grid-row: 3 / 3;
+  width: 300px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.detail-info h2 {
+  font-family: "Gothic A1", sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+/* 🔹 상세페이지 부제용 라운드 박스 */
+#detail-subtitle {
+  display: inline-block;
+  padding: 0.15rem 0.15rem;
+  border: 1px solid var(--color-text-main);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  background-color: transparent;
+  word-break: keep-all;
+}
+
+.detail-info p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  word-break: keep-all;
+  text-align: left;
+}
+
+/* 오른쪽 하단: 나머지 이미지들 */
+.detail-images {
+  width: 1100px;
+  grid-column: 2 / 5;
+  grid-row: 3 / 3;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: start;
+  gap: 2rem;
+}
+
+.detail-images img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* =============================== CV 페이지 =============================== */
+#cv-page {
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  overflow-y: auto;
+}
+
+.cv-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 3rem;
+  font-family: "Gothic A1", sans-serif;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.cv-section {
+  margin-bottom: 2rem;
+}
+
+.cv-section h3 {
+  font-family: "Gothic A1", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  line-height: 0;
+}
+
+.cv-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.cv-section li {
+  margin-bottom: 0.25rem;
+}
+
+/* 상세 설명 안의 링크 스타일 */
+#detail-description a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+#detail-description a:hover {
+  opacity: 0.7;
+}
+
+/* =============================== 반응형: 모바일 전용 뷰 =============================== */
+@media (max-width: 768px) {
+  .main-desc {
+    width: 70vw;
+    font-size: 13px;
+  }
+
+  #detail-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .detail-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 7rem 0 2rem 0;
+  }
+
+  .detail-main-image {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .detail-main-image img {
+    width: 60%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .detail-info {
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  .detail-info h2 {
+    font-size: 18px;
+  }
+
+  .detail-info p {
+    font-size: 16px;
+    text-align: left;
+  }
+
+  .detail-meta-item {
+    font-size: 14px;
+  }
+
+  .detail-images {
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr;
+    /* 모바일에서는 한 줄에 한 장 */
+    gap: 2rem;
+  }
+
+  .detail-images img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* 🔹 모바일에서 CV 페이지 레이아웃 */
+  #cv-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .cv-inner {
+    max-width: 100%;
+    padding: 4.5rem 1rem 2rem;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .cv-inner h2 {
+    font-size: 18px;
+  }
+
+  .cv-section h3 {
+    font-size: 13px;
+  }
+}
