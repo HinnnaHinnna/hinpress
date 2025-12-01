@@ -2,7 +2,6 @@
 :root {
   /* 메인 배경(white) */
   --color-bg-main: #ffffff;
-  /* 메인 브랜드 컬러 (지금 쓰는 형광 연두) */
   --color-brand: #55ff00;
   /* 포트폴리오 배경 */
   --color-portfolio-bg: #000000;
