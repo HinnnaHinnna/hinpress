@@ -6,7 +6,7 @@
   --color-brand: #55ff00;
   /* 포트폴리오 배경 */
   --color-portfolio-bg: #000000;
-  --color-desc-bg: #eafd5a;
+  --color-desc-bg: #ffffff;
   /* + 옵션: 중립 색 (검정/회색) - 꼭 변수를 안 써도 되지만, 통일하고 싶으면 이렇게 */
   --color-text-main: #000000;
   --color-main-gray: rgb(230, 229, 229);
