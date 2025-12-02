@@ -629,3 +629,4 @@ if (detailPage) {
     }
   }
 }, { passive: true });
+}
