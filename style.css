@@ -1,546 +1,572 @@
- /* =============================== 기본 리셋 =============================== */
-    :root {
-      --color-bg-main: #ffffff;
-      --color-brand: #fcfe7d;
-      --color-portfolio-bg: #000000;
-      --color-desc-bg: #fcfe7d;
-      --color-text-main: #000000;
-      --color-muted: #0008ff;
-      --color-main-gray: rgb(246, 238, 227); /* 메인 배경 */
-      --color-arrow: rgb(46, 100, 225);      /* 화살표 컬러 */
-      --color-maque: rgb(46, 100, 225);      /* 마퀴바 배경 */
-
-      --bar-height: 3rem;
-      --bar-font-size: 0.8rem;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    .gothic-a1-extralight {
-      font-family: "Gothic A1", sans-serif;
-      font-weight: 200;
-      font-style: normal;
-    }
-
-    .gothic-a1-light {
-      font-family: "Gothic A1", sans-serif;
-      font-weight: 300;
-      font-style: normal;
-    }
-
-    .gothic-a1-regular {
-      font-family: "Gothic A1", sans-serif;
-      font-weight: 400;
-      font-style: normal;
-    }
-
-    .gothic-a1-medium {
-      font-family: "Gothic A1", sans-serif;
-      font-weight: 500;
-      font-style: normal;
-    }
-
-    .inter-uniquifier {
-      font-family: "Inter", sans-serif;
-      font-optical-sizing: auto;
-      font-weight: 400;
-      font-style: normal;
-    }
-
-    body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, "Gothic A1";
-      font-weight: 300;
-      background: var(--color-bg-main);
-      color: var(--color-text-main);
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    /* =============================== 상단 바 =============================== */
-    .top-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: var(--bar-height);
-      background: var(--color-brand);
-      display: flex;
-      align-items: center;
-      padding: 0 1rem;
-      z-index: 300;
-      transform: translateY(0);
-      transition: transform 0.3s ease;
-    }
-
-    .top-bar.hidden {
-      transform: translateY(-100%);
-    }
-
-    .top-bar-inner {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      position: relative;
-    }
-
-    .top-nav {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .top-nav-item {
-      background: none;
-      border: none;
-      padding: 0;
-      font: inherit;
-      cursor: pointer;
-    }
-
-    .top-nav-item:hover {
-      opacity: 0.6;
-    }
-
-    .top-nav-item,
-    #top-logo {
-      font-family: "Gothic A1", sans-serif;
-      font-size: var(--bar-font-size);
-      font-weight: 500;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      height: var(--bar-height);
-    }
-
-    #top-logo {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    /* =============================== 페이지 공통 =============================== */
-    .page {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .page.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    /* =============================== 메인 페이지 =============================== */
-    #main-page {
-      background: var(--color-main-gray);
-    }
-
-    .title-container {
-      position: absolute;
-      top: auto;
-      bottom: 20vh;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      padding: 0 1rem;
-      width: 100%;
-      font-family: "Gothic A1", sans-serif;
-      font-weight: 300;
-    }
-
-    .main-desc {
-      margin: 0.75rem auto 0;
-      width: 40vw;
-      line-height: 1.8;
-      font-size: 13px;
-      word-break: keep-all;
-    }
-
-    #main-title {
-      white-space: nowrap;
-      font-size: min(24vw, 60vh);
-      font-family: 'Inter', Helvetica, Arial, sans-serif;
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      color: white;
-      text-align: center;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    #main-title .press-text {
-      font-family: "Inter", sans-serif;
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      color: #ffffff;
-    }
-
-    #main-title:hover {
-      opacity: 0.8;
-    }
-
-    @keyframes mobileTitleBlink {
-      0%, 100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.3;
-      }
-    }
-
-    /* =============================== 마퀴바 =============================== */
-    .marquee-bar {
-      position: fixed;
-      top: 0;             /* ✅ 항상 화면 맨 위에 보이도록 */
-      left: 0;
-      width: 100vw;
-      height: var(--bar-height);
-      overflow: hidden;
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      background-color: var(--color-maque);
-    }
-
-    .marquee-inner {
-      display: inline-block;
-      white-space: nowrap;
-      padding-left: 100%;
-      animation: marquee 70s linear infinite;
-    }
-
-    .marquee-text {
-      font-family: "Gothic A1", sans-serif;
-      font-weight: 400;          /* 기존 300 → 한 단계 더 두껍게 */
-      font-size: var(--bar-font-size);
-      line-height: 1;
-      word-break: keep-all;
-      padding-right: 4rem;
-      color: #ffffff;            /* 흰색 텍스트 */
-    }
-
-    @keyframes marquee {
-      0% {
-        transform: translateX(0);
-      }
-
-      100% {
-        transform: translateX(-100%);
-      }
-    }
-
-    #canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    /* =============================== 포트폴리오 페이지 =============================== */
-    #portfolio-page {
-      background: var(--color-portfolio-bg);
-      overflow-y: auto;
-    }
-
-    #thumbnails-container {
-      position: relative;
-      width: 100%;
-      padding: 4.5rem 1rem 1rem 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: flex-end;
-      gap: 3em;
-    }
-
-    .thumbnail {
-      cursor: pointer;
-      transition: opacity 0.2s;
-      flex-shrink: 0;
-      width: 260px;
-    }
-
-    .thumbnail:hover {
-      opacity: 0.7;
-    }
-
-    .thumbnail img {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      display: block;
-    }
-
-    /* =============================== 상세 페이지 =============================== */
-    #detail-page {
-      background: var(--color-desc-bg);
-      overflow-y: auto;
-      padding-left: 10vw;
-      padding-right: 10vw;
-      font-weight: 400;
-    }
-
-    .detail-nav {
-      position: fixed;
-      top: 4.5rem;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 1rem;
-      font-size: 28px;
-      z-index: 210;
-      color: var(--color-muted);
-    }
-
-    .detail-nav span {
-      cursor: pointer;
-      user-select: none;
-      color: var(--color-arrow);
-      padding-right: 10px;
-    }
-
-    .detail-nav span:hover {
-      opacity: 0.6;
-    }
-
-    .detail-nav span.disabled {
-      color: var(--color-brand);
-      cursor: default;
-      pointer-events: none;
-      opacity: 0;
-    }
-
-    .detail-content {
-      display: grid;
-      grid-template-columns: 300px 300px;
-      column-gap: 2rem;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 7rem 1rem 2rem 1rem;
-    }
-
-    .detail-main-image {
-      grid-column: 2 / 5;
-      grid-row: 1 / 3;
-      display: flex;
-      justify-content: flex-start;
-      align-items: flex-start;
-    }
-
-    .detail-main-image img {
-      width: 300px;
-      height: auto;
-      display: block;
-      margin-bottom: 2rem;
-    }
-
-    .detail-info {
-      grid-column: 1 / 5;
-      grid-row: 3 / 3;
-      width: 300px;
-      font-size: 12px;
-      line-height: 1.5;
-      margin-bottom: 1rem;
-    }
-
-    .detail-info h2 {
-      font-family: "Gothic A1", sans-serif;
-      font-size: 19px;
-      font-weight: 700;
-    }
-
-    #detail-subtitle {
-      display: inline-block;
-      padding: 0.15rem 0.15rem;
-      border: 1px solid var(--color-text-main);
-      border-radius: 6px;
-      font-size: 11px;
-      line-height: 1.4;
-      margin-top: 0.5rem;
-      background-color: transparent;
-      word-break: keep-all;
-    }
-
-    .detail-info p {
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 1rem;
-      margin-top: 0.5rem;
-      word-break: keep-all;
-      text-align: left;
-    }
-
-    .detail-meta-item {
-      font-size: 12px;
-      margin-top: 0.2rem;
-    }
-
-    .detail-images {
-      width: 1100px;
-      grid-column: 2 / 5;
-      grid-row: 3 / 3;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      justify-items: start;
-      gap: 2rem;
-    }
-
-    .detail-images img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* =============================== CV 페이지 =============================== */
-    #cv-page {
-      background: var(--color-bg-main);
-      color: var(--color-text-main);
-      overflow-y: auto;
-    }
-
-    .cv-inner {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 5rem 1.5rem 3rem;
-      font-family: "Gothic A1", sans-serif;
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    .cv-section {
-      margin-bottom: 2rem;
-    }
-
-    .cv-section h3 {
-      font-family: "Gothic A1", sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      line-height: 0;
-    }
-
-    .cv-section ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .cv-section li {
-      margin-bottom: 0.25rem;
-    }
-
-    #detail-description a {
-      color: inherit;
-      text-decoration: underline;
-    }
-
-    #detail-description a:hover {
-      opacity: 0.7;
-    }
-
-    /* =============================== 모바일 =============================== */
-    @media (max-width: 768px) {
-      :root {
-        --bar-height: 3.2rem;
-      }
-
-      .marquee-bar {
-        top: 0;      /* 모바일에서도 일단 맨 위에 고정 */
-      }
-
-      #main-title {
-        animation: mobileTitleBlink 1.2s ease-in-out infinite;
-      }
-
-      .title-container {
-        bottom: 20vh;
-      }
-
-      #detail-page {
-        padding-left: 0;
-        padding-right: 0;
-      }
-
-      .detail-content {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        padding: 7rem 0 2rem 0;
-      }
-
-      .detail-main-image {
-        width: 100%;
-        margin-bottom: 1.5rem;
-        display: flex;
-        justify-content: center;
-      }
-
-      .detail-main-image img {
-        width: 60%;
-        height: auto;
-        object-fit: contain;
-      }
-
-      .detail-info {
-        width: 100%;
-        padding: 0 1rem;
-        box-sizing: border-box;
-        font-size: 16px;
-      }
-
-      .detail-info h2 {
-        font-size: 18px;
-      }
-
-      .detail-info p {
-        font-size: 16px;
-        text-align: left;
-      }
-
-      .detail-meta-item {
-        font-size: 14px;
-      }
-
-      .detail-images {
-        width: 100%;
-        padding: 0 1rem;
-        box-sizing: border-box;
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
-
-      .detail-images img {
-        width: 100%;
-        height: auto;
-      }
-
-      #cv-page {
-        padding-left: 0;
-        padding-right: 0;
-      }
-
-      .cv-inner {
-        max-width: 100%;
-        padding: 4.5rem 1rem 2rem;
-        font-size: 13px;
-        line-height: 1.7;
-      }
-
-      .cv-inner h2 {
-        font-size: 18px;
-      }
-
-      .cv-section h3 {
-        font-size: 13px;
-      }
-    }
+/* =============================== 기본 리셋 =============================== */
+:root {
+  /* 메인 배경(white) */
+  --color-bg-main: #ffffff;
+  /* 메인 브랜드 컬러 (지금 쓰는 형광 연두) */
+  --color-brand: #fcfe7d;
+  /* 포트폴리오 배경 */
+  --color-portfolio-bg: #000000;
+  --color-desc-bg: #fcfe7d;
+  /* + 옵션: 중립 색 (검정/회색) */
+  --color-text-main: #000000;
+  --color-muted: #0008ff;
+  --color-main-gray: rgb(246, 238, 227); /* 메인 배경 */
+  --color-arrow: rgb(46, 100, 225);      /* 버튼/화살표용 */
+  --color-maque: rgb(46, 100, 225);      /* 마퀴바 배경 */
+
+  /* 상단 바/마퀴 공통 시스템 */
+  --bar-height: 3rem;
+  --bar-font-size: 0.8rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 구글 폰트 프리셋 */
+.gothic-a1-extralight {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.gothic-a1-light {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.gothic-a1-regular {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.gothic-a1-medium {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.inter-uniquifier {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, "Gothic A1", sans-serif;
+  font-weight: 300;
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* =============================== 상단 바 =============================== */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--bar-height);
+  background: var(--color-brand);
+  border-bottom: 0px solid var(--color-bg-main);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 300;
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+}
+
+/* 메인 페이지에서 숨김 */
+.top-bar.hidden {
+  transform: translateY(-100%);
+}
+
+.top-bar-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+/* 왼쪽 메뉴 */
+.top-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.top-nav-item {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.top-nav-item:hover {
+  opacity: 0.6;
+}
+
+.top-nav-item,
+#top-logo {
+  font-family: "Gothic A1", sans-serif;
+  font-size: var(--bar-font-size);
+  font-weight: 500;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  height: var(--bar-height);
+}
+
+/* 중앙 로고 위치 */
+#top-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* =============================== 페이지 공통 =============================== */
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.page.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* =============================== 메인 페이지 =============================== */
+#main-page {
+  background: var(--color-main-gray);
+}
+
+.title-container {
+  position: absolute;
+  top: auto;
+  bottom: 20vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 0 1rem;
+  width: 100%;
+  text-align: left;
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 300;
+}
+
+.main-desc {
+  margin: 0.75rem auto 0;
+  width: 40vw;
+  line-height: 1.8;
+  font-size: 13px;
+  word-break: keep-all;
+}
+
+/* main-title */
+#main-title {
+  white-space: nowrap;
+  font-size: min(24vw, 60vh);
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+/* Press 부분 */
+#main-title .press-text {
+  font-family: "Inter", sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+#main-title:hover {
+  opacity: 0.8;
+}
+
+/* 모바일에서 타이틀 깜빡임 */
+@keyframes mobileTitleBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* =============================== 마퀴바 =============================== */
+.marquee-bar {
+  position: fixed;
+  top: 0;              /* 화면 상단 고정 */
+  left: 0;
+  width: 100vw;        /* JS에서 패들 길이로 다시 설정 */
+  height: var(--bar-height);
+  overflow: hidden;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-maque);
+}
+
+/* 흐르는 컨테이너 */
+.marquee-inner {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: marquee 70s linear infinite;
+}
+
+/* 🔹 여기서 텍스트 색/두께 조정 */
+.marquee-text {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 400;              /* 기존보다 한 단계 두꺼운 400 */
+  font-size: var(--bar-font-size);
+  line-height: 1;
+  word-break: keep-all;
+  padding-right: 4rem;
+  color: #ffffff;                /* 흰색 텍스트 */
+}
+
+/* 흐르는 애니메이션 */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* 캔버스 */
+#canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* =============================== 포트폴리오 페이지 =============================== */
+#portfolio-page {
+  background: var(--color-portfolio-bg);
+  overflow-y: auto;
+}
+
+/* 섬네일 컨테이너 */
+#thumbnails-container {
+  position: relative;
+  width: 100%;
+  padding: 4.5rem 1rem 1rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3em;
+}
+
+.thumbnail {
+  cursor: pointer;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  width: 260px; /* 썸네일 가로폭 고정 */
+}
+
+.thumbnail:hover {
+  opacity: 0.7;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* =============================== 상세 페이지 =============================== */
+#detail-page {
+  background: var(--color-desc-bg);
+  overflow-y: auto;
+  padding-left: 10vw;
+  padding-right: 10vw;
+  font-weight: 400;
+}
+
+/* ← → 네비게이션 */
+.detail-nav {
+  position: fixed;
+  top: 4.5rem; /* 상단바 바로 아래 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+  font-size: 28px;
+  z-index: 210;
+  color: var(--color-muted);
+}
+
+.detail-nav span {
+  cursor: pointer;
+  user-select: none;
+  color: var(--color-arrow);
+  padding-right: 10px;
+}
+
+.detail-nav span:hover {
+  opacity: 0.6;
+}
+
+/* 비활성(첫/마지막) 상태 */
+.detail-nav span.disabled {
+  color: var(--color-brand);
+  cursor: default;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* 상세 내용 (데스크탑 레이아웃) */
+.detail-content {
+  display: grid;
+  grid-template-columns: 300px 300px;
+  column-gap: 2rem;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 7rem 1rem 2rem 1rem;
+}
+
+/* 첫 번째 이미지 */
+.detail-main-image {
+  grid-column: 2 / 5;
+  grid-row: 1 / 3;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.detail-main-image img {
+  width: 300px;
+  height: auto;
+  display: block;
+  margin-bottom: 2rem;
+}
+
+/* 오른쪽 상단: 텍스트 */
+.detail-info {
+  grid-column: 1 / 5;
+  grid-row: 3 / 3;
+  width: 300px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.detail-info h2 {
+  font-family: "Gothic A1", sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+/* 부제 박스 */
+#detail-subtitle {
+  display: inline-block;
+  padding: 0.15rem 0.15rem;
+  border: 1px solid var(--color-text-main);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  background-color: transparent;
+  word-break: keep-all;
+}
+
+.detail-info p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  word-break: keep-all;
+  text-align: left;
+}
+
+.detail-meta-item {
+  font-size: 12px;
+  margin-top: 0.2rem;
+}
+
+/* 나머지 이미지들 */
+.detail-images {
+  width: 1100px;
+  grid-column: 2 / 5;
+  grid-row: 3 / 3;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: start;
+  gap: 2rem;
+}
+
+.detail-images img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* =============================== CV 페이지 =============================== */
+#cv-page {
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  overflow-y: auto;
+}
+
+.cv-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 3rem;
+  font-family: "Gothic A1", sans-serif;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.cv-section {
+  margin-bottom: 2rem;
+}
+
+.cv-section h3 {
+  font-family: "Gothic A1", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  line-height: 0;
+}
+
+.cv-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.cv-section li {
+  margin-bottom: 0.25rem;
+}
+
+/* 상세 설명 안의 링크 스타일 */
+#detail-description a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+#detail-description a:hover {
+  opacity: 0.7;
+}
+
+/* =============================== 반응형: 모바일 전용 뷰 =============================== */
+@media (max-width: 768px) {
+
+  /* 마퀴바/상단바 높이 */
+  :root {
+    --bar-height: 3.2rem;
+  }
+
+  /* 메인 타이틀 깜빡임 */
+  #main-title {
+    animation: mobileTitleBlink 1.2s ease-in-out infinite;
+  }
+
+  .title-container {
+    top: auto;
+    bottom: 20vh;
+  }
+
+  #detail-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .detail-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 7rem 0 2rem 0;
+  }
+
+  .detail-main-image {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .detail-main-image img {
+    width: 60%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .detail-info {
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  .detail-info h2 {
+    font-size: 18px;
+  }
+
+  .detail-info p {
+    font-size: 16px;
+    text-align: left;
+  }
+
+  .detail-meta-item {
+    font-size: 14px;
+  }
+
+  .detail-images {
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr; /* 모바일에서 한 줄에 한 장 */
+    gap: 2rem;
+  }
+
+  .detail-images img {
+    width: 100%;
+    height: auto;
+  }
+
+  #cv-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .cv-inner {
+    max-width: 100%;
+    padding: 4.5rem 1rem 2rem;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .cv-inner h2 {
+    font-size: 18px;
+  }
+
+  .cv-section h3 {
+    font-size: 13px;
+  }
+}
