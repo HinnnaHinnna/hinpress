@@ -149,7 +149,7 @@ body {
 
 /* =============================== 메인 페이지 =============================== */
 #main-page {
-  background: var(--color-main-gray);
+  background: var(--color-arrow);
 }
 
 .title-container {
