@@ -4,7 +4,7 @@
 const mainPage = document.getElementById('main-page');
 const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
-const cvPage = document.getElementById('cv-page');
+const cvPage = document.getElementById('cv-page'); // CV 페이지
 
 const mainTitle = document.getElementById('main-title');
 
@@ -46,8 +46,8 @@ function showPage(page) {
 
   page.classList.add('active');
 
-  // 메인 페이지에서는 상단바 숨기기
   if (page === mainPage) {
+    // 메인에서는 상단바 숨김
     topBar.classList.add('hidden');
   } else {
     topBar.classList.remove('hidden');
@@ -89,7 +89,7 @@ if (contactBtn) {
 }
 
 // ==============================
-// 상세 페이지 네비게이션 버튼 상태
+// 상세 페이지 네비게이션 (버튼)
 // ==============================
 function updateDetailNavButtons() {
   if (!detailPrev || !detailNext) return;
@@ -107,7 +107,6 @@ function updateDetailNavButtons() {
   }
 }
 
-// 왼쪽/오른쪽 화살표 클릭 시 이전/다음 프로젝트로 이동
 if (detailPrev) {
   detailPrev.addEventListener('click', () => {
     if (currentProjectIndex <= 0) return;
@@ -127,7 +126,7 @@ if (detailNext) {
 }
 
 // ==============================
-// 캔버스 & 마퀴 패들 설정
+// 캔버스 & 마퀴 패들
 // ==============================
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -139,14 +138,14 @@ let paddleX = 0;
 let paddleY = 0;
 let paddleVX = 0;
 
-// 마퀴바 DOM 위치/폭을 갱신하는 함수
+// DOM 상의 마퀴바 위치/크기를 JS에서 업데이트
 function updatePaddleDom() {
   if (!marqueeBar) return;
   marqueeBar.style.width = `${paddleWidth}px`;
   marqueeBar.style.left = `${paddleX}px`;
 }
 
-// 초기 패들 길이/위치 계산
+// 패들 초기 위치/크기 계산
 function initPaddle() {
   if (!marqueeBar) return;
 
@@ -154,23 +153,21 @@ function initPaddle() {
   const viewportWidth = window.innerWidth;
 
   if (viewportWidth <= 768) {
-    // 모바일에서 패들 길이를 더 길게
+    // 모바일에서 좀 더 긴 패들
     paddleWidth = Math.min(viewportWidth * 0.4, viewportWidth);
   } else {
     paddleWidth = Math.min(viewportWidth * 0.2, viewportWidth);
   }
 
-  // 가운데 정렬
   paddleX = (viewportWidth - paddleWidth) / 2;
 
-  // 화면에서의 실제 y 위치
   const rect = marqueeBar.getBoundingClientRect();
+  // 마퀴바의 "바닥" y좌표를 패들의 상단 역할로 사용
   paddleY = rect.bottom;
 
   updatePaddleDom();
 }
 
-// 캔버스 크기를 화면에 맞게 설정
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -191,12 +188,68 @@ let isDraggingPaddle = false;
 let lastPointerX = 0;
 let lastPointerTime = 0;
 
+// 자이로(기울기) permission 설정 플래그
+let orientationHandlerAttached = false;
+
+// 기울기 이벤트 핸들러
+function handleOrientation(event) {
+  // 모바일 화면에서만 동작
+  if (window.innerWidth > 768) return;
+
+  const gamma = event.gamma; // 좌우 기울기 (-90 ~ 90)
+  if (gamma === null) return;
+
+  if (typeof handleOrientation.lastGamma === 'undefined' || handleOrientation.lastGamma === null) {
+    handleOrientation.lastGamma = gamma;
+    return;
+  }
+
+  // 이전 프레임 대비 기울기 차이만 사용
+  const deltaGamma = gamma - handleOrientation.lastGamma;
+  handleOrientation.lastGamma = gamma;
+
+  const sensitivity = 2.0; // 좌우 이동 민감도
+
+  paddleX += deltaGamma * sensitivity;
+
+  const maxX = canvas.width - paddleWidth;
+  if (paddleX < 0) paddleX = 0;
+  if (paddleX > maxX) paddleX = maxX;
+
+  updatePaddleDom();
+}
+
+// 자이로(기울기) 사용 허용 요청
+function setupTiltControl() {
+  if (orientationHandlerAttached) return;
+  orientationHandlerAttached = true;
+
+  // iOS 13+ : 권한 요청 필요
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+    typeof DeviceOrientationEvent.requestPermission === 'function') {
+
+    DeviceOrientationEvent.requestPermission()
+      .then((response) => {
+        if (response === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation);
+        }
+      })
+      .catch((err) => {
+        console.warn('DeviceOrientation permission denied:', err);
+      });
+  } else if (window.DeviceOrientationEvent) {
+    // 안드로이드/일부 브라우저: 바로 사용 가능
+    window.addEventListener('deviceorientation', handleOrientation);
+  }
+}
+
 if (marqueeBar) {
   // 마우스 드래그 시작
   marqueeBar.addEventListener('mousedown', (e) => {
     isDraggingPaddle = true;
     lastPointerX = e.clientX;
     lastPointerTime = performance.now();
+    setupTiltControl(); // 첫 인터랙션 때 자이로 권한 요청
     e.preventDefault();
   });
 
@@ -208,9 +261,11 @@ if (marqueeBar) {
     const dx = e.clientX - lastPointerX;
     const dt = now - lastPointerTime || 16;
 
-    paddleVX = (dx / dt) * 16; // 속도 계산
+    // dt(시간) 대비 얼마나 움직였는지 → 속도 추정
+    paddleVX = (dx / dt) * 16;
 
     paddleX += dx;
+
     const maxX = canvas.width - paddleWidth;
     if (paddleX < 0) paddleX = 0;
     if (paddleX > maxX) paddleX = maxX;
@@ -235,6 +290,8 @@ if (marqueeBar) {
     isDraggingPaddle = true;
     lastPointerX = touch.clientX;
     lastPointerTime = performance.now();
+
+    setupTiltControl(); // 모바일에서 첫 터치 시 자이로 권한 요청
 
     e.preventDefault();
   }, { passive: false });
@@ -270,68 +327,6 @@ if (marqueeBar) {
 
   window.addEventListener('touchend', endTouch);
   window.addEventListener('touchcancel', endTouch);
-}
-
-// ==============================
-// 모바일 기울기(자이로) 제어
-// ==============================
-
-// 한 번만 권한 요청하기 위한 플래그
-let tiltEnabled = false;
-
-// 기울기 값으로 패들 위치 조정
-function handleOrientation(event) {
-  // 데스크탑에서는 무시
-  if (window.innerWidth > 768) return;
-
-  let gamma = event.gamma; // -90 ~ 90
-  if (gamma === null || typeof gamma === 'undefined') return;
-
-  // 너무 심한 값은 클램프
-  const maxTilt = 30; // 좌우 30도까지만 사용
-  gamma = Math.max(-maxTilt, Math.min(maxTilt, gamma)); // -30 ~ 30
-
-  // gamma를 0~1 비율로 변환
-  const ratio = (gamma + maxTilt) / (2 * maxTilt); // 0~1
-  const maxX = canvas.width - paddleWidth;
-
-  paddleX = maxX * ratio;
-  updatePaddleDom();
-}
-
-// 클릭/터치 한 번 발생했을 때 권한 요청 + 이벤트 연결
-function enableTiltControlOnce() {
-  if (tiltEnabled) return;
-  tiltEnabled = true;
-
-  // iOS 13+ : 권한 요청 필요
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-    typeof DeviceOrientationEvent.requestPermission === 'function') {
-
-    DeviceOrientationEvent.requestPermission()
-      .then((state) => {
-        if (state === 'granted') {
-          window.addEventListener('deviceorientation', handleOrientation);
-        } else {
-          console.warn('DeviceOrientation permission not granted:', state);
-        }
-      })
-      .catch((err) => {
-        console.warn('DeviceOrientation permission error:', err);
-      });
-
-  } else if ('DeviceOrientationEvent' in window) {
-    // 안드로이드 / 일부 브라우저
-    window.addEventListener('deviceorientation', handleOrientation);
-  } else {
-    console.warn('DeviceOrientationEvent is not supported on this device.');
-  }
-}
-
-// 모바일에서만 자이로 권한 요청 시도
-if (window.innerWidth <= 768) {
-  window.addEventListener('click', enableTiltControlOnce, { once: true });
-  window.addEventListener('touchstart', enableTiltControlOnce, { once: true });
 }
 
 // ==============================
@@ -387,7 +382,7 @@ class Ball {
       this.vx = Math.abs(this.vx);
     }
 
-    // 마퀴바 아래에서 튕기기
+    // 마퀴바 충돌 (위쪽 벽 역할)
     if (paddleHeight > 0) {
       const topLimit = paddleY;
 
@@ -395,11 +390,12 @@ class Ball {
         const withinPaddle =
           this.x >= paddleX && this.x <= paddleX + paddleWidth;
 
+        // 마퀴바보다 위로 올라갈 수 없게 y 고정
         this.y = topLimit + this.radius;
         this.vy = Math.abs(this.vy);
 
+        // 패들 위에 있을 때는 패들 속도 영향을 일부 받게
         if (withinPaddle) {
-          // 패들이 움직였던 속도만큼 x 방향 속도 추가
           this.vx += paddleVX * 0.8;
         }
       }
@@ -422,7 +418,7 @@ const ballColor = '#fcff54';
 const MAX_BALLS = 410;
 let lastSpawnTime = 0;
 
-// 공끼리 충돌 체크
+// 공끼리 부딪히는지 체크
 function checkCollision(ball1, ball2) {
   const dx = ball2.x - ball1.x;
   const dy = ball2.y - ball1.y;
@@ -433,23 +429,19 @@ function checkCollision(ball1, ball2) {
     const sin = Math.sin(angle);
     const cos = Math.cos(angle);
 
-    // 회전 좌표계로 속도 변환
     const vx1 = ball1.vx * cos + ball1.vy * sin;
     const vy1 = ball1.vy * cos - ball1.vx * sin;
     const vx2 = ball2.vx * cos + ball2.vy * sin;
     const vy2 = ball2.vy * cos - ball2.vx * sin;
 
-    // 1차원 탄성 충돌 (x방향 속도를 서로 교환)
     const vx1Final = vx2;
     const vx2Final = vx1;
 
-    // 다시 원래 좌표계로 변환
     ball1.vx = vx1Final * cos - vy1 * sin;
     ball1.vy = vy1 * cos + vx1Final * sin;
     ball2.vx = vx2Final * cos - vy2 * sin;
     ball2.vy = vy2 * cos + vx2Final * sin;
 
-    // 충돌 시 새로운 공 생성 (퍼지는 느낌)
     const now = performance.now();
     if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
       const newRadius = ball1.radius;
@@ -462,7 +454,7 @@ function checkCollision(ball1, ball2) {
   }
 }
 
-// 초기 공 생성 (마퀴바 아래쪽 범위에서만)
+// 초기 공 생성 (마퀴바 아래쪽 영역에만)
 for (let i = 0; i < numBalls; i++) {
   const radius = 16;
   const minY = paddleY + radius + 10;
@@ -472,7 +464,6 @@ for (let i = 0; i < numBalls; i++) {
   balls.push(new Ball(x, y, radius, ballColor));
 }
 
-// 애니메이션 루프
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -505,7 +496,6 @@ function createThumbnails() {
 
     thumbnail.appendChild(img);
 
-    // 썸네일 클릭 시 상세 페이지로
     thumbnail.addEventListener('click', () => {
       showProjectDetail(project.id);
     });
@@ -513,9 +503,9 @@ function createThumbnails() {
     thumbnailsContainer.appendChild(thumbnail);
   });
 }
+
 createThumbnails();
 
-// 상세 페이지 구성 함수
 function showProjectDetail(projectId) {
   const index = projects.findIndex((p) => p.id === projectId);
   if (index === -1) return;
@@ -527,7 +517,6 @@ function showProjectDetail(projectId) {
   detailSubtitleEl.textContent = project.subtitle || '';
   detailYearEl.textContent = project.year || '';
 
-  // 제본
   if (project.specs) {
     detailSpecsEl.textContent = project.specs;
     detailSpecsContainer.style.display = 'flex';
@@ -536,7 +525,6 @@ function showProjectDetail(projectId) {
     detailSpecsContainer.style.display = 'none';
   }
 
-  // 사양
   if (project.size) {
     detailSizeEl.textContent = project.size;
     detailSizeContainer.style.display = 'flex';
@@ -545,7 +533,6 @@ function showProjectDetail(projectId) {
     detailSizeContainer.style.display = 'none';
   }
 
-  // 의뢰인/기관
   let clientText = '';
   if (Array.isArray(project.client)) {
     clientText = project.client.join(', ');
@@ -561,16 +548,13 @@ function showProjectDetail(projectId) {
     detailClientContainer.style.display = 'none';
   }
 
-  // 설명 (HTML 그대로 사용)
   detailDescriptionEl.innerHTML = project.description || '';
 
-  // 이미지들
   const images = project.images || [];
   if (detailMainImageEl) detailMainImageEl.innerHTML = '';
   detailImagesEl.innerHTML = '';
 
   if (images.length > 0) {
-    // 첫 번째 이미지는 상단 메인 이미지
     if (detailMainImageEl) {
       const firstImg = document.createElement('img');
       firstImg.src = images[0];
@@ -583,7 +567,6 @@ function showProjectDetail(projectId) {
       detailImagesEl.appendChild(img);
     }
 
-    // 나머지 이미지들
     for (let i = 1; i < images.length; i++) {
       const img = document.createElement('img');
       img.src = images[i];
@@ -592,9 +575,58 @@ function showProjectDetail(projectId) {
     }
   }
 
-  // 상세 페이지로 전환
   showPage(detailPage);
   detailPage.scrollTop = 0;
 
   updateDetailNavButtons();
+}
+
+// ==============================
+// 🔹 모바일 스와이프 네비게이션 추가
+// ==============================
+
+if (detailPage) {
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  const SWIPE_THRESHOLD = 50;      // 최소 가로 이동 거리(px)
+  const VERTICAL_LIMIT = 40;       // 세로 이동이 이보다 크면 "스크롤"로 보고 무시
+
+  detailPage.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 0) return;
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: true });
+
+  detailPage.addEventListener('touchend', (e) => {
+    if (e.changedTouches.length === 0) return;
+    const touch = e.changedTouches[0];
+
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+
+    // 세로로 너무 많이 움직이면 → 스크롤 제스처로 보고 스와이프 무시
+    if (Math.abs(dy) > VERTICAL_LIMIT) return;
+
+    // 가로 이동이 너무 작으면 → 스와이프 아닌 것으로 무시
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+
+    // 화면 폭이 충분히 좁을 때만 (모바일) 동작하게 하고 싶으면 이 조건 유지
+    if (window.innerWidth > 1024) return;
+
+    if (dx > 0) {
+      // 👉 오른쪽으로 스와이프 → 이전 프로젝트
+      if (currentProjectIndex > 0) {
+        const prevProject = projects[currentProjectIndex - 1];
+        if (prevProject) showProjectDetail(prevProject.id);
+      }
+    } else {
+      // 👈 왼쪽으로 스와이프 → 다음 프로젝트
+      if (currentProjectIndex < projects.length - 1) {
+        const nextProject = projects[currentProjectIndex + 1];
+        if (nextProject) showProjectDetail(nextProject.id);
+      }
+    }
+  }, { passive: true });
 }
