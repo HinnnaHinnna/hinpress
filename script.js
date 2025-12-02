@@ -1,3 +1,127 @@
+ // ==============================
+    // 공통 페이지 요소 선택
+    // ==============================
+    const mainPage = document.getElementById('main-page');
+    const portfolioPage = document.getElementById('portfolio-page');
+    const detailPage = document.getElementById('detail-page');
+    const cvPage = document.getElementById('cv-page');
+
+    const mainTitle = document.getElementById('main-title');
+
+    const topBar = document.getElementById('top-bar');
+    const topLogo = document.getElementById('top-logo');
+    const aboutBtn = document.getElementById('about-btn');
+    const cvBtn = document.getElementById('cv-btn');
+    const contactBtn = document.getElementById('contact-btn');
+
+    const thumbnailsContainer = document.getElementById('thumbnails-container');
+
+    const detailPrev = document.getElementById('detail-prev');
+    const detailNext = document.getElementById('detail-next');
+
+    const detailTitleEl = document.getElementById('detail-title');
+    const detailSubtitleEl = document.getElementById('detail-subtitle');
+    const detailYearEl = document.getElementById('detail-year');
+    const detailSpecsEl = document.getElementById('detail-specs');
+    const detailSizeEl = document.getElementById('detail-size');
+    const detailClientEl = document.getElementById('detail-client');
+    const detailDescriptionEl = document.getElementById('detail-description');
+
+    const detailMainImageEl = document.getElementById('detail-main-image');
+    const detailImagesEl = document.getElementById('detail-images');
+
+    const detailSpecsContainer = document.getElementById('detail-specs-container');
+    const detailSizeContainer = document.getElementById('detail-size-container');
+    const detailClientContainer = document.getElementById('detail-client-container');
+
+    let currentProjectIndex = -1;
+
+    // ==============================
+    // 페이지 전환
+    // ==============================
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      page.classList.add('active');
+
+      if (page === mainPage) {
+        topBar.classList.add('hidden');
+      } else {
+        topBar.classList.remove('hidden');
+      }
+    }
+
+    showPage(mainPage);
+
+    if (mainTitle) {
+      mainTitle.addEventListener('click', () => {
+        showPage(portfolioPage);
+      });
+    }
+
+    if (topLogo) {
+      topLogo.addEventListener('click', () => {
+        showPage(portfolioPage);
+      });
+    }
+
+    if (aboutBtn) {
+      aboutBtn.addEventListener('click', () => {
+        showPage(mainPage);
+      });
+    }
+
+    if (cvBtn) {
+      cvBtn.addEventListener('click', () => {
+        if (cvPage) showPage(cvPage);
+      });
+    }
+
+    if (contactBtn) {
+      contactBtn.addEventListener('click', () => {
+        window.open('https://www.instagram.com/chales9/', '_blank', 'noopener');
+      });
+    }
+
+    // ==============================
+    // 상세페이지 ← / → 버튼 상태
+    // ==============================
+    function updateDetailNavButtons() {
+      if (!detailPrev || !detailNext) return;
+
+      if (currentProjectIndex <= 0) {
+        detailPrev.classList.add('disabled');
+      } else {
+        detailPrev.classList.remove('disabled');
+      }
+
+      if (currentProjectIndex >= projects.length - 1) {
+        detailNext.classList.add('disabled');
+      } else {
+        detailNext.classList.remove('disabled');
+      }
+    }
+
+    if (detailPrev) {
+      detailPrev.addEventListener('click', () => {
+        if (currentProjectIndex <= 0) return;
+        const prevIndex = currentProjectIndex - 1;
+        const prevProject = projects[prevIndex];
+        if (prevProject) showProjectDetail(prevProject.id);
+      });
+    }
+
+    if (detailNext) {
+      detailNext.addEventListener('click', () => {
+        if (currentProjectIndex >= projects.length - 1) return;
+        const nextIndex = currentProjectIndex + 1;
+        const nextProject = projects[nextIndex];
+        if (nextProject) showProjectDetail(nextProject.id);
+      });
+    }
+
+    // ==============================
+    // 캔버스 & 마퀴 패들
+    // ==============================
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const marqueeBar = document.querySelector('.marquee-bar');
