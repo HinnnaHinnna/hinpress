@@ -13,6 +13,7 @@
   --color-muted: #0008ff;
   --color-arrow: rgb(46, 100, 225);
   /* 🔹 상단 바/마퀴 공통 시스템 */
+  --color-maque: rgb(46, 100, 225);
   --bar-height: 3rem;
   --bar-font-size: 0.8rem;
 }
@@ -227,7 +228,7 @@ body {
   z-index: 100;
   display: flex;
   align-items: center;
-  background-color: var(color-arrow);
+  background-color: var(--color-maque);
 }
 
 /* 🔹 마퀴 바 흔들림 효과: JS에서 .shake 클래스를 잠깐 붙였다 떼는 방식 
