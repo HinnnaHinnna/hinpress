@@ -6,9 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>hinStudio Portfolio</title>
 
-  <!-- 외부 CSS -->
-  <link rel="stylesheet" href="style.css">
-
   <!-- 구글 폰트 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,9 +16,7 @@
 
 <body>
 
-  <!-- ============================
-       상단 바
-       ============================ -->
+  <!-- 상단 바 -->
   <header id="top-bar" class="top-bar hidden">
     <div class="top-bar-inner">
       <nav class="top-nav">
@@ -33,23 +28,20 @@
     </div>
   </header>
 
-  <!-- ============================
-       메인 페이지
-       ============================ -->
+  <!-- 메인 페이지 -->
   <div id="main-page" class="page active">
     <div class="title-container">
-      <!-- 상단 흐르는 마퀴바 (패들로도 사용) -->
       <div class="marquee-bar">
         <div class="marquee-inner">
           <span class="marquee-text">
-            원래 힌(hin)은 고대에 쓰이던 액체 용량 단위입니다. 1 hin = 물 한동이, 약 3.8L 안팎으로 문헌마다 조금씩
-            다르게 정의됩니다. 힌프레스는 이 모호한 단위를 좋아합니다. 책과 텍스트, 이미지는 언제나
+            원래 힌(hin)은 고대에 쓰이던 액체 용량 단위입니다. 1 hin = 물 한동이, 약 3.8L 안팎으로
+            문헌마다 조금씩 다르게 정의됩니다. 힌프레스는 이 모호한 단위를 좋아합니다. 책과 텍스트, 이미지는 언제나
             일정한 부피로 담기지 않고, 독자의 시간과 맥락에 따라 그 크기가 달라지기 때문입니다.
             힌프레스에서 한 권의 책은 1 hin입니다.
           </span>
           <span class="marquee-text">
-            원래 힌(hin)은 고대에 쓰이던 액체 용량 단위입니다. 1 hin = 물 한동이, 약 3.8L 안팎으로 문헌마다 조금씩
-            다르게 정의됩니다. 힌프레스는 이 모호한 단위를 좋아합니다. 책과 텍스트, 이미지는 언제나
+            원래 힌(hin)은 고대에 쓰이던 액체 용량 단위입니다. 1 hin = 물 한동이, 약 3.8L 안팎으로
+            문헌마다 조금씩 다르게 정의됩니다. 힌프레스는 이 모호한 단위를 좋아합니다. 책과 텍스트, 이미지는 언제나
             일정한 부피로 담기지 않고, 독자의 시간과 맥락에 따라 그 크기가 달라지기 때문입니다.
             힌프레스에서 한 권의 책은 1 hin입니다.
           </span>
@@ -61,20 +53,15 @@
       </h1>
     </div>
 
-    <!-- 스마일 볼 애니메이션 캔버스 -->
     <canvas id="canvas"></canvas>
   </div>
 
-  <!-- ============================
-       포트폴리오 페이지
-       ============================ -->
+  <!-- 포트폴리오 페이지 -->
   <div id="portfolio-page" class="page">
     <div id="thumbnails-container"></div>
   </div>
 
-  <!-- ============================
-       CV 페이지
-       ============================ -->
+  <!-- CV 페이지 -->
   <div id="cv-page" class="page">
     <div class="cv-inner">
       <div class="cv-section">
@@ -116,22 +103,16 @@
     </div>
   </div>
 
-  <!-- ============================
-       상세 페이지
-       ============================ -->
+  <!-- 상세 페이지 -->
   <div id="detail-page" class="page">
-    <!-- 상단 바 바로 아래의 ← / → -->
     <div class="detail-nav">
       <span id="detail-prev">☜</span>
       <span id="detail-next">☞</span>
     </div>
 
-    <!-- 상세 내용 -->
     <div class="detail-content">
-      <!-- 1) 첫 번째 이미지 -->
       <div class="detail-main-image" id="detail-main-image"></div>
 
-      <!-- 2) 제목 / 설명 / 메타 정보 -->
       <div class="detail-info">
         <h2 id="detail-title"></h2>
         <p id="detail-subtitle"></p>
@@ -155,17 +136,16 @@
         </div>
 
         <p id="detail-description"></p>
-
-        <!-- 🔗 프로젝트 관련 링크가 들어갈 영역 (JS에서 채움) -->
         <div id="detail-links" class="detail-links"></div>
       </div>
 
-      <!-- 3) 나머지 이미지들 -->
       <div class="detail-images" id="detail-images"></div>
     </div>
   </div>
- <script src="projects-data.js"></script>
-  <script src="script.js"></script>
+
+  <!-- 프로젝트 데이터 -->
+  <script src="projects-data.js"></script>
+
 </body>
 
 </html>
