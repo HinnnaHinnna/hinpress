@@ -9,11 +9,11 @@
   --color-desc-bg: #fcfe7d;
   /* + 옵션: 중립 색 (검정/회색) - 꼭 변수를 안 써도 되지만, 통일하고 싶으면 이렇게 */
   --color-text-main: #000000;
-  --color-main-gray: rgb(246, 238, 227);
   --color-muted: #0008ff;
-  --color-arrow: rgb(46, 100, 225);
+  --color-main-gray: rgb(246, 238, 227); /* 메인 배경 */
+  --color-arrow: rgb(46, 100, 225);      /* 예: 버튼/화살표용 */
+  --color-maque: rgb(46, 100, 225);      /* 마퀴바 */
   /* 🔹 상단 바/마퀴 공통 시스템 */
-  --color-maque: rgb(46, 100, 225);
   --bar-height: 3rem;
   --bar-font-size: 0.8rem;
 }
@@ -150,7 +150,7 @@ body {
 
 /* =============================== 메인 페이지 =============================== */
 #main-page {
-  background: var(--color-arrow);
+background: var(--color-main-gray); 
 }
 
 .title-container {
