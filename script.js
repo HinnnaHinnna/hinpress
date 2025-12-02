@@ -4,7 +4,7 @@
     const mainPage = document.getElementById('main-page');
     const portfolioPage = document.getElementById('portfolio-page');
     const detailPage = document.getElementById('detail-page');
-    const cvPage = document.getElementById('cv-page'); // CV 페이지
+    const cvPage = document.getElementById('cv-page');
 
     const mainTitle = document.getElementById('main-title');
 
@@ -19,7 +19,6 @@
     const detailPrev = document.getElementById('detail-prev');
     const detailNext = document.getElementById('detail-next');
 
-    // 상세 정보 요소
     const detailTitleEl = document.getElementById('detail-title');
     const detailSubtitleEl = document.getElementById('detail-subtitle');
     const detailYearEl = document.getElementById('detail-year');
@@ -38,12 +37,10 @@
     let currentProjectIndex = -1;
 
     // ==============================
-    // 페이지 전환 함수
+    // 페이지 전환
     // ==============================
     function showPage(page) {
-      const pages = document.querySelectorAll('.page');
-      pages.forEach((p) => p.classList.remove('active'));
-
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       page.classList.add('active');
 
       if (page === mainPage) {
@@ -53,10 +50,8 @@
       }
     }
 
-    // 초기 메인 페이지
     showPage(mainPage);
 
-    // 네비게이션
     if (mainTitle) {
       mainTitle.addEventListener('click', () => {
         showPage(portfolioPage);
@@ -88,7 +83,7 @@
     }
 
     // ==============================
-    // 상세 페이지 네비게이션
+    // 상세페이지 ← / → 버튼 상태
     // ==============================
     function updateDetailNavButtons() {
       if (!detailPrev || !detailNext) return;
@@ -147,16 +142,15 @@
       if (!marqueeBar) return;
 
       paddleHeight = marqueeBar.offsetHeight || 0;
-      const viewportWidth = window.innerWidth;
+      const vw = window.innerWidth;
 
-      if (viewportWidth <= 768) {
-        // 모바일에서 패들 길이 커짐
-        paddleWidth = Math.min(viewportWidth * 0.4, viewportWidth);
+      if (vw <= 768) {
+        paddleWidth = Math.min(vw * 0.4, vw);
       } else {
-        paddleWidth = Math.min(viewportWidth * 0.2, viewportWidth);
+        paddleWidth = Math.min(vw * 0.2, vw);
       }
 
-      paddleX = (viewportWidth - paddleWidth) / 2;
+      paddleX = (vw - paddleWidth) / 2;
 
       const rect = marqueeBar.getBoundingClientRect();
       paddleY = rect.bottom;
@@ -178,87 +172,29 @@
     });
 
     // ==============================
-    // 패들 드래그: 마우스 + 터치
+    // 패들 드래그 (마우스 + 터치)
     // ==============================
     let isDraggingPaddle = false;
     let lastPointerX = 0;
     let lastPointerTime = 0;
 
-    // 자이로(기울기) permission 설정 플래그
-    let orientationHandlerAttached = false;
-
-    function handleOrientation(event) {
-      // 모바일에서만 동작
-      if (window.innerWidth > 768) return;
-
-      const gamma = event.gamma; // -90 ~ 90
-      if (gamma === null) return;
-
-      // 이전 기울기값과의 차이만 사용해서 상대 이동
-      if (typeof handleOrientation.lastGamma === 'undefined' || handleOrientation.lastGamma === null) {
-        handleOrientation.lastGamma = gamma;
-        return;
-      }
-
-      const deltaGamma = gamma - handleOrientation.lastGamma;
-      handleOrientation.lastGamma = gamma;
-
-      const sensitivity = 2.0; // 좌우 이동 민감도 (필요하면 조절)
-
-      paddleX += deltaGamma * sensitivity;
-
-      const maxX = canvas.width - paddleWidth;
-      if (paddleX < 0) paddleX = 0;
-      if (paddleX > maxX) paddleX = maxX;
-
-      updatePaddleDom();
-    }
-
-    function setupTiltControl() {
-      if (orientationHandlerAttached) return;
-      orientationHandlerAttached = true;
-
-      // iOS 13+ : 권한 요청 필요
-      if (typeof DeviceOrientationEvent !== 'undefined' &&
-        typeof DeviceOrientationEvent.requestPermission === 'function') {
-
-        DeviceOrientationEvent.requestPermission()
-          .then((response) => {
-            if (response === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation);
-            }
-          })
-          .catch((err) => {
-            console.warn('DeviceOrientation permission denied:', err);
-          });
-      } else if (window.DeviceOrientationEvent) {
-        // 안드로이드/일부 브라우저: 바로 사용 가능
-        window.addEventListener('deviceorientation', handleOrientation);
-      }
-    }
-
     if (marqueeBar) {
-      // 마우스 드래그 시작
       marqueeBar.addEventListener('mousedown', (e) => {
         isDraggingPaddle = true;
         lastPointerX = e.clientX;
         lastPointerTime = performance.now();
-        setupTiltControl(); // 첫 인터랙션 때 자이로 권한 요청 시도
         e.preventDefault();
       });
 
-      // 마우스 이동
       window.addEventListener('mousemove', (e) => {
         if (!isDraggingPaddle) return;
 
         const now = performance.now();
         const dx = e.clientX - lastPointerX;
         const dt = now - lastPointerTime || 16;
-
         paddleVX = (dx / dt) * 16;
 
         paddleX += dx;
-
         const maxX = canvas.width - paddleWidth;
         if (paddleX < 0) paddleX = 0;
         if (paddleX > maxX) paddleX = maxX;
@@ -269,35 +205,27 @@
         lastPointerTime = now;
       });
 
-      // 마우스 드래그 끝
       window.addEventListener('mouseup', () => {
         isDraggingPaddle = false;
         paddleVX = 0;
       });
 
-      // 터치 시작
       marqueeBar.addEventListener('touchstart', (e) => {
         if (e.touches.length === 0) return;
-
         const touch = e.touches[0];
         isDraggingPaddle = true;
         lastPointerX = touch.clientX;
         lastPointerTime = performance.now();
-
-        setupTiltControl(); // 모바일에서 첫 터치 시 자이로 권한 요청
-
         e.preventDefault();
       }, { passive: false });
 
-      // 터치 이동
       window.addEventListener('touchmove', (e) => {
         if (!isDraggingPaddle || e.touches.length === 0) return;
-
         const touch = e.touches[0];
+
         const now = performance.now();
         const dx = touch.clientX - lastPointerX;
         const dt = now - lastPointerTime || 16;
-
         paddleVX = (dx / dt) * 16;
 
         paddleX += dx;
@@ -320,6 +248,58 @@
 
       window.addEventListener('touchend', endTouch);
       window.addEventListener('touchcancel', endTouch);
+    }
+
+    // ==============================
+    // 모바일 기울기(자이로) 제어
+    // ==============================
+    let tiltEnabled = false;
+
+    function handleOrientation(event) {
+      if (window.innerWidth > 768) return;
+
+      let gamma = event.gamma; // -90 ~ 90
+      if (gamma === null || typeof gamma === 'undefined') return;
+
+      const maxTilt = 30;
+      gamma = Math.max(-maxTilt, Math.min(maxTilt, gamma)); // -30 ~ 30
+
+      const ratio = (gamma + maxTilt) / (2 * maxTilt); // 0 ~ 1
+      const maxX = canvas.width - paddleWidth;
+
+      paddleX = maxX * ratio;
+      updatePaddleDom();
+    }
+
+    function enableTiltControlOnce() {
+      if (tiltEnabled) return;
+      tiltEnabled = true;
+
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+
+        DeviceOrientationEvent.requestPermission()
+          .then((state) => {
+            if (state === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation);
+            } else {
+              console.warn('DeviceOrientation permission not granted:', state);
+            }
+          })
+          .catch((err) => {
+            console.warn('DeviceOrientation permission error:', err);
+          });
+
+      } else if ('DeviceOrientationEvent' in window) {
+        window.addEventListener('deviceorientation', handleOrientation);
+      } else {
+        console.warn('DeviceOrientationEvent is not supported on this device.');
+      }
+    }
+
+    if (window.innerWidth <= 768) {
+      window.addEventListener('click', enableTiltControlOnce, { once: true });
+      window.addEventListener('touchstart', enableTiltControlOnce, { once: true });
     }
 
     // ==============================
@@ -351,7 +331,6 @@
         ctx.strokeStyle = this.color;
         ctx.stroke();
 
-        // 스마일 입
         ctx.strokeStyle = '#fcff54';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -365,7 +344,6 @@
         this.x += this.vx;
         this.y += this.vy;
 
-        // 좌우 벽
         if (this.x + this.radius > canvas.width) {
           this.x = canvas.width - this.radius;
           this.vx = -Math.abs(this.vx);
@@ -374,13 +352,11 @@
           this.vx = Math.abs(this.vx);
         }
 
-        // 마퀴바 충돌 (위쪽 벽 역할)
         if (paddleHeight > 0) {
           const topLimit = paddleY;
 
           if (this.y - this.radius < topLimit) {
-            const withinPaddle =
-              this.x >= paddleX && this.x <= paddleX + paddleWidth;
+            const withinPaddle = this.x >= paddleX && this.x <= paddleX + paddleWidth;
 
             this.y = topLimit + this.radius;
             this.vy = Math.abs(this.vy);
@@ -391,7 +367,6 @@
           }
         }
 
-        // 바닥
         if (this.y + this.radius > canvas.height) {
           this.y = canvas.height - this.radius;
           this.vy = -Math.abs(this.vy);
@@ -443,7 +418,6 @@
       }
     }
 
-    // 초기 공 생성 (마퀴바 아래쪽 영역에만)
     for (let i = 0; i < numBalls; i++) {
       const radius = 16;
       const minY = paddleY + radius + 10;
@@ -456,7 +430,7 @@
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      balls.forEach((ball) => ball.update());
+      balls.forEach(ball => ball.update());
 
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
@@ -469,7 +443,7 @@
     animate();
 
     // ==============================
-    // 썸네일 생성 & 프로젝트 상세
+    // 썸네일 / 상세페이지
     // ==============================
     function createThumbnails() {
       if (!thumbnailsContainer) return;
@@ -566,6 +540,5 @@
 
       showPage(detailPage);
       detailPage.scrollTop = 0;
-
       updateDetailNavButtons();
     }
