@@ -1,67 +1,6 @@
 // ==============================
 // 공통 페이지 요소 선택
 // ==============================
-
-// ==============================
-// 🔹 디버그 패널 (맨 위에 배치!)
-// ==============================
-let debugPanel = null;
-let debugContent = null;
-let debugMessages = [];
-
-function addDebugMessage(msg) {
-  console.log(msg);
-  debugMessages.push(msg);
-  if (debugMessages.length > 15) debugMessages.shift();
-  
-  // debugContent가 아직 없으면 다시 찾기
-  if (!debugContent) {
-    debugContent = document.getElementById('debug-content');
-  }
-  
-  if (debugContent) {
-    debugContent.innerHTML = debugMessages.join('<br>');
-  }
-}
-
-// 디버그 패널 초기화 함수
-function initDebugPanel() {
-  debugPanel = document.getElementById('debug-panel');
-  debugContent = document.getElementById('debug-content');
-  
-  // 모바일에서만 디버그 패널 표시
-  if (window.innerWidth <= 768 && debugPanel) {
-    debugPanel.style.display = 'block';
-    addDebugMessage('🔧 디버그 패널 활성화');
-    addDebugMessage('📱 화면 너비: ' + window.innerWidth);
-    
-    // iOS Safari 확인
-    const isIOSSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS/.test(navigator.userAgent);
-    const isIOSChrome = /iPhone|iPad|iPod/.test(navigator.userAgent) && /CriOS/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
-    
-    if (isIOSChrome) {
-      addDebugMessage('⚠️ iOS 크롬 감지!');
-      addDebugMessage('Safari를 사용하세요!');
-    } else if (isIOSSafari) {
-      addDebugMessage('✅ iOS Safari 감지');
-      addDebugMessage('화면을 터치하세요!');
-    } else if (isAndroid) {
-      addDebugMessage('✅ Android 감지');
-    } else {
-      addDebugMessage('📱 기기: ' + navigator.userAgent.substring(0, 30));
-    }
-  } else if (window.innerWidth <= 768 && !debugPanel) {
-    console.warn('⚠️ 모바일이지만 debugPanel을 찾을 수 없습니다');
-  } else {
-    // 데스크탑에서는 조용히 처리
-    console.log('💻 데스크탑 모드 - 디버그 패널 비활성화');
-  }
-}
-
-// ==============================
-// 페이지 요소 선택
-// ==============================
 const mainPage = document.getElementById('main-page');
 const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
@@ -249,183 +188,6 @@ let isDraggingPaddle = false;
 let lastPointerX = 0;
 let lastPointerTime = 0;
 
-// 자이로(기울기) permission 설정 플래그
-let orientationHandlerAttached = false;
-
-// 기울기 이벤트 핸들러
-function handleOrientation(event) {
-  // 모바일 화면에서만 동작
-  if (window.innerWidth > 768) return;
-
-  const gamma = event.gamma; // 좌우 기울기 (-90 ~ 90)
-  if (gamma === null) return;
-
-  if (typeof handleOrientation.lastGamma === 'undefined' || handleOrientation.lastGamma === null) {
-    handleOrientation.lastGamma = gamma;
-    const msg = '📱 기울기 감지 시작, gamma: ' + gamma.toFixed(1);
-    console.log(msg);
-    addDebugMessage(msg);
-    return;
-  }
-
-  // 이전 프레임 대비 기울기 차이만 사용
-  const deltaGamma = gamma - handleOrientation.lastGamma;
-  handleOrientation.lastGamma = gamma;
-
-  const sensitivity = 2.0; // 좌우 이동 민감도
-
-  paddleX += deltaGamma * sensitivity;
-
-  const maxX = canvas.width - paddleWidth;
-  if (paddleX < 0) paddleX = 0;
-  if (paddleX > maxX) paddleX = maxX;
-
-  const msg = '🔄 기울기: ' + gamma.toFixed(1) + ' | paddleX: ' + paddleX.toFixed(1);
-  console.log(msg);
-  addDebugMessage(msg);
-
-  updatePaddleDom();
-}
-
-// 자이로(기울기) 사용 허용 요청
-function setupTiltControl() {
-  if (orientationHandlerAttached) {
-    const msg = '⚠️ 이미 기울기 센서 활성화됨';
-    console.log(msg);
-    addDebugMessage(msg);
-    return;
-  }
-  orientationHandlerAttached = true;
-
-  addDebugMessage('🔹 기울기 권한 요청 시도');
-  addDebugMessage('📊 화면: ' + window.innerWidth + 'px');
-
-  // iOS 13+ : 권한 요청 필요
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-    typeof DeviceOrientationEvent.requestPermission === 'function') {
-
-    addDebugMessage('🍎 iOS - 권한 요청 중...');
-    DeviceOrientationEvent.requestPermission()
-      .then((response) => {
-        addDebugMessage('📱 iOS 응답: ' + response);
-        if (response === 'granted') {
-          window.addEventListener('deviceorientation', handleOrientation);
-          addDebugMessage('✅ iOS 기울기 허용됨!');
-        } else {
-          addDebugMessage('❌ iOS 기울기 거부됨');
-        }
-      })
-      .catch((err) => {
-        addDebugMessage('❌ 오류: ' + err.message);
-        console.error('❌ DeviceOrientation permission error:', err);
-      });
-  } else if (window.DeviceOrientationEvent) {
-    // 안드로이드/일부 브라우저: 바로 사용 가능
-    window.addEventListener('deviceorientation', handleOrientation);
-    addDebugMessage('✅ Android 센서 활성화됨!');
-    addDebugMessage('핸드폰을 기울여보세요');
-  } else {
-    addDebugMessage('❌ 센서 미지원 기기');
-  }
-}
-
-// 🔹 페이지 로드 시 바로 기울기 센서 활성화 시도 (안드로이드에서 작동)
-console.log('🔧 script.js 로드 완료');
-
-// 🔹 기울기 권한 요청 플래그 (한 번만 실행되도록)
-let tiltPermissionRequested = false;
-
-// DOMContentLoaded와 load 둘 다 시도
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎯 DOMContentLoaded 이벤트 발생');
-  
-  // 디버그 패널 먼��� 초기화
-  initDebugPanel();
-  
-  // iOS 감지
-  const isIOS = typeof DeviceOrientationEvent !== 'undefined' &&
-                typeof DeviceOrientationEvent.requestPermission === 'function';
-  
-  if (isIOS) {
-    addDebugMessage('⏸️ iOS - 터치 대기 중');
-    
-    // iOS: 메인 페이지 전체에서 터치 시 권한 요청
-    if (mainPage) {
-      console.log('✅ mainPage 찾음 - iOS 터치 이벤트 리스너 등록');
-      
-      // 🔥 중요: touchstart 핸들러 안에서 직접 권한 요청!
-      mainPage.addEventListener('touchstart', function(e) {
-        if (tiltPermissionRequested) return;
-        tiltPermissionRequested = true;
-        
-        console.log('👆 touchstart - 권한 요청 시작');
-        addDebugMessage('👆 화면 터치 감지!');
-        addDebugMessage('🔹 iOS 권한 요청 중...');
-        
-        // 🔥 여기서 바로 권한 요청 (함수 호출 X)
-        DeviceOrientationEvent.requestPermission()
-          .then((response) => {
-            addDebugMessage('📱 iOS 응답: ' + response);
-            if (response === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation);
-              orientationHandlerAttached = true;
-              addDebugMessage('✅ iOS 기울기 허용됨!');
-              addDebugMessage('핸드폰을 기울여보세요!');
-            } else {
-              addDebugMessage('❌ iOS 기울기 거부됨');
-            }
-          })
-          .catch((err) => {
-            addDebugMessage('❌ 오류: ' + err.message);
-            console.error('❌ DeviceOrientation error:', err);
-          });
-      }, { once: true, passive: true });
-      
-      // click 이벤트도 동일하게
-      mainPage.addEventListener('click', function(e) {
-        if (tiltPermissionRequested) return;
-        tiltPermissionRequested = true;
-        
-        console.log('🖱️ click - 권한 요청 시작');
-        addDebugMessage('🖱️ 화면 클릭 감지!');
-        addDebugMessage('🔹 iOS 권한 요청 중...');
-        
-        DeviceOrientationEvent.requestPermission()
-          .then((response) => {
-            addDebugMessage('📱 iOS 응답: ' + response);
-            if (response === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation);
-              orientationHandlerAttached = true;
-              addDebugMessage('✅ iOS 기울기 허용됨!');
-              addDebugMessage('핸드폰을 기울여보세요!');
-            } else {
-              addDebugMessage('❌ iOS 기울기 거부됨');
-            }
-          })
-          .catch((err) => {
-            addDebugMessage('❌ 오류: ' + err.message);
-            console.error('❌ DeviceOrientation error:', err);
-          });
-      }, { once: true });
-    } else {
-      console.log('❌ mainPage를 찾을 수 없습니다');
-      addDebugMessage('❌ mainPage를 찾을 수 없음');
-    }
-  } else {
-    // Android/기타: 바로 활성화
-    addDebugMessage('🚀 자동 센서 활성화 시도');
-    setupTiltControl();
-  }
-});
-
-window.addEventListener('load', () => {
-  console.log('🎯 window load 이벤트 발생');
-  
-  // 디버그 패널이 아직 없으면 다시 초기화
-  if (!debugPanel) {
-    initDebugPanel();
-  }
-});
 
 if (marqueeBar) {
   // 마우스 드래그 시작
@@ -433,7 +195,6 @@ if (marqueeBar) {
     isDraggingPaddle = true;
     lastPointerX = e.clientX;
     lastPointerTime = performance.now();
-    setupTiltControl(); // 첫 인터랙션 때 자이로 권한 요청
     e.preventDefault();
   });
 
@@ -474,8 +235,6 @@ if (marqueeBar) {
     isDraggingPaddle = true;
     lastPointerX = touch.clientX;
     lastPointerTime = performance.now();
-
-    setupTiltControl(); // 모바일에서 첫 터치 시 자이로 권한 요청
 
     e.preventDefault();
   }, { passive: false });
@@ -795,6 +554,9 @@ if (detailPage) {
 
   // 가로 이동이 너무 작으면 → 스와이프 아닌 것으로 무시
   if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+
+  // 🔹 이 줄은 삭제 (크롬 iOS가 데스크톱 폭으로 잡히는 경우를 막기 위해)
+  // if (window.innerWidth > 1024) return;
 
   if (dx > 0) {
     // 👉 오른쪽으로 스와이프 → 이전 프로젝트
