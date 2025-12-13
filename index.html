@@ -18,11 +18,6 @@
 </head>
 
 <body>
-  <!-- 🔹 디버그 패널 (모든 페이지 위에 표시) -->
-  <div id="debug-panel" style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: #fcff54; padding: 10px; font-size: 11px; border-radius: 5px; max-width: 300px; z-index: 99999; display: none; font-family: monospace; line-height: 1.4;">
-    <div id="debug-content"></div>
-  </div>
-
   <!-- ============================
        상단 바
        ============================ -->
@@ -41,8 +36,8 @@
        메인 페이지
        ============================ -->
   <div id="main-page" class="page active">
-    <h1 id="main-title">hinPress</h1>
-    
+
+    <!-- 🔹 마퀴바: title-container 바깥으로 분리 -->
     <div class="marquee-bar">
       <div class="marquee-inner">
         <span class="marquee-text">
@@ -54,10 +49,17 @@
         <span class="marquee-text">
           원래 힌(hin)은 고대에 쓰이던 액체 용량 단위입니다. 1 hin = 물 한동이, 약 3.8L 안팎으로
           문헌마다 조금씩 다르게 정의됩니다. 힌프레스는 이 모호한 단위를 좋아합니다. 책과 텍스트, 이미지는 언제나
-          일정한 부피로 담기지 않고, 독자의 시간과 맥락에 따라 그 크기가 달라지기 때문입니.
+          일정한 부피로 담기지 않고, 독자의 시간과 맥락에 따라 그 크기가 달라지기 때문입니다.
           힌프레스에서 한 권의 책은 1 hin입니다.
         </span>
       </div>
+    </div>
+
+    <!-- 🔹 타이틀 컨테이너: 이제 한 번만 사용 -->
+    <div class="title-container">
+      <h1 id="main-title">
+        hin<span class="press-text">P</span>ress
+      </h1>
     </div>
 
     <!-- 스마일 볼 애니메이션 캔버스 -->
@@ -97,8 +99,8 @@
           <li>충무로영화제감독주간, box8, 박찬욱 감독 30주년 『마침내, 박찬욱』 단행본</li>
           <li>백남준아트센터, 『소장품 하이라이트』 상설전시도록</li>
           <li>한국영상자료원, 아카이브 프리즘-한국영화 100선</li>
-          <li>국립한글박물관, 『훈민정음 천년의 문계획』 상설전시도록, 『한글을 듣다』 단행본</li>
-          <li>국립민속박물관, 『여주, 영릉을 풀다』 전시도록, 『강화의 포구』, 『연평도』 지역조사보고서</li>
+          <li>국립한글박물관, 『훈민정음 천년의 문자계획』 상설전시도록, 『한글을 듣다』 단행본</li>
+          <li>국립민속박물관, 『여주, 영릉을 품다』 전시도록, 『강화의 포구』, 『연평도』 지역조사보고서</li>
           <li>서울역사박물관, 『북촌』, 『연지 효제』 지역조사보고서</li>
           <li>공예박물관, 전시 홍보물</li>
           <li>한양도성박물관, 『도성의 수문』 포스터, 전시도록</li>
