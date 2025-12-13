@@ -1,6 +1,67 @@
 // ==============================
 // 공통 페이지 요소 선택
 // ==============================
+
+// ==============================
+// 🔹 디버그 패널 (맨 위에 배치!)
+// ==============================
+let debugPanel = null;
+let debugContent = null;
+let debugMessages = [];
+
+function addDebugMessage(msg) {
+  console.log(msg);
+  debugMessages.push(msg);
+  if (debugMessages.length > 15) debugMessages.shift();
+  
+  // debugContent가 아직 없으면 다시 찾기
+  if (!debugContent) {
+    debugContent = document.getElementById('debug-content');
+  }
+  
+  if (debugContent) {
+    debugContent.innerHTML = debugMessages.join('<br>');
+  }
+}
+
+// 디버그 패널 초기화 함수
+function initDebugPanel() {
+  debugPanel = document.getElementById('debug-panel');
+  debugContent = document.getElementById('debug-content');
+  
+  // 모바일에서만 디버그 패널 표시
+  if (window.innerWidth <= 768 && debugPanel) {
+    debugPanel.style.display = 'block';
+    addDebugMessage('🔧 디버그 패널 활성화');
+    addDebugMessage('📱 화면 너비: ' + window.innerWidth);
+    
+    // iOS Safari 확인
+    const isIOSSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS/.test(navigator.userAgent);
+    const isIOSChrome = /iPhone|iPad|iPod/.test(navigator.userAgent) && /CriOS/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    if (isIOSChrome) {
+      addDebugMessage('⚠️ iOS 크롬 감지!');
+      addDebugMessage('Safari를 사용하세요!');
+    } else if (isIOSSafari) {
+      addDebugMessage('✅ iOS Safari 감지');
+      addDebugMessage('화면을 터치하세요!');
+    } else if (isAndroid) {
+      addDebugMessage('✅ Android 감지');
+    } else {
+      addDebugMessage('📱 기기: ' + navigator.userAgent.substring(0, 30));
+    }
+  } else if (window.innerWidth <= 768 && !debugPanel) {
+    console.warn('⚠️ 모바일이지만 debugPanel을 찾을 수 없습니다');
+  } else {
+    // 데스크탑에서는 조용히 처리
+    console.log('💻 데스크탑 모드 - 디버그 패널 비활성화');
+  }
+}
+
+// ==============================
+// 페이지 요소 선택
+// ==============================
 const mainPage = document.getElementById('main-page');
 const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
@@ -236,7 +297,7 @@ function setupTiltControl() {
   }
   orientationHandlerAttached = true;
 
-  addDebugMessage('🔹 기울기 권한 요청 시���');
+  addDebugMessage('🔹 기울기 권한 요청 시도');
   addDebugMessage('📊 화면: ' + window.innerWidth + 'px');
 
   // iOS 13+ : 권한 요청 필요
@@ -271,60 +332,6 @@ function setupTiltControl() {
 // 🔹 페이지 로드 시 바로 기울기 센서 활성화 시도 (안드로이드에서 작동)
 console.log('🔧 script.js 로드 완료');
 
-// 🔹 화면 디버깅 패널 변수
-let debugPanel = null;
-let debugContent = null;
-let debugMessages = [];
-
-function addDebugMessage(msg) {
-  console.log(msg);
-  debugMessages.push(msg);
-  if (debugMessages.length > 15) debugMessages.shift();
-  
-  // debugContent가 아직 없으면 다시 찾기
-  if (!debugContent) {
-    debugContent = document.getElementById('debug-content');
-  }
-  
-  if (debugContent) {
-    debugContent.innerHTML = debugMessages.join('<br>');
-  }
-}
-
-// 디버그 패널 초기화 함수
-function initDebugPanel() {
-  debugPanel = document.getElementById('debug-panel');
-  debugContent = document.getElementById('debug-content');
-  
-  // 모바일에서만 디버그 패널 표시
-  if (window.innerWidth <= 768 && debugPanel) {
-    debugPanel.style.display = 'block';
-    addDebugMessage('🔧 디버그 패널 활성화');
-    addDebugMessage('📱 화면 너비: ' + window.innerWidth);
-    
-    // iOS Safari 확인
-    const isIOSSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS/.test(navigator.userAgent);
-    const isIOSChrome = /iPhone|iPad|iPod/.test(navigator.userAgent) && /CriOS/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
-    
-    if (isIOSChrome) {
-      addDebugMessage('⚠️ iOS 크롬 감지!');
-      addDebugMessage('Safari를 사용하세요!');
-    } else if (isIOSSafari) {
-      addDebugMessage('✅ iOS Safari 감지');
-      addDebugMessage('화면을 터치하세요!');
-    } else if (isAndroid) {
-      addDebugMessage('✅ Android 감지');
-    } else {
-      addDebugMessage('📱 기기: ' + navigator.userAgent.substring(0, 30));
-    }
-  } else if (!debugPanel) {
-    console.error('❌ debugPanel을 찾을 수 없습니다');
-  } else {
-    console.log('💻 데스크탑 모드 - 디버그 패널 숨김');
-  }
-}
-
 // DOMContentLoaded와 load 둘 다 시도
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🎯 DOMContentLoaded 이벤트 발생');
@@ -343,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('load', () => {
-  console.log('🎯 window load 이벤트 발생');
+  console.log('🎯 window load 이벤트 ���생');
   
   // 디버그 패널이 아직 없으면 다시 초기화
   if (!debugPanel) {
