@@ -227,7 +227,14 @@ body {
   width: 100%;
   /* 100vw 대신 100% 써도 OK */
   height: var(--bar-height);
+  resize: horizontal;
+  /* ✅ 가로만 늘리기/줄이기 */
   overflow: hidden;
+  /* ✅ resize 동작 조건 */
+  max-width: calc(100vw - 12px);
+  /* 화면 밖으로 너무 나가지 않게 안전장치(선택) */
+  min-width: 120px;
+  /* 너무 작아져서 잡기 힘든 상황 방지(선택) */
   z-index: 100;
   display: flex;
   align-items: center;
