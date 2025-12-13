@@ -224,45 +224,84 @@ function handleOrientation(event) {
 
 // 자이로(기울기) 사용 허용 요청
 function setupTiltControl() {
-  if (orientationHandlerAttached) return;
+  if (orientationHandlerAttached) {
+    console.log('⚠️ 이미 기울기 센서가 활성화되어 있습니다');
+    return;
+  }
   orientationHandlerAttached = true;
 
   console.log('🔹 기울기 권한 요청 시작');
+  console.log('📊 DeviceOrientationEvent 존재 여부:', typeof DeviceOrientationEvent !== 'undefined');
+  console.log('📊 requestPermission 존재 여부:', typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function');
+  console.log('📊 현재 화면 너비:', window.innerWidth);
 
   // iOS 13+ : 권한 요청 필요
   if (typeof DeviceOrientationEvent !== 'undefined' &&
     typeof DeviceOrientationEvent.requestPermission === 'function') {
 
+    console.log('🍎 iOS 감지됨 - 권한 요청 시작');
     DeviceOrientationEvent.requestPermission()
       .then((response) => {
+        console.log('📱 iOS 권한 응답:', response);
         if (response === 'granted') {
           window.addEventListener('deviceorientation', handleOrientation);
-          console.log('✅ iOS 기울기 권한 허용됨');
+          console.log('✅ iOS 기울기 권한 허용됨 - 이벤트 리스너 등록 완료');
         } else {
           console.log('❌ iOS 기울기 권한 거부됨');
         }
       })
       .catch((err) => {
-        console.warn('DeviceOrientation permission denied:', err);
+        console.error('❌ DeviceOrientation permission error:', err);
       });
   } else if (window.DeviceOrientationEvent) {
     // 안드로이드/일부 브라우저: 바로 사용 가능
     window.addEventListener('deviceorientation', handleOrientation);
-    console.log('✅ Android 기울기 센서 활성화됨');
+    console.log('✅ Android/기타 기기 - 기울기 센서 활성화됨 (이벤트 리스너 등록 완료)');
   } else {
     console.log('❌ 기울기 센서를 지원하지 않는 기기입니다');
   }
 }
 
-// 🔹 메인 페이지 전체에서 터치 시 권한 요청
+// 🔹 페이지 로드 시 바로 기울기 센서 활성화 시도 (안드로이드에서 작동)
+console.log('🔧 script.js 로드 완료');
+
+// DOMContentLoaded와 load 둘 다 시도
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🎯 DOMContentLoaded 이벤트 발생');
+  // iOS가 아닌 경우(안드로이드 등) 바로 활성화
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission !== 'function') {
+    console.log('🚀 DOMContentLoaded - 기울기 센서 자동 활성화 시도');
+    setupTiltControl();
+  } else {
+    console.log('⏸️ iOS 감지 - 사용자 터치 대기 중');
+  }
+});
+
+window.addEventListener('load', () => {
+  console.log('🎯 window load 이벤트 발생');
+  // iOS가 아닌 경우(안드로이드 등) 바로 활성화
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission !== 'function') {
+    console.log('🚀 window load - 기울기 센서 자동 활성화 시도');
+    setupTiltControl();
+  }
+});
+
+// 🔹 메인 페이지 전체에서 터치 시 권한 요청 (iOS용)
 if (mainPage) {
+  console.log('✅ mainPage 찾음 - 터치 이벤트 리스너 등록');
   mainPage.addEventListener('touchstart', (e) => {
+    console.log('👆 mainPage touchstart 이벤트 발생');
     setupTiltControl();
   }, { once: true, passive: true });
   
   mainPage.addEventListener('click', (e) => {
+    console.log('🖱️ mainPage click 이벤트 발생');
     setupTiltControl();
   }, { once: true });
+} else {
+  console.log('❌ mainPage를 찾을 수 없습니다');
 }
 
 if (marqueeBar) {
