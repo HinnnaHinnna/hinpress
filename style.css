@@ -3,7 +3,7 @@
   /* 메인 배경(white) */
   --color-bg-main: #ffffff;
   /* 메인 브랜드 컬러 (지금 쓰는 형광 연두) */
-  --color-brand: #fe7df3;
+  --color-brand: #fcfe7d;
   /* 포트폴리오 배경 */
   --color-portfolio-bg: #000000;
   --color-desc-bg: #fcfe7d;
@@ -18,7 +18,7 @@
   /* 마퀴바 배경 */
 
   /* 상단 바/마퀴 공통 시스템 */
-  --bar-height: 3rem;
+  --bar-height: 2.5rem;
   --bar-font-size: 0.8rem;
 }
 
