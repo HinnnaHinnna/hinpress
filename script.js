@@ -201,7 +201,9 @@ function handleOrientation(event) {
 
   if (typeof handleOrientation.lastGamma === 'undefined' || handleOrientation.lastGamma === null) {
     handleOrientation.lastGamma = gamma;
-    console.log('📱 기울기 감지 시작, gamma:', gamma);
+    const msg = '📱 기울기 감지 시작, gamma: ' + gamma.toFixed(1);
+    console.log(msg);
+    addDebugMessage(msg);
     return;
   }
 
@@ -217,7 +219,9 @@ function handleOrientation(event) {
   if (paddleX < 0) paddleX = 0;
   if (paddleX > maxX) paddleX = maxX;
 
-  console.log('🔄 기울기:', gamma.toFixed(1), '| paddleX:', paddleX.toFixed(1));
+  const msg = '🔄 기울기: ' + gamma.toFixed(1) + ' | paddleX: ' + paddleX.toFixed(1);
+  console.log(msg);
+  addDebugMessage(msg);
 
   updatePaddleDom();
 }
@@ -225,45 +229,79 @@ function handleOrientation(event) {
 // 자이로(기울기) 사용 허용 요청
 function setupTiltControl() {
   if (orientationHandlerAttached) {
-    console.log('⚠️ 이미 기울기 센서가 활성화되어 있습니다');
+    const msg = '⚠️ 이미 기울기 센서 활성화됨';
+    console.log(msg);
+    addDebugMessage(msg);
     return;
   }
   orientationHandlerAttached = true;
 
-  console.log('🔹 기울기 권한 요청 시작');
-  console.log('📊 DeviceOrientationEvent 존재 여부:', typeof DeviceOrientationEvent !== 'undefined');
-  console.log('📊 requestPermission 존재 여부:', typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function');
-  console.log('📊 현재 화면 너비:', window.innerWidth);
+  addDebugMessage('🔹 기울기 권한 요청 시작');
+  addDebugMessage('📊 화면: ' + window.innerWidth + 'px');
 
   // iOS 13+ : 권한 요청 필요
   if (typeof DeviceOrientationEvent !== 'undefined' &&
     typeof DeviceOrientationEvent.requestPermission === 'function') {
 
-    console.log('🍎 iOS 감지됨 - 권한 요청 시작');
+    addDebugMessage('🍎 iOS - 권한 요청 중...');
     DeviceOrientationEvent.requestPermission()
       .then((response) => {
-        console.log('📱 iOS 권한 응답:', response);
+        addDebugMessage('📱 iOS 응답: ' + response);
         if (response === 'granted') {
           window.addEventListener('deviceorientation', handleOrientation);
-          console.log('✅ iOS 기울기 권한 허용됨 - 이벤트 리스너 등록 완료');
+          addDebugMessage('✅ iOS 기울기 허용됨!');
         } else {
-          console.log('❌ iOS 기울기 권한 거부됨');
+          addDebugMessage('❌ iOS 기울기 거부됨');
         }
       })
       .catch((err) => {
+        addDebugMessage('❌ 오류: ' + err.message);
         console.error('❌ DeviceOrientation permission error:', err);
       });
   } else if (window.DeviceOrientationEvent) {
     // 안드로이드/일부 브라우저: 바로 사용 가능
     window.addEventListener('deviceorientation', handleOrientation);
-    console.log('✅ Android/기타 기기 - 기울기 센서 활성화됨 (이벤트 리스너 등록 완료)');
+    addDebugMessage('✅ Android 센서 활성화됨!');
+    addDebugMessage('핸드폰을 기울여보세요');
   } else {
-    console.log('❌ 기울기 센서를 지원하지 않는 기기입니다');
+    addDebugMessage('❌ 센서 미지원 기기');
   }
 }
 
 // 🔹 페이지 로드 시 바로 기울기 센서 활성화 시도 (안드로이드에서 작동)
 console.log('🔧 script.js 로드 완료');
+
+// 🔹 화면 디버깅 패널
+const debugPanel = document.getElementById('debug-panel');
+const debugContent = document.getElementById('debug-content');
+let debugMessages = [];
+
+function addDebugMessage(msg) {
+  console.log(msg);
+  debugMessages.push(msg);
+  if (debugMessages.length > 15) debugMessages.shift();
+  if (debugContent) {
+    debugContent.innerHTML = debugMessages.join('<br>');
+  }
+}
+
+// 모바일에서만 디버그 패널 표시
+if (window.innerWidth <= 768 && debugPanel) {
+  debugPanel.style.display = 'block';
+  addDebugMessage('🔧 script.js 로드 완료');
+  addDebugMessage('📱 화면 너비: ' + window.innerWidth);
+  addDebugMessage('📱 User-Agent: ' + (navigator.userAgent.includes('iPhone') ? 'iPhone' : navigator.userAgent.includes('Android') ? 'Android' : '기타'));
+  
+  // iOS Safari 확인
+  const isIOSSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS/.test(navigator.userAgent);
+  const isIOSChrome = /iPhone|iPad|iPod/.test(navigator.userAgent) && /CriOS/.test(navigator.userAgent);
+  
+  if (isIOSChrome) {
+    addDebugMessage('⚠️ iOS 크롬 감지! Safari를 사용하세요!');
+  } else if (isIOSSafari) {
+    addDebugMessage('✅ iOS Safari 감지');
+  }
+}
 
 // DOMContentLoaded와 load 둘 다 시도
 document.addEventListener('DOMContentLoaded', () => {
