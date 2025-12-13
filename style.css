@@ -18,7 +18,7 @@
   /* 마퀴바 배경 */
 
   /* 상단 바/마퀴 공통 시스템 */
-  --bar-height: 2.5rem;
+  --bar-height: 2rem;
   --bar-font-size: 0.8rem;
 }
 
@@ -491,7 +491,7 @@ body {
 
   /* 마퀴바/상단바 높이 */
   :root {
-    --bar-height: 3.2rem;
+    --bar-height: 2.5rem;
   }
 
   /* 메인 타이틀 깜빡임 */
