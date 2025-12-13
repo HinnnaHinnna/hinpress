@@ -3,16 +3,19 @@
   /* 메인 배경(white) */
   --color-bg-main: #ffffff;
   /* 메인 브랜드 컬러 (지금 쓰는 형광 연두) */
-  --color-brand: #fcfe7d;
+  --color-brand: #fe7df3;
   /* 포트폴리오 배경 */
   --color-portfolio-bg: #000000;
   --color-desc-bg: #fcfe7d;
   /* + 옵션: 중립 색 (검정/회색) */
   --color-text-main: #000000;
   --color-muted: #0008ff;
-  --color-main-gray: rgb(246, 238, 227); /* 메인 배경 */
-  --color-arrow: rgb(46, 100, 225);      /* 버튼/화살표용 */
-  --color-maque: #fcfe7d;      /* 마퀴바 배경 */
+  --color-main-gray: rgb(246, 238, 227);
+  /* 메인 배경 */
+  --color-arrow: rgb(46, 100, 225);
+  /* 버튼/화살표용 */
+  --color-maque: #fcfe7d;
+  /* 마퀴바 배경 */
 
   /* 상단 바/마퀴 공통 시스템 */
   --bar-height: 3rem;
@@ -203,7 +206,9 @@ body {
 
 /* 모바일에서 타이틀 깜빡임 */
 @keyframes mobileTitleBlink {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
 
@@ -216,9 +221,11 @@ body {
 /* 상단 흐르는 글 + 패들 바 */
 .marquee-bar {
   position: fixed;
-  top: 20px;              /* 🔹 여기 숫자를 바꾸면 위/아래 위치가 절대값으로 변경됨 */
+  top: 20px;
+  /* 🔹 여기 숫자를 바꾸면 위/아래 위치가 절대값으로 변경됨 */
   left: 0;
-  width: 100%;            /* 100vw 대신 100% 써도 OK */
+  width: 100%;
+  /* 100vw 대신 100% 써도 OK */
   height: var(--bar-height);
   overflow: hidden;
   z-index: 100;
@@ -239,12 +246,13 @@ body {
 /* 🔹 여기서 텍스트 색/두께 조정 */
 .marquee-text {
   font-family: "Gothic A1", sans-serif;
-  font-weight: 400;              /* 기존보다 한 단계 두꺼운 400 */
+  font-weight: 400;
+  /* 기존보다 한 단계 두꺼운 400 */
   font-size: var(--bar-font-size);
   line-height: 1;
   word-break: keep-all;
   padding-right: 4rem;
-  color: #000000;               
+  color: #000000;
 }
 
 /* 흐르는 애니메이션 */
@@ -252,6 +260,7 @@ body {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-100%);
   }
@@ -286,7 +295,8 @@ body {
   cursor: pointer;
   transition: opacity 0.2s;
   flex-shrink: 0;
-  width: 260px; /* 썸네일 가로폭 고정 */
+  width: 260px;
+  /* 썸네일 가로폭 고정 */
 }
 
 .thumbnail:hover {
@@ -312,7 +322,8 @@ body {
 /* ← → 네비게이션 */
 .detail-nav {
   position: fixed;
-  top: 4.5rem; /* 상단바 바로 아래 */
+  top: 4.5rem;
+  /* 상단바 바로 아래 */
   left: 0;
   width: 100%;
   display: flex;
@@ -543,7 +554,8 @@ body {
     padding: 0 1rem;
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: 1fr; /* 모바일에서 한 줄에 한 장 */
+    grid-template-columns: 1fr;
+    /* 모바일에서 한 줄에 한 장 */
     gap: 2rem;
   }
 
