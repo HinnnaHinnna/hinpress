@@ -208,7 +208,7 @@ function handleOrientation(event) {
   const deltaGamma = gamma - handleOrientation.lastGamma;
   handleOrientation.lastGamma = gamma;
 
-  const sensitivity = 2.0; // 좌우 이동 민감도
+  const sensitivity = 10.0; // 좌우 이동 민감도
 
   paddleX += deltaGamma * sensitivity;
 
