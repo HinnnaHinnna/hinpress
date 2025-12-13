@@ -543,33 +543,33 @@ if (detailPage) {
   }, { passive: true });
 
   detailPage.addEventListener('touchend', (e) => {
-  if (e.changedTouches.length === 0) return;
-  const touch = e.changedTouches[0];
+    if (e.changedTouches.length === 0) return;
+    const touch = e.changedTouches[0];
 
-  const dx = touch.clientX - touchStartX;
-  const dy = touch.clientY - touchStartY;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
 
-  // 세로로 너무 많이 움직이면 → 스크롤 제스처로 보고 스와이프 무시
-  if (Math.abs(dy) > VERTICAL_LIMIT) return;
+    // 세로로 너무 많이 움직이면 → 스크롤 제스처로 보고 스와이프 무시
+    if (Math.abs(dy) > VERTICAL_LIMIT) return;
 
-  // 가로 이동이 너무 작으면 → 스와이프 아닌 것으로 무시
-  if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+    // 가로 이동이 너무 작으면 → 스와이프 아닌 것으로 무시
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
 
-  // 🔹 이 줄은 삭제 (크롬 iOS가 데스크톱 폭으로 잡히는 경우를 막기 위해)
-  // if (window.innerWidth > 1024) return;
+    // 🔹 이 줄은 삭제 (크롬 iOS가 데스크톱 폭으로 잡히는 경우를 막기 위해)
+    // if (window.innerWidth > 1024) return;
 
-  if (dx > 0) {
-    // 👉 오른쪽으로 스와이프 → 이전 프로젝트
-    if (currentProjectIndex > 0) {
-      const prevProject = projects[currentProjectIndex - 1];
-      if (prevProject) showProjectDetail(prevProject.id);
+    if (dx > 0) {
+      // 👉 오른쪽으로 스와이프 → 이전 프로젝트
+      if (currentProjectIndex > 0) {
+        const prevProject = projects[currentProjectIndex - 1];
+        if (prevProject) showProjectDetail(prevProject.id);
+      }
+    } else {
+      // 👈 왼쪽으로 스와이프 → 다음 프로젝트
+      if (currentProjectIndex < projects.length - 1) {
+        const nextProject = projects[currentProjectIndex + 1];
+        if (nextProject) showProjectDetail(nextProject.id);
+      }
     }
-  } else {
-    // 👈 왼쪽으로 스와이프 → 다음 프로젝트
-    if (currentProjectIndex < projects.length - 1) {
-      const nextProject = projects[currentProjectIndex + 1];
-      if (nextProject) showProjectDetail(nextProject.id);
-    }
-  }
-}, { passive: true });
+  }, { passive: true });
 }
