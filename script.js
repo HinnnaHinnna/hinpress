@@ -201,6 +201,7 @@ function handleOrientation(event) {
 
   if (typeof handleOrientation.lastGamma === 'undefined' || handleOrientation.lastGamma === null) {
     handleOrientation.lastGamma = gamma;
+    console.log('📱 기울기 감지 시작, gamma:', gamma);
     return;
   }
 
@@ -208,13 +209,15 @@ function handleOrientation(event) {
   const deltaGamma = gamma - handleOrientation.lastGamma;
   handleOrientation.lastGamma = gamma;
 
-  const sensitivity = 10.0; // 좌우 이동 민감도
+  const sensitivity = 2.0; // 좌우 이동 민감도
 
   paddleX += deltaGamma * sensitivity;
 
   const maxX = canvas.width - paddleWidth;
   if (paddleX < 0) paddleX = 0;
   if (paddleX > maxX) paddleX = maxX;
+
+  console.log('🔄 기울기:', gamma.toFixed(1), '| paddleX:', paddleX.toFixed(1));
 
   updatePaddleDom();
 }
@@ -224,6 +227,8 @@ function setupTiltControl() {
   if (orientationHandlerAttached) return;
   orientationHandlerAttached = true;
 
+  console.log('🔹 기울기 권한 요청 시작');
+
   // iOS 13+ : 권한 요청 필요
   if (typeof DeviceOrientationEvent !== 'undefined' &&
     typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -232,6 +237,9 @@ function setupTiltControl() {
       .then((response) => {
         if (response === 'granted') {
           window.addEventListener('deviceorientation', handleOrientation);
+          console.log('✅ iOS 기울기 권한 허용됨');
+        } else {
+          console.log('❌ iOS 기울기 권한 거부됨');
         }
       })
       .catch((err) => {
@@ -240,7 +248,21 @@ function setupTiltControl() {
   } else if (window.DeviceOrientationEvent) {
     // 안드로이드/일부 브라우저: 바로 사용 가능
     window.addEventListener('deviceorientation', handleOrientation);
+    console.log('✅ Android 기울기 센서 활성화됨');
+  } else {
+    console.log('❌ 기울기 센서를 지원하지 않는 기기입니다');
   }
+}
+
+// 🔹 메인 페이지 전체에서 터치 시 권한 요청
+if (mainPage) {
+  mainPage.addEventListener('touchstart', (e) => {
+    setupTiltControl();
+  }, { once: true, passive: true });
+  
+  mainPage.addEventListener('click', (e) => {
+    setupTiltControl();
+  }, { once: true });
 }
 
 if (marqueeBar) {
@@ -611,9 +633,6 @@ if (detailPage) {
 
   // 가로 이동이 너무 작으면 → 스와이프 아닌 것으로 무시
   if (Math.abs(dx) < SWIPE_THRESHOLD) return;
-
-  // 🔹 이 줄은 삭제 (크롬 iOS가 데스크톱 폭으로 잡히는 경우를 막기 위해)
-  // if (window.innerWidth > 1024) return;
 
   if (dx > 0) {
     // 👉 오른쪽으로 스와이프 → 이전 프로젝트
