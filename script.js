@@ -236,7 +236,7 @@ function setupTiltControl() {
   }
   orientationHandlerAttached = true;
 
-  addDebugMessage('🔹 기울기 권한 요청 시작');
+  addDebugMessage('🔹 기울기 권한 요청 시���');
   addDebugMessage('📊 화면: ' + window.innerWidth + 'px');
 
   // iOS 13+ : 권한 요청 필요
@@ -271,57 +271,89 @@ function setupTiltControl() {
 // 🔹 페이지 로드 시 바로 기울기 센서 활성화 시도 (안드로이드에서 작동)
 console.log('🔧 script.js 로드 완료');
 
-// 🔹 화면 디버깅 패널
-const debugPanel = document.getElementById('debug-panel');
-const debugContent = document.getElementById('debug-content');
+// 🔹 화면 디버깅 패널 변수
+let debugPanel = null;
+let debugContent = null;
 let debugMessages = [];
 
 function addDebugMessage(msg) {
   console.log(msg);
   debugMessages.push(msg);
   if (debugMessages.length > 15) debugMessages.shift();
+  
+  // debugContent가 아직 없으면 다시 찾기
+  if (!debugContent) {
+    debugContent = document.getElementById('debug-content');
+  }
+  
   if (debugContent) {
     debugContent.innerHTML = debugMessages.join('<br>');
   }
 }
 
-// 모바일에서만 디버그 패널 표시
-if (window.innerWidth <= 768 && debugPanel) {
-  debugPanel.style.display = 'block';
-  addDebugMessage('🔧 script.js 로드 완료');
-  addDebugMessage('📱 화면 너비: ' + window.innerWidth);
-  addDebugMessage('📱 User-Agent: ' + (navigator.userAgent.includes('iPhone') ? 'iPhone' : navigator.userAgent.includes('Android') ? 'Android' : '기타'));
+// 디버그 패널 초기화 함수
+function initDebugPanel() {
+  debugPanel = document.getElementById('debug-panel');
+  debugContent = document.getElementById('debug-content');
   
-  // iOS Safari 확인
-  const isIOSSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS/.test(navigator.userAgent);
-  const isIOSChrome = /iPhone|iPad|iPod/.test(navigator.userAgent) && /CriOS/.test(navigator.userAgent);
-  
-  if (isIOSChrome) {
-    addDebugMessage('⚠️ iOS 크롬 감지! Safari를 사용하세요!');
-  } else if (isIOSSafari) {
-    addDebugMessage('✅ iOS Safari 감지');
+  // 모바일에서만 디버그 패널 표시
+  if (window.innerWidth <= 768 && debugPanel) {
+    debugPanel.style.display = 'block';
+    addDebugMessage('🔧 디버그 패널 활성화');
+    addDebugMessage('📱 화면 너비: ' + window.innerWidth);
+    
+    // iOS Safari 확인
+    const isIOSSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS/.test(navigator.userAgent);
+    const isIOSChrome = /iPhone|iPad|iPod/.test(navigator.userAgent) && /CriOS/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    if (isIOSChrome) {
+      addDebugMessage('⚠️ iOS 크롬 감지!');
+      addDebugMessage('Safari를 사용하세요!');
+    } else if (isIOSSafari) {
+      addDebugMessage('✅ iOS Safari 감지');
+      addDebugMessage('화면을 터치하세요!');
+    } else if (isAndroid) {
+      addDebugMessage('✅ Android 감지');
+    } else {
+      addDebugMessage('📱 기기: ' + navigator.userAgent.substring(0, 30));
+    }
+  } else if (!debugPanel) {
+    console.error('❌ debugPanel을 찾을 수 없습니다');
+  } else {
+    console.log('💻 데스크탑 모드 - 디버그 패널 숨김');
   }
 }
 
 // DOMContentLoaded와 load 둘 다 시도
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🎯 DOMContentLoaded 이벤트 발생');
+  
+  // 디버그 패널 먼저 초기화
+  initDebugPanel();
+  
   // iOS가 아닌 경우(안드로이드 등) 바로 활성화
   if (typeof DeviceOrientationEvent !== 'undefined' &&
       typeof DeviceOrientationEvent.requestPermission !== 'function') {
-    console.log('🚀 DOMContentLoaded - 기울기 센서 자동 활성화 시도');
+    addDebugMessage('🚀 자동 센서 활성화 시도');
     setupTiltControl();
   } else {
-    console.log('⏸️ iOS 감지 - 사용자 터치 대기 중');
+    addDebugMessage('⏸️ iOS - 터치 대기 중');
   }
 });
 
 window.addEventListener('load', () => {
   console.log('🎯 window load 이벤트 발생');
+  
+  // 디버그 패널이 아직 없으면 다시 초기화
+  if (!debugPanel) {
+    initDebugPanel();
+  }
+  
   // iOS가 아닌 경우(안드로이드 등) 바로 활성화
   if (typeof DeviceOrientationEvent !== 'undefined' &&
       typeof DeviceOrientationEvent.requestPermission !== 'function') {
-    console.log('🚀 window load - 기울기 센서 자동 활성화 시도');
+    addDebugMessage('🚀 load - 센서 활성화 시도');
     setupTiltControl();
   }
 });
@@ -329,13 +361,16 @@ window.addEventListener('load', () => {
 // 🔹 메인 페이지 전체에서 터치 시 권한 요청 (iOS용)
 if (mainPage) {
   console.log('✅ mainPage 찾음 - 터치 이벤트 리스너 등록');
+  
   mainPage.addEventListener('touchstart', (e) => {
     console.log('👆 mainPage touchstart 이벤트 발생');
+    addDebugMessage('👆 화면 터치 감지!');
     setupTiltControl();
   }, { once: true, passive: true });
   
   mainPage.addEventListener('click', (e) => {
     console.log('🖱️ mainPage click 이벤트 발생');
+    addDebugMessage('🖱️ 화면 클릭 감지!');
     setupTiltControl();
   }, { once: true });
 } else {
