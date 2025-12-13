@@ -138,34 +138,70 @@ let paddleX = 0;
 let paddleY = 0;
 let paddleVX = 0;
 
-// DOM 상의 마퀴바 위치/크기를 JS에서 업데이트
+/**
+ * ✅ 추가: DOM에서 마퀴바의 "진짜" 크기/위치를 읽어서
+ * paddleWidth / paddleHeight / paddleX / paddleY를 최신 상태로 유지
+ * - 사용자가 CSS resize로 폭을 바꾸면, rect.width가 바뀐다.
+ * - 공 충돌 판정/드래그 clamp가 최신 폭을 따라가게 됨.
+ */
+function syncPaddleFromDom() {
+  if (!marqueeBar) return;
+  const rect = marqueeBar.getBoundingClientRect();
+  paddleWidth = rect.width;
+  paddleHeight = rect.height;
+  paddleX = rect.left;
+  paddleY = rect.bottom;
+}
+
+/**
+ * ✅ 수정 핵심:
+ * 기존 updatePaddleDom()는 매번 width를 JS가 강제로 덮어썼음.
+ * → 그러면 사용자가 늘린 폭이 바로 원래대로 돌아가서 리사이즈가 불가능.
+ *
+ * 그래서 "left만" 업데이트하고,
+ * width는 DOM(사용자 리사이즈 결과)을 존중한다.
+ */
 function updatePaddleDom() {
   if (!marqueeBar) return;
-  marqueeBar.style.width = `${paddleWidth}px`;
   marqueeBar.style.left = `${paddleX}px`;
+}
+
+/**
+ * ✅ 화면 밖으로 나가지 않게 clamp
+ * - paddleWidth는 syncPaddleFromDom()으로 최신값을 읽은 후 계산해야 함
+ */
+function clampPaddleX() {
+  const maxX = canvas.width - paddleWidth;
+  if (paddleX < 0) paddleX = 0;
+  if (paddleX > maxX) paddleX = maxX;
 }
 
 // 패들 초기 위치/크기 계산
 function initPaddle() {
   if (!marqueeBar) return;
 
-  paddleHeight = marqueeBar.offsetHeight || 0;
   const viewportWidth = window.innerWidth;
 
+  // ✅ "초기 한 번"만 기본 폭을 잡아줌(네 기존 로직 그대로 유지)
+  // 이후 사용자가 resize로 바꾸는 폭은 JS가 건드리지 않게 됨.
+  let initialWidth = 0;
   if (viewportWidth <= 768) {
-    // 모바일에서 좀 더 긴 패들
-    paddleWidth = Math.min(viewportWidth * 0.4, viewportWidth);
+    initialWidth = Math.min(viewportWidth * 0.4, viewportWidth);
   } else {
-    paddleWidth = Math.min(viewportWidth * 0.2, viewportWidth);
+    initialWidth = Math.min(viewportWidth * 0.2, viewportWidth);
   }
+  marqueeBar.style.width = `${initialWidth}px`;
 
+  // DOM에서 실제 값 읽기(폭/높이/좌표)
+  syncPaddleFromDom();
+
+  // 가운데 정렬
   paddleX = (viewportWidth - paddleWidth) / 2;
-
-  const rect = marqueeBar.getBoundingClientRect();
-  // 마퀴바의 "바닥" y좌표를 패들의 상단 역할로 사용
-  paddleY = rect.bottom;
-
+  clampPaddleX();
   updatePaddleDom();
+
+  // left 적용 후 바닥(y) 포함 재동기화
+  syncPaddleFromDom();
 }
 
 function resizeCanvas() {
@@ -176,9 +212,46 @@ function resizeCanvas() {
 resizeCanvas();
 initPaddle();
 
+/**
+ * ✅ 추가: ResizeObserver
+ * - 사용자가 마퀴바 폭을 늘리거나 줄일 때마다 paddleWidth/paddleY 최신화
+ * - 폭이 커져서 화면 밖으로 나가면 left를 자동으로 clamp
+ */
+if (marqueeBar && 'ResizeObserver' in window) {
+  let isAdjusting = false;
+
+  const ro = new ResizeObserver(() => {
+    if (isAdjusting) return;
+    isAdjusting = true;
+
+    syncPaddleFromDom();   // 새 폭 반영
+    clampPaddleX();        // 화면 밖 방지
+    updatePaddleDom();     // left만 조정
+    syncPaddleFromDom();   // y(bottom) 갱신
+
+    isAdjusting = false;
+  });
+
+  ro.observe(marqueeBar);
+}
+
+/**
+ * ✅ 수정: window resize 때 initPaddle()을 다시 부르면
+ * 사용자가 조절한 폭이 초기폭으로 리셋될 수 있음.
+ * → 캔버스만 리사이즈하고, 마퀴바는 "폭 유지 + 위치만 clamp"로 처리
+ */
 window.addEventListener('resize', () => {
   resizeCanvas();
-  initPaddle();
+
+  // 현재 DOM 폭/위치 기준으로 최신화
+  syncPaddleFromDom();
+
+  // 창이 줄어들면 화면 밖으로 나갈 수 있으니 left만 보정
+  clampPaddleX();
+  updatePaddleDom();
+
+  // y(bottom) 다시 읽기
+  syncPaddleFromDom();
 });
 
 // ==============================
@@ -188,10 +261,29 @@ let isDraggingPaddle = false;
 let lastPointerX = 0;
 let lastPointerTime = 0;
 
+/**
+ * ✅ 추가: 오른쪽 끝(리사이즈 핸들 영역)을 잡을 때는
+ * 드래그(이동) 시작을 막아야 브라우저 기본 resize가 동작함.
+ * - 대략 오른쪽 끝 20px을 리사이즈 영역으로 취급
+ */
+function isOnResizeHandle(clientX, clientY) {
+  if (!marqueeBar) return false;
+  const rect = marqueeBar.getBoundingClientRect();
+  const EDGE = 20; // 핸들 판정 범위(px)
+
+  const nearRight = (rect.right - clientX) < EDGE;
+  const nearBottom = (rect.bottom - clientY) < EDGE;
+
+  // horizontal resize라도 브라우저에 따라 우하단 핸들이 쓰이기도 해서 둘 다 허용
+  return nearRight || (nearRight && nearBottom);
+}
 
 if (marqueeBar) {
   // 마우스 드래그 시작
   marqueeBar.addEventListener('mousedown', (e) => {
+    // ✅ 리사이즈하려는 클릭이면 이동 드래그를 막고 브라우저 resize를 살림
+    if (isOnResizeHandle(e.clientX, e.clientY)) return;
+
     isDraggingPaddle = true;
     lastPointerX = e.clientX;
     lastPointerTime = performance.now();
@@ -209,16 +301,19 @@ if (marqueeBar) {
     // dt(시간) 대비 얼마나 움직였는지 → 속도 추정
     paddleVX = (dx / dt) * 16;
 
+    // ✅ 먼저 DOM에서 현재 폭을 읽어야 clamp가 정확함(사용자 리사이즈 반영)
+    syncPaddleFromDom();
+
     paddleX += dx;
 
-    const maxX = canvas.width - paddleWidth;
-    if (paddleX < 0) paddleX = 0;
-    if (paddleX > maxX) paddleX = maxX;
-
+    clampPaddleX();
     updatePaddleDom();
 
     lastPointerX = e.clientX;
     lastPointerTime = now;
+
+    // y(bottom) 갱신
+    syncPaddleFromDom();
   });
 
   // 마우스 드래그 끝
@@ -250,15 +345,19 @@ if (marqueeBar) {
 
     paddleVX = (dx / dt) * 16;
 
-    paddleX += dx;
-    const maxX = canvas.width - paddleWidth;
-    if (paddleX < 0) paddleX = 0;
-    if (paddleX > maxX) paddleX = maxX;
+    // ✅ 터치에서도 DOM 폭을 최신화
+    syncPaddleFromDom();
 
+    paddleX += dx;
+
+    clampPaddleX();
     updatePaddleDom();
 
     lastPointerX = touch.clientX;
     lastPointerTime = now;
+
+    // y(bottom) 갱신
+    syncPaddleFromDom();
 
     e.preventDefault();
   }, { passive: false });
@@ -325,7 +424,8 @@ class Ball {
       this.vx = Math.abs(this.vx);
     }
 
-    // 마퀴바 충돌 (위쪽 벽 역할)
+    // ✅ 마퀴바 충돌 (위쪽 벽 역할)
+    // - paddleWidth/paddleY는 syncPaddleFromDom()으로 최신값 유지
     if (paddleHeight > 0) {
       const topLimit = paddleY;
 
@@ -398,6 +498,7 @@ function checkCollision(ball1, ball2) {
 }
 
 // 초기 공 생성 (마퀴바 아래쪽 영역에만)
+syncPaddleFromDom();
 for (let i = 0; i < numBalls; i++) {
   const radius = 16;
   const minY = paddleY + radius + 10;
@@ -409,6 +510,9 @@ for (let i = 0; i < numBalls; i++) {
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // ✅ 매 프레임 최신화(리사이즈 폭/바닥 y가 즉시 반영되게)
+  syncPaddleFromDom();
 
   balls.forEach((ball) => ball.update());
 
@@ -527,7 +631,6 @@ function showProjectDetail(projectId) {
 // ==============================
 // 🔹 모바일 스와이프 네비게이션 추가
 // ==============================
-
 if (detailPage) {
   let touchStartX = 0;
   let touchStartY = 0;
@@ -554,9 +657,6 @@ if (detailPage) {
 
     // 가로 이동이 너무 작으면 → 스와이프 아닌 것으로 무시
     if (Math.abs(dx) < SWIPE_THRESHOLD) return;
-
-    // 🔹 이 줄은 삭제 (크롬 iOS가 데스크톱 폭으로 잡히는 경우를 막기 위해)
-    // if (window.innerWidth > 1024) return;
 
     if (dx > 0) {
       // 👉 오른쪽으로 스와이프 → 이전 프로젝트
