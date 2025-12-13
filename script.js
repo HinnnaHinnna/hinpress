@@ -339,7 +339,7 @@ let tiltPermissionRequested = false;
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🎯 DOMContentLoaded 이벤트 발생');
   
-  // 디버그 패널 먼저 초기화
+  // 디버그 패널 먼��� 초기화
   initDebugPanel();
   
   // iOS 감지
@@ -353,22 +353,59 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mainPage) {
       console.log('✅ mainPage 찾음 - iOS 터치 이벤트 리스너 등록');
       
-      mainPage.addEventListener('touchstart', (e) => {
+      // 🔥 중요: touchstart 핸들러 안에서 직접 권한 요청!
+      mainPage.addEventListener('touchstart', function(e) {
         if (tiltPermissionRequested) return;
         tiltPermissionRequested = true;
         
-        console.log('👆 mainPage touchstart 이벤트 발생');
+        console.log('👆 touchstart - 권한 요청 시작');
         addDebugMessage('👆 화면 터치 감지!');
-        setupTiltControl();
+        addDebugMessage('🔹 iOS 권한 요청 중...');
+        
+        // 🔥 여기서 바로 권한 요청 (함수 호출 X)
+        DeviceOrientationEvent.requestPermission()
+          .then((response) => {
+            addDebugMessage('📱 iOS 응답: ' + response);
+            if (response === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation);
+              orientationHandlerAttached = true;
+              addDebugMessage('✅ iOS 기울기 허용됨!');
+              addDebugMessage('핸드폰을 기울여보세요!');
+            } else {
+              addDebugMessage('❌ iOS 기울기 거부됨');
+            }
+          })
+          .catch((err) => {
+            addDebugMessage('❌ 오류: ' + err.message);
+            console.error('❌ DeviceOrientation error:', err);
+          });
       }, { once: true, passive: true });
       
-      mainPage.addEventListener('click', (e) => {
+      // click 이벤트도 동일하게
+      mainPage.addEventListener('click', function(e) {
         if (tiltPermissionRequested) return;
         tiltPermissionRequested = true;
         
-        console.log('🖱️ mainPage click 이벤트 발생');
+        console.log('🖱️ click - 권한 요청 시작');
         addDebugMessage('🖱️ 화면 클릭 감지!');
-        setupTiltControl();
+        addDebugMessage('🔹 iOS 권한 요청 중...');
+        
+        DeviceOrientationEvent.requestPermission()
+          .then((response) => {
+            addDebugMessage('📱 iOS 응답: ' + response);
+            if (response === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation);
+              orientationHandlerAttached = true;
+              addDebugMessage('✅ iOS 기울기 허용됨!');
+              addDebugMessage('핸드폰을 기울여보세요!');
+            } else {
+              addDebugMessage('❌ iOS 기울기 거부됨');
+            }
+          })
+          .catch((err) => {
+            addDebugMessage('❌ 오류: ' + err.message);
+            console.error('❌ DeviceOrientation error:', err);
+          });
       }, { once: true });
     } else {
       console.log('❌ mainPage를 찾을 수 없습니다');
