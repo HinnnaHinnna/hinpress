@@ -332,6 +332,9 @@ function setupTiltControl() {
 // 🔹 페이지 로드 시 바로 기울기 센서 활성화 시도 (안드로이드에서 작동)
 console.log('🔧 script.js 로드 완료');
 
+// 🔹 기울기 권한 요청 플래그 (한 번만 실행되도록)
+let tiltPermissionRequested = false;
+
 // DOMContentLoaded와 load 둘 다 시도
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🎯 DOMContentLoaded 이벤트 발생');
@@ -339,50 +342,53 @@ document.addEventListener('DOMContentLoaded', () => {
   // 디버그 패널 먼저 초기화
   initDebugPanel();
   
-  // iOS가 아닌 경우(안드로이드 등) 바로 활성화
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission !== 'function') {
+  // iOS 감지
+  const isIOS = typeof DeviceOrientationEvent !== 'undefined' &&
+                typeof DeviceOrientationEvent.requestPermission === 'function';
+  
+  if (isIOS) {
+    addDebugMessage('⏸️ iOS - 터치 대기 중');
+    
+    // iOS: 메인 페이지 전체에서 터치 시 권한 요청
+    if (mainPage) {
+      console.log('✅ mainPage 찾음 - iOS 터치 이벤트 리스너 등록');
+      
+      mainPage.addEventListener('touchstart', (e) => {
+        if (tiltPermissionRequested) return;
+        tiltPermissionRequested = true;
+        
+        console.log('👆 mainPage touchstart 이벤트 발생');
+        addDebugMessage('👆 화면 터치 감지!');
+        setupTiltControl();
+      }, { once: true, passive: true });
+      
+      mainPage.addEventListener('click', (e) => {
+        if (tiltPermissionRequested) return;
+        tiltPermissionRequested = true;
+        
+        console.log('🖱️ mainPage click 이벤트 발생');
+        addDebugMessage('🖱️ 화면 클릭 감지!');
+        setupTiltControl();
+      }, { once: true });
+    } else {
+      console.log('❌ mainPage를 찾을 수 없습니다');
+      addDebugMessage('❌ mainPage를 찾을 수 없음');
+    }
+  } else {
+    // Android/기타: 바로 활성화
     addDebugMessage('🚀 자동 센서 활성화 시도');
     setupTiltControl();
-  } else {
-    addDebugMessage('⏸️ iOS - 터치 대기 중');
   }
 });
 
 window.addEventListener('load', () => {
-  console.log('🎯 window load 이벤트 ���생');
+  console.log('🎯 window load 이벤트 발생');
   
   // 디버그 패널이 아직 없으면 다시 초기화
   if (!debugPanel) {
     initDebugPanel();
   }
-  
-  // iOS가 아닌 경우(안드로이드 등) 바로 활성화
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission !== 'function') {
-    addDebugMessage('🚀 load - 센서 활성화 시도');
-    setupTiltControl();
-  }
 });
-
-// 🔹 메인 페이지 전체에서 터치 시 권한 요청 (iOS용)
-if (mainPage) {
-  console.log('✅ mainPage 찾음 - 터치 이벤트 리스너 등록');
-  
-  mainPage.addEventListener('touchstart', (e) => {
-    console.log('👆 mainPage touchstart 이벤트 발생');
-    addDebugMessage('👆 화면 터치 감지!');
-    setupTiltControl();
-  }, { once: true, passive: true });
-  
-  mainPage.addEventListener('click', (e) => {
-    console.log('🖱️ mainPage click 이벤트 발생');
-    addDebugMessage('🖱️ 화면 클릭 감지!');
-    setupTiltControl();
-  }, { once: true });
-} else {
-  console.log('❌ mainPage를 찾을 수 없습니다');
-}
 
 if (marqueeBar) {
   // 마우스 드래그 시작
