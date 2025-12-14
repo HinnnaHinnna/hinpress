@@ -324,7 +324,7 @@ body {
 
 /* =============================== 상세 페이지 =============================== */
 #detail-page {
-  background: var(--color-main-gray);
+  background: var(--color-brand);
   overflow-y: auto;
   padding-left: 10vw;
   padding-right: 10vw;
@@ -453,7 +453,7 @@ body {
 
 /* =============================== CV 페이지 =============================== */
 #cv-page {
-  background: var(--color-bg-main);
+  background: var(--color-main-gray);
   color: var(--color-text-main);
   overflow-y: auto;
 }
