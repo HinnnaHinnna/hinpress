@@ -265,7 +265,7 @@ const rawProjects = [
     client: ['국립한글박물관'],
     imageFolder: 'bc/hanguel',        // 한박상설 -> hanguel
     imageBaseName: 'hanguel',
-    imageCount: 12,
+    imageCount: 13,
     imageExt: 'jpg',
     padLength: 2
   },
