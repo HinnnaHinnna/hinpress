@@ -282,7 +282,7 @@ const rawProjects = [
     client: ['서울역사박물관'],
     imageFolder: 'bc/bukchon',        // 강화 -> kangwha
     imageBaseName: 'bukchon',
-    imageCount: 11,
+    imageCount: 12,
     imageExt: 'jpg',
     padLength: 2
   }
