@@ -271,18 +271,18 @@ const rawProjects = [
   },
   {
     id: 14,
-    title: '강화의 포구',
+    title: '북촌 지역 보고서',
     subtitle: ['책'],
-    year: '2019',
-    specs: '무선제본',
-    size: ['190x260mm', '326p'],
+    year: '2020',
+    specs: '소프트 양장제본',
+    size: ['210x297mm'],
     description:
-      '황해도 지역의 강화도 섬을 조사한 민속 보고서. 메인 컬러는 황색(황해), 먹색(갯벌 진흙색). 내지는 그물을 모티브로 그리드를 설계했다. 도비라, 표지에도 그물 이미지를 연결했다.',
+      '북촌 지역 보고서. 메인 컬러는 갈색(한옥 나무), 하늘색(하늘).',
     category: 'Graphic Design',
-    client: ['국립민속박물관'],
-    imageFolder: 'bc/kangwha',        // 강화 -> kangwha
-    imageBaseName: 'kangwha',
-    imageCount: 13,
+    client: ['서울역사박물관'],
+    imageFolder: 'bc/bukchon',        // 강화 -> kangwha
+    imageBaseName: 'bukchon',
+    imageCount: 11,
     imageExt: 'jpg',
     padLength: 2
   }
