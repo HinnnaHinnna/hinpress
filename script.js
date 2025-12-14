@@ -46,6 +46,13 @@ function showPage(page) {
 
   page.classList.add('active');
 
+  // ✅ 포트폴리오 페이지가 "열릴 때마다" 썸네일 순서를 랜덤으로 다시 생성
+  // - projects 배열 자체는 그대로 두고(상세페이지 prev/next 순서 유지)
+  // - 화면에 보여주는 썸네일만 섞어서 뿌립니다.
+  if (page === portfolioPage) {
+    createThumbnails({ shuffle: true });
+  }
+
   if (page === mainPage) {
     // 메인에서는 상단바 숨김
     topBar.classList.add('hidden');
@@ -529,11 +536,33 @@ animate();
 // ==============================
 // 썸네일 생성 & 프로젝트 상세
 // ==============================
-function createThumbnails() {
+/**
+ * ✅ 배열을 섞는 함수(Fisher–Yates shuffle)
+ * - sort(() => Math.random() - 0.5) 방식은 편향이 생길 수 있어서 사용하지 않음
+ * - 원본 배열(projects)은 건드리지 않고, "복사본"만 섞어서 반환
+ */
+function shuffleArray(inputArray) {
+  const arr = inputArray.slice();
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  return arr;
+}
+
+function createThumbnails(options = {}) {
   if (!thumbnailsContainer) return;
   thumbnailsContainer.innerHTML = '';
 
-  projects.forEach((project) => {
+  // ✅ 기본값: shuffle = true (열 때마다 랜덤)
+  const { shuffle = true } = options;
+
+  // projects 배열 자체는 그대로 두고, "보여주는 순서"만 섞는다.
+  const list = shuffle ? shuffleArray(projects) : projects;
+
+  list.forEach((project) => {
     const thumbnail = document.createElement('div');
     thumbnail.className = 'thumbnail';
 
@@ -551,8 +580,8 @@ function createThumbnails() {
   });
 }
 
-createThumbnails();
-
+// ✅ 최초 로드에서도 한 번 랜덤으로 뿌리기
+createThumbnails({ shuffle: true });
 function showProjectDetail(projectId) {
   const index = projects.findIndex((p) => p.id === projectId);
   if (index === -1) return;
