@@ -3,10 +3,10 @@
   /* 메인 배경(white) */
   --color-bg-main: #ffffff;
   /* 메인 브랜드 컬러 (지금 쓰는 형광 연두) */
-  --color-brand: #fcfe7d;
+  --color-brand: #fafb8d;
   /* 포트폴리오 배경 */
   --color-portfolio-bg: #000000;
-  --color-desc-bg: #fcfe7d;
+  --color-desc-bg: #fafb8d;
   /* + 옵션: 중립 색 (검정/회색) */
   --color-text-main: #000000;
   --color-muted: #0008ff;
@@ -14,7 +14,7 @@
   /* 메인 배경 */
   --color-arrow: rgb(46, 100, 225);
   /* 버튼/화살표용 */
-  --color-maque: #fcfe7d;
+  --color-maque: #fafb8d;
   /* 마퀴바 배경 */
 
   /* 상단 바/마퀴 공통 시스템 */
@@ -311,7 +311,8 @@ body {
 }
 
 .thumbnail:hover {
-  opacity: 0.7;
+  opacity: 1;
+
 }
 
 .thumbnail img {
@@ -323,7 +324,7 @@ body {
 
 /* =============================== 상세 페이지 =============================== */
 #detail-page {
-  background: var(--color-desc-bg);
+  background: var(--color-main-gray);
   overflow-y: auto;
   padding-left: 10vw;
   padding-right: 10vw;
