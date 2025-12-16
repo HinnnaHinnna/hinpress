@@ -65,7 +65,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 'm'
+    mainImageSize: 'l'
   },
   {
     id: 3,
@@ -142,7 +142,7 @@ const rawProjects = [
     padLength: 2,
 
     // 포스터류는 대표이미지를 작게 두고 싶으면 's'
-    mainImageSize: 's'
+    mainImageSize: 'l'
   },
   {
     id: 7,
@@ -199,7 +199,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 's'
+    mainImageSize: 'l'
   },
   {
     id: 10,
@@ -218,7 +218,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 'm'
+    mainImageSize: 'l'
   },
   {
     id: 11,
@@ -236,7 +236,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 's'
+    mainImageSize: 'l'
   },
   {
     id: 12,
@@ -254,7 +254,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 'm'
+    mainImageSize: 'l'
   },
   {
     id: 13,
@@ -291,7 +291,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 'm'
+    mainImageSize: 'l'
   }
 ];
 

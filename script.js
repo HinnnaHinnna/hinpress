@@ -112,11 +112,16 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const marqueeBar = document.querySelector('.marquee-bar');
 
-// 패들(마퀴바)의 실제 DOM 크기/위치를 계속 읽어서 공 충돌에 사용
+/**
+ * ✅ 패들(마퀴바)의 실제 위치/크기
+ * - paddleX ~ paddleX+paddleWidth : 패들 가로 범위
+ * - paddleTop ~ paddleBottom      : 패들 세로 범위(두께)
+ */
 let paddleWidth = 0;
 let paddleHeight = 0;
 let paddleX = 0;
-let paddleY = 0;
+let paddleTop = 0;
+let paddleBottom = 0;
 let paddleVX = 0;
 
 function syncPaddleFromDom() {
@@ -125,7 +130,8 @@ function syncPaddleFromDom() {
   paddleWidth = rect.width;
   paddleHeight = rect.height;
   paddleX = rect.left;
-  paddleY = rect.bottom;
+  paddleTop = rect.top;
+  paddleBottom = rect.bottom;
 }
 
 function updatePaddleDomLeftOnly() {
@@ -149,7 +155,7 @@ function initPaddle() {
 
   const viewportWidth = window.innerWidth;
 
-  // ✅ 초기 한 번만 폭 설정(이후 사용자가 resize로 바꾼 폭은 존중)
+  // ✅ 초기 한 번만 폭 설정(이후 사용자의 resize 폭은 존중)
   let initialWidth = 0;
   if (viewportWidth <= 768) initialWidth = Math.min(viewportWidth * 0.4, viewportWidth);
   else initialWidth = Math.min(viewportWidth * 0.2, viewportWidth);
@@ -183,7 +189,7 @@ if (marqueeBar && 'ResizeObserver' in window) {
   ro.observe(marqueeBar);
 }
 
-// 창 크기 변화: 캔버스만 리사이즈 + 마퀴바는 “폭 유지, left만 clamp”
+// 창 크기 변화: 캔버스 리사이즈 + 패들 left만 보정
 window.addEventListener('resize', () => {
   resizeCanvas();
   syncPaddleFromDom();
@@ -194,7 +200,7 @@ window.addEventListener('resize', () => {
 
 // ==============================
 // 패들 드래그(이동): 마우스 + 터치
-// - 오른쪽 끝(핸들 영역) 잡으면 브라우저 resize가 우선 되게 이동 드래그 막음
+// - 오른쪽 끝(핸들 영역) 잡으면 브라우저 resize가 우선
 // ==============================
 let isDraggingPaddle = false;
 let lastPointerX = 0;
@@ -224,6 +230,7 @@ if (marqueeBar) {
     const dx = e.clientX - lastPointerX;
     const dt = now - lastPointerTime || 16;
 
+    // 패들 속도(공이 “맞았을 때” 가로힘을 주기 위해)
     paddleVX = (dx / dt) * 16;
 
     syncPaddleFromDom();
@@ -317,7 +324,19 @@ class Ball {
     ctx.restore();
   }
 
+  /**
+   * ✅ 중요 변경점:
+   * - 예전: 마퀴바가 "천장"이라서 x와 상관없이 무조건 막힘
+   * - 지금: 마퀴바는 "패들"이라서
+   *         패들 범위 안에서 부딪힐 때만 튕김
+   *         못 맞추면 위로 통과 → 화면 밖으로 빠져나감
+   */
   update() {
+    // 이동 전 위치(충돌 판정을 위해 저장)
+    const prevX = this.x;
+    const prevY = this.y;
+
+    // 이동
     this.x += this.vx;
     this.y += this.vy;
 
@@ -330,17 +349,48 @@ class Ball {
       this.vx = Math.abs(this.vx);
     }
 
-    // 마퀴바를 ‘천장’처럼 취급
+    // =====================================================
+    // ✅ 패들(마퀴바) 충돌: "맞으면 튕김 / 빗나가면 통과"
+    // - 패들은 '막대'니까 위/아래 면 둘 다 반사 가능
+    // - 하지만 "패들 가로 범위 안"일 때만 반사한다.
+    // =====================================================
     if (paddleHeight > 0) {
-      const topLimit = paddleY;
+      // 패들에 “맞았는지” 판단할 때, 공의 반지름까지 고려해서 살짝 넓게 잡아준다.
+      const withinPaddleX =
+        this.x >= (paddleX - this.radius) &&
+        this.x <= (paddleX + paddleWidth + this.radius);
 
-      if (this.y - this.radius < topLimit) {
-        const withinPaddle = this.x >= paddleX && this.x <= paddleX + paddleWidth;
+      // 1) 아래에서 위로 올라오다가( vy < 0 ) 패들의 '아래면(bottom)'을 통과하면 반사
+      //    - prevTop > paddleBottom 이었다가 currTop <= paddleBottom 이 되면 "아래면을 건드림"
+      if (this.vy < 0 && withinPaddleX) {
+        const prevTop = (prevY - this.radius);
+        const currTop = (this.y - this.radius);
 
-        this.y = topLimit + this.radius;
-        this.vy = Math.abs(this.vy);
+        const crossedBottomSurface = (prevTop > paddleBottom) && (currTop <= paddleBottom);
 
-        if (withinPaddle) {
+        if (crossedBottomSurface) {
+          // 패들 아래쪽 면에서 튕겨 내려가게
+          this.y = paddleBottom + this.radius;
+          this.vy = Math.abs(this.vy); // 아래로
+
+          // 패들을 움직이고 있을 때, 공에 가로힘 추가
+          this.vx += paddleVX * 0.8;
+        }
+      }
+
+      // 2) 위에서 아래로 내려오다가( vy > 0 ) 패들의 '윗면(top)'을 통과하면 반사
+      //    - prevBottom < paddleTop 이었다가 currBottom >= paddleTop 이 되면 "윗면을 건드림"
+      if (this.vy > 0 && withinPaddleX) {
+        const prevBottom = (prevY + this.radius);
+        const currBottom = (this.y + this.radius);
+
+        const crossedTopSurface = (prevBottom < paddleTop) && (currBottom >= paddleTop);
+
+        if (crossedTopSurface) {
+          // 패들 윗면에서 튕겨 올라가게
+          this.y = paddleTop - this.radius;
+          this.vy = -Math.abs(this.vy); // 위로
+
           this.vx += paddleVX * 0.8;
         }
       }
@@ -352,8 +402,33 @@ class Ball {
       this.vy = -Math.abs(this.vy);
     }
 
+    // =====================================================
+    // ✅ 위쪽 화면 밖으로 "빠져나가게" 만들기
+    // - (천장 없음) y가 완전히 화면 밖으로 나가면 공을 “재생성”해서 계속 흐르게 함
+    // - 만약 "그냥 사라지게" 하고 싶으면, 아래 recycleBall() 대신 return false로 처리하면 됨.
+    // =====================================================
+    if (this.y + this.radius < 0) {
+      this.recycleBall();
+    }
+
     this.rotation += this.rotationSpeed;
     this.draw();
+  }
+
+  /**
+   * ✅ 공이 위로 빠져나갔을 때 “새 공”처럼 아래에서 다시 시작
+   * - 관객 입장에서는: 공이 위로 탈출하면 사라지고, 아래에서 새로 등장하는 느낌
+   */
+  recycleBall() {
+    this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
+    this.y = canvas.height - this.radius - 5;
+
+    // 아래에서 위로 올라가게 초기화
+    this.vx = (Math.random() - 0.5) * 10;
+    this.vy = -(Math.random() * 8 + 3);
+
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotationSpeed = (Math.random() - 0.5) * 0.05;
   }
 }
 
@@ -398,21 +473,18 @@ function checkCollision(ball1, ball2) {
   }
 }
 
-// 초기 공 생성(마퀴바 아래에만)
-syncPaddleFromDom();
+// 초기 공 생성(캔버스 내부에서)
 for (let i = 0; i < numBalls; i++) {
   const radius = 16;
-  const minY = paddleY + radius + 10;
-  const maxY = canvas.height - radius * 2;
   const x = radius + Math.random() * (canvas.width - radius * 2);
-  const y = minY + Math.random() * Math.max(0, maxY - minY);
+  const y = radius + Math.random() * (canvas.height - radius * 2);
   balls.push(new Ball(x, y, radius, ballColor));
 }
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // 매 프레임 마퀴바 실제 값 반영
+  // 매 프레임 패들 위치/크기 최신화
   syncPaddleFromDom();
 
   balls.forEach((b) => b.update());
@@ -430,8 +502,6 @@ animate();
 // =====================================================
 // 5) 썸네일 생성 & 상세 표시
 // =====================================================
-
-// 배열 셔플(Fisher–Yates)
 function shuffleArray(inputArray) {
   const arr = inputArray.slice();
   for (let i = arr.length - 1; i > 0; i--) {
@@ -465,21 +535,13 @@ function createThumbnails(options = {}) {
 // 최초 한 번 뿌리기
 createThumbnails({ shuffle: true });
 
-/**
- * ✅ 프로젝트의 mainImageSize 값('s'|'m'|'l')을
- * CSS 클래스(main-img-s/m/l)로 변환하는 안전 함수
- */
 function normalizeMainImageSize(value) {
   const v = String(value || '').toLowerCase();
   if (v === 's' || v === 'small') return 's';
   if (v === 'l' || v === 'large') return 'l';
-  return 'm'; // 기본값
+  return 'm';
 }
 
-/**
- * 값이 배열이면 ' / '로 합치고, 문자열이면 그대로.
- * 빈 값이면 ''로 정리.
- */
 function normalizeText(value) {
   if (Array.isArray(value)) return value.filter(Boolean).join(' / ');
   if (typeof value === 'string') return value;
@@ -493,12 +555,10 @@ function showProjectDetail(projectId) {
   currentProjectIndex = index;
   const project = projects[index];
 
-  // 텍스트들
   detailTitleEl.textContent = project.title || '';
   detailSubtitleEl.textContent = normalizeText(project.subtitle);
   detailYearEl.textContent = project.year || '';
 
-  // specs
   const specsText = normalizeText(project.specs);
   if (specsText) {
     detailSpecsEl.textContent = specsText;
@@ -508,7 +568,6 @@ function showProjectDetail(projectId) {
     detailSpecsContainer.style.display = 'none';
   }
 
-  // size
   const sizeText = normalizeText(project.size);
   if (sizeText) {
     detailSizeEl.textContent = sizeText;
@@ -518,7 +577,6 @@ function showProjectDetail(projectId) {
     detailSizeContainer.style.display = 'none';
   }
 
-  // client
   const clientText = normalizeText(project.client);
   if (clientText) {
     detailClientEl.textContent = clientText;
@@ -528,39 +586,24 @@ function showProjectDetail(projectId) {
     detailClientContainer.style.display = 'none';
   }
 
-  // description은 HTML이 들어갈 수 있으니 innerHTML (네 데이터가 이미 &lt; 처리 등 하고 있음)
   detailDescriptionEl.innerHTML = project.description || '';
 
-  // 이미지 렌더링
   const images = project.images || [];
   if (detailMainImageEl) detailMainImageEl.innerHTML = '';
   detailImagesEl.innerHTML = '';
 
-  // ✅ 대표이미지 사이즈: projects-data.js의 mainImageSize로 고정
   const mainSize = normalizeMainImageSize(project.mainImageSize);
   const mainClass = `main-img-${mainSize}`;
 
   if (images.length > 0) {
-    // 1) 첫 번째 이미지는 대표 영역에
     if (detailMainImageEl) {
       const firstImg = document.createElement('img');
       firstImg.src = images[0];
       firstImg.alt = project.title || '';
-
-      // ✅ 여기서 S/M/L 결정
       firstImg.classList.add(mainClass);
-
       detailMainImageEl.appendChild(firstImg);
-    } else {
-      // 혹시 대표영역이 없을 때 대비(안전장치)
-      const img = document.createElement('img');
-      img.src = images[0];
-      img.alt = project.title || '';
-      img.classList.add(mainClass);
-      detailImagesEl.appendChild(img);
     }
 
-    // 2) 나머지 이미지는 detail-images에
     for (let i = 1; i < images.length; i++) {
       const img = document.createElement('img');
       img.src = images[i];
@@ -602,13 +645,11 @@ if (detailPage) {
     if (Math.abs(dx) < SWIPE_THRESHOLD) return;
 
     if (dx > 0) {
-      // 오른쪽 스와이프 → 이전
       if (currentProjectIndex > 0) {
         const prev = projects[currentProjectIndex - 1];
         if (prev) showProjectDetail(prev.id);
       }
     } else {
-      // 왼쪽 스와이프 → 다음
       if (currentProjectIndex < projects.length - 1) {
         const next = projects[currentProjectIndex + 1];
         if (next) showProjectDetail(next.id);
