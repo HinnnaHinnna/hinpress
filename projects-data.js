@@ -112,7 +112,7 @@ const rawProjects = [
     client: ['충무로영화제-감독주간, box8'],
     imageFolder: '2024/parkchanwuk',  // 박찬욱 -> parkchanwuk
     imageBaseName: 'parkchanwuk',
-    imageCount: 22,
+    imageCount: 23,
     imageExt: 'jpg',
     padLength: 2
   },
