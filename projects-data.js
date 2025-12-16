@@ -292,8 +292,64 @@ const rawProjects = [
     padLength: 2,
 
     mainImageSize: 'l'
+  },
+  {
+    id: 15,
+    title: '2025 새해 인사',
+    subtitle: ['그래픽'],
+    year: '2025',
+    specs: '웹',
+    size: [' '],
+    description: '푸른 (보아)뱀의 해. 2025! Happy new year!',
+    category: 'Graphic Design',
+    client: ['개인 작업'],
+    imageFolder: '2024/2025year',
+    imageBaseName: '2025year',
+    imageCount: 2,
+    imageExt: 'jpg',
+    padLength: 2,
+
+    mainImageSize: 'l'
+  },
+  {
+    id: 16,
+    title: 'xyz',
+    subtitle: ['포스터'],
+    year: '2024',
+    specs: '웹',
+    size: [' '],
+    description: '서울시립대학교 디자인전문대학원 시각디자인 국외 디자이너 초빙 특강/워크숍 포스터. XYZ 랩(XYZ Lab): 자오완칭(赵宛青/Zhao Wanqing), 샤오녠(邵年/Shao Nian)',
+    category: 'Graphic Design',
+    client: ['개인 작업'],
+    imageFolder: '2024/xyz',
+    imageBaseName: 'xyz',
+    imageCount: 2,
+    imageExt: 'jpg',
+    padLength: 2,
+
+    mainImageSize: 'l'
+  },
+  {
+    id: 17,
+    title: 'craftm',
+    subtitle: ['포스터, 홍보물, 배너'],
+    year: '2023',
+    specs: ' ',
+    size: [' '],
+    description: '<입고 꾸미기 위한 공예> 포스터. ',
+    category: 'Graphic Design',
+    client: ['서울공예박물관'],
+    imageFolder: '2024/craftm',
+    imageBaseName: 'craftm',
+    imageCount: 4,
+    imageExt: 'jpg',
+    padLength: 2,
+
+    mainImageSize: 'l'
   }
 ];
+
+
 
 // ============================================
 // 최종 projects 배열 생성
