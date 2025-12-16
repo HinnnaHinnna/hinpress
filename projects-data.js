@@ -236,7 +236,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 'm'
+    mainImageSize: 'l'
   },
   {
     id: 12,
