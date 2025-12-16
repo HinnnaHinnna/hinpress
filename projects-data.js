@@ -65,7 +65,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 'l'
+    mainImageSize: 'm'
   },
   {
     id: 3,
@@ -236,7 +236,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    mainImageSize: 'l'
+    mainImageSize: 'm'
   },
   {
     id: 12,
@@ -273,7 +273,7 @@ const rawProjects = [
     padLength: 2,
 
     // ✅ 예시: 한글박물관 프로젝트는 대표이미지 크게
-    mainImageSize: 'l'
+    mainImageSize: 'm'
   },
   {
     id: 14,
