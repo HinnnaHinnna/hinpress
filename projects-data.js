@@ -273,7 +273,7 @@ const rawProjects = [
     padLength: 2,
 
     // ✅ 예시: 한글박물관 프로젝트는 대표이미지 크게
-    mainImageSize: 'm'
+    mainImageSize: 'l'
   },
   {
     id: 14,
@@ -318,7 +318,7 @@ const rawProjects = [
     year: '2024',
     specs: '웹',
     size: [' '],
-    description: '서울시립대학교 디자인전문대학원 시각디자인 국외 디자이너 초빙 특강/워크숍 포스터. XYZ 랩(XYZ Lab): 자오완칭(赵宛青/Zhao Wanqing), 샤오녠(邵年/Shao Nian)',
+    description: '서울시립대학교 디자인전문대학원 시각디자인 국외 디자이너 XYZ 랩: 자오완칭(赵宛青/Zhao Wanqing), 샤오녠(邵年/Shao Nian) 초빙 특강/워크숍 포스터.',
     category: 'Graphic Design',
     client: ['개인 작업'],
     imageFolder: '2024/xyz',
