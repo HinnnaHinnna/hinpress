@@ -1,63 +1,41 @@
 /* =============================== 기본 리셋 =============================== */
 :root {
-  /* 메인 배경(white) */
   --color-bg-main: #ffffff;
-  /* 메인 브랜드 컬러 (지금 쓰는 형광 연두) */
   --color-brand: #fafb8d;
-  /* 포트폴리오 배경 */
   --color-portfolio-bg: #000000;
   --color-desc-bg: #fafb8d;
-  /* + 옵션: 중립 색 (검정/회색) */
+
   --color-text-main: #000000;
   --color-muted: #0008ff;
   --color-main-gray: rgb(246, 238, 227);
-  /* 메인 배경 */
-  --color-arrow: rgb(46, 100, 225);
-  /* 버튼/화살표용 */
-  --color-maque: #fafb8d;
-  /* 마퀴바 배경 */
 
-  /* 상단 바/마퀴 공통 시스템 */
+  --color-arrow: rgb(46, 100, 225);
+  --color-maque: #fafb8d;
+
   --bar-height: 2rem;
   --bar-font-size: 0.8rem;
+
+  /* =====================================================
+     ✅ 대표이미지(첫 번째 이미지) 3단계 크기 프리셋
+     - JS는 프로젝트의 mainImageSize 값을 보고
+       img에 main-img-s / main-img-m / main-img-l 클래스를 붙인다.
+     - “폭(px)”은 여기서 한번에 조정 가능.
+     ===================================================== */
+  --detail-main-img-s: 220px;
+  --detail-main-img-m: 300px;
+  /* 기존 300px 기준 */
+  --detail-main-img-l: 600px;
+
+  /* 모바일은 %로 처리하는 게 안전해서 별도 프리셋 */
+  --detail-main-img-s-mobile: 50%;
+  --detail-main-img-m-mobile: 60%;
+  --detail-main-img-l-mobile: 85%;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-/* 구글 폰트 프리셋 */
-.gothic-a1-extralight {
-  font-family: "Gothic A1", sans-serif;
-  font-weight: 200;
-  font-style: normal;
-}
-
-.gothic-a1-light {
-  font-family: "Gothic A1", sans-serif;
-  font-weight: 300;
-  font-style: normal;
-}
-
-.gothic-a1-regular {
-  font-family: "Gothic A1", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.gothic-a1-medium {
-  font-family: "Gothic A1", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-}
-
-.inter-uniquifier {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
 }
 
 body {
@@ -78,7 +56,6 @@ body {
   width: 100%;
   height: var(--bar-height);
   background: var(--color-brand);
-  border-bottom: 0px solid var(--color-bg-main);
   display: flex;
   align-items: center;
   padding: 0 1rem;
@@ -128,7 +105,7 @@ body {
   height: var(--bar-height);
 }
 
-/* 중앙 로고 위치 */
+/* 중앙 로고 */
 #top-logo {
   position: absolute;
   left: 50%;
@@ -159,7 +136,6 @@ body {
 
 .title-container {
   position: absolute;
-  top: auto;
   bottom: 20vh;
   left: 50%;
   transform: translateX(-50%);
@@ -171,15 +147,6 @@ body {
   font-weight: 300;
 }
 
-.main-desc {
-  margin: 0.75rem auto 0;
-  width: 40vw;
-  line-height: 1.8;
-  font-size: 13px;
-  word-break: keep-all;
-}
-
-/* main-title */
 #main-title {
   white-space: nowrap;
   font-size: min(24vw, 60vh);
@@ -192,7 +159,6 @@ body {
   transition: opacity 0.2s;
 }
 
-/* Press 부분 */
 #main-title .press-text {
   font-family: "Inter", sans-serif;
   font-weight: 300;
@@ -204,7 +170,6 @@ body {
   opacity: 0.8;
 }
 
-/* 모바일에서 타이틀 깜빡임 */
 @keyframes mobileTitleBlink {
 
   0%,
@@ -218,35 +183,23 @@ body {
 }
 
 /* =============================== 마퀴바 =============================== */
-/* 상단 흐르는 글 + 패들 바 */
+/* 상단 흐르는 글 + (데스크탑) 가로 리사이즈 가능 */
 .marquee-bar {
   position: fixed;
   top: 20px;
-  /* 🔹 여기 숫자를 바꾸면 위/아래 위치가 절대값으로 변경됨 */
   left: 0;
   width: 100%;
-  /* 100vw 대신 100% 써도 OK */
   height: var(--bar-height);
   resize: horizontal;
-  /* ✅ 가로만 늘리기/줄이기 */
   overflow: hidden;
-  /* ✅ resize 동작 조건 */
   max-width: calc(100vw - 12px);
-  /* 화면 밖으로 너무 나가지 않게 안전장치(선택) */
   min-width: 120px;
-  /* 너무 작아져서 잡기 힘든 상황 방지(선택) */
   z-index: 100;
   display: flex;
   align-items: center;
   background-color: var(--color-maque);
 }
 
-/* 핸들은 기본적으로 숨김(데스크탑에서는 기존 resize를 쓰거나, 필요 없으니까) */
-.marquee-resizer {
-  display: none;
-}
-
-/* 흐르는 컨테이너 */
 .marquee-inner {
   display: inline-block;
   white-space: nowrap;
@@ -254,11 +207,9 @@ body {
   animation: marquee 70s linear infinite;
 }
 
-/* 🔹 여기서 텍스트 색/두께 조정 */
 .marquee-text {
   font-family: "Gothic A1", sans-serif;
   font-weight: 400;
-  /* 기존보다 한 단계 두꺼운 400 */
   font-size: var(--bar-font-size);
   line-height: 1;
   word-break: keep-all;
@@ -266,7 +217,6 @@ body {
   color: #000000;
 }
 
-/* 흐르는 애니메이션 */
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -290,7 +240,6 @@ body {
   overflow-y: auto;
 }
 
-/* 섬네일 컨테이너 */
 #thumbnails-container {
   position: relative;
   width: 100%;
@@ -307,12 +256,10 @@ body {
   transition: opacity 0.2s;
   flex-shrink: 0;
   width: 260px;
-  /* 썸네일 가로폭 고정 */
 }
 
 .thumbnail:hover {
   opacity: 1;
-
 }
 
 .thumbnail img {
@@ -335,7 +282,6 @@ body {
 .detail-nav {
   position: fixed;
   top: 4.5rem;
-  /* 상단바 바로 아래 */
   left: 0;
   width: 100%;
   display: flex;
@@ -357,7 +303,6 @@ body {
   opacity: 0.6;
 }
 
-/* 비활성(첫/마지막) 상태 */
 .detail-nav span.disabled {
   color: var(--color-brand);
   cursor: default;
@@ -365,7 +310,7 @@ body {
   opacity: 0;
 }
 
-/* 상세 내용 (데스크탑 레이아웃) */
+/* 상세 내용 레이아웃 */
 .detail-content {
   display: grid;
   grid-template-columns: 300px 300px;
@@ -375,7 +320,7 @@ body {
   padding: 7rem 1rem 2rem 1rem;
 }
 
-/* 첫 번째 이미지 */
+/* 대표(첫 번째) 이미지 컨테이너 */
 .detail-main-image {
   grid-column: 2 / 5;
   grid-row: 1 / 3;
@@ -384,11 +329,24 @@ body {
   align-items: flex-start;
 }
 
+/* 대표 이미지 공통 */
 .detail-main-image img {
-  width: 300px;
   height: auto;
   display: block;
   margin-bottom: 2rem;
+}
+
+/* ✅ 대표이미지 3단계 (데스크탑 px) */
+.detail-main-image img.main-img-s {
+  width: var(--detail-main-img-s);
+}
+
+.detail-main-image img.main-img-m {
+  width: var(--detail-main-img-m);
+}
+
+.detail-main-image img.main-img-l {
+  width: var(--detail-main-img-l);
 }
 
 /* 오른쪽 상단: 텍스트 */
@@ -407,7 +365,6 @@ body {
   font-weight: 700;
 }
 
-/* 부제 박스 */
 #detail-subtitle {
   display: inline-block;
   padding: 0.15rem 0.15rem;
@@ -500,54 +457,38 @@ body {
 }
 
 /* =========================
-       ✅ 대시(-) 목록 스타일
-       =========================
-       1) ul의 기본 불릿을 제거
-       2) li 왼쪽에 공간을 만들고(padding-left)
-       3) li::before로 '-'를 절대 위치로 찍어서
-          줄바꿈이 되어도 텍스트 시작점이 동일하게 정렬되게 함
-    */
+   ✅ 대시(-) 목록 스타일
+   ========================= */
 .dash-list {
   list-style: none;
-  /* 기본 불릿 제거 */
   padding-left: 0;
-  /* ul 기본 들여쓰기 제거 */
   margin: 0;
-  /* 필요하면 조절 */
 }
 
 .dash-list li {
   position: relative;
-  /* ::before의 기준점 */
   padding-left: 1.1em;
-  /* 대시가 들어갈 왼쪽 공간 */
   margin: 6px 0;
-  /* 항목 간격(취향) */
 }
 
 .dash-list li::before {
   content: "-";
-  /* 여기서 "-"/"–"/"—" 바꿔도 됨 */
   position: absolute;
   left: 0;
   top: 0;
 }
 
-/* =============================== 반응형: 모바일 전용 뷰 =============================== */
+/* =============================== 반응형: 모바일 =============================== */
 @media (max-width: 768px) {
-
-  /* 마퀴바/상단바 높이 */
   :root {
     --bar-height: 2.5rem;
   }
 
-  /* 메인 타이틀 깜빡임 */
   #main-title {
     animation: mobileTitleBlink 1.2s ease-in-out infinite;
   }
 
   .title-container {
-    top: auto;
     bottom: 20vh;
   }
 
@@ -570,10 +511,17 @@ body {
     justify-content: center;
   }
 
-  .detail-main-image img {
-    width: 60%;
-    height: auto;
-    object-fit: contain;
+  /* ✅ 모바일 대표이미지 3단계(%) */
+  .detail-main-image img.main-img-s {
+    width: var(--detail-main-img-s-mobile);
+  }
+
+  .detail-main-image img.main-img-m {
+    width: var(--detail-main-img-m-mobile);
+  }
+
+  .detail-main-image img.main-img-l {
+    width: var(--detail-main-img-l-mobile);
   }
 
   .detail-info {
@@ -602,7 +550,6 @@ body {
     box-sizing: border-box;
     display: grid;
     grid-template-columns: 1fr;
-    /* 모바일에서 한 줄에 한 장 */
     gap: 2rem;
   }
 
@@ -621,10 +568,6 @@ body {
     padding: 4.5rem 1rem 2rem;
     font-size: 13px;
     line-height: 1.7;
-  }
-
-  .cv-inner h2 {
-    font-size: 18px;
   }
 
   .cv-section h3 {

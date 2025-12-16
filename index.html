@@ -2,19 +2,19 @@
 <html lang="ko">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>hinStudio Portfolio</title>
 
   <!-- 외부 CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 
   <!-- 구글 폰트 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Gothic+A1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" />
 </head>
 
 <body>
@@ -36,8 +36,7 @@
        메인 페이지
        ============================ -->
   <div id="main-page" class="page active">
-
-    <!-- 🔹 마퀴바: 기존 디자인/기능 유지 + "가로 리사이즈"만 추가 -->
+    <!-- 마퀴바 (캔버스 공의 ‘천장’ 역할 + 드래그 이동 + (데스크탑) 가로 리사이즈) -->
     <div class="marquee-bar" id="marquee-bar">
       <div class="marquee-inner">
         <span class="marquee-text">
@@ -55,7 +54,7 @@
       </div>
     </div>
 
-    <!-- 🔹 타이틀 -->
+    <!-- 타이틀 -->
     <div class="title-container">
       <h1 id="main-title">
         hin<span class="press-text">P</span>ress
@@ -111,8 +110,9 @@
       <div class="cv-section">
         <h3>연락처</h3>
         <ul>
-          <li>Email: <a href="mailto:hinnahinna3939@gmail.com" target="_blank">hinnahinna3939@gmail.com</a></li>
-          <li>Instagram: <a href="https://www.instagram.com/direct/inbox/" target="_blank">@chales9</a></li>
+          <li>Email: <a href="mailto:hinnahinna3939@gmail.com" target="_blank"
+              rel="noopener">hinnahinna3939@gmail.com</a></li>
+          <li>Instagram: <a href="https://www.instagram.com/chales9/" target="_blank" rel="noopener">@chales9</a></li>
         </ul>
       </div>
     </div>
@@ -128,6 +128,7 @@
     </div>
 
     <div class="detail-content">
+      <!-- 대표(첫 번째) 이미지가 들어갈 곳 -->
       <div class="detail-main-image" id="detail-main-image"></div>
 
       <div class="detail-info">
@@ -156,6 +157,7 @@
         <div id="detail-links" class="detail-links"></div>
       </div>
 
+      <!-- 2번째 이미지부터 쌓이는 곳 -->
       <div class="detail-images" id="detail-images"></div>
     </div>
   </div>
