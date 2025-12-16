@@ -600,7 +600,7 @@ function showProjectDetail(projectId) {
       const firstImg = document.createElement('img');
       firstImg.src = images[0];
       firstImg.alt = project.title || '';
-      firstImg.classList.add(mainClass);
+      firstImg.classList.add(`main-img-${mainSize}`);
       detailMainImageEl.appendChild(firstImg);
     }
 
