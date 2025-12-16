@@ -21,8 +21,8 @@
        img에 main-img-s / main-img-m / main-img-l 클래스를 붙인다.
      - “폭(px)”은 여기서 한번에 조정 가능.
      ===================================================== */
-  --detail-main-img-s: 220px;
-  --detail-main-img-m: 300px;
+  --detail-main-img-s: 300px;
+  --detail-main-img-m: 500px;
   /* 기존 300px 기준 */
   --detail-main-img-l: 600px;
 
