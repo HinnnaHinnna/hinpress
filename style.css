@@ -148,22 +148,17 @@ body {
 
 #main-title {
   white-space: nowrap;
-  font-size: min(24vw, 60vh);
+  font-size: min(20vw, 55vh);
   font-family: 'Inter', Helvetica, Arial, sans-serif;
-  font-weight: 300;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  letter-spacing: -0.027em;
   color: white;
   text-align: center;
   cursor: pointer;
   transition: opacity 0.2s;
 }
 
-#main-title .press-text {
-  font-family: "Inter", sans-serif;
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  color: #ffffff;
-}
+
 
 #main-title:hover {
   opacity: 0.8;
