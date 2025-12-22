@@ -15,7 +15,7 @@
   --bar-height: 2rem;
   --bar-font-size: 0.8rem;
 
-  /* ✅ 공통 좌우 여백(모바일에서 top-bar/콘텐츠/스트립을 똑같이 맞출 변수) */
+  /* ✅ 공통 좌우 여백 */
   --page-side-padding: 1rem;
 
   /* ✅ 상세페이지 좌우 패딩(데스크탑) */
@@ -37,9 +37,11 @@
   --detail-strip-thumb-maxh: 88px;
   --detail-strip-gap: 16px;
   --detail-strip-arrow-zone: 60px;
-  --detail-strip-active-outline: 4px;
 
-  /* 마퀴(필요 변수는 그대로) */
+  /* ✅ 썸네일 선택 테두리 두께(여기 줄이면 얇아짐) */
+  --detail-strip-active-outline: 2px;
+
+  /* 마퀴 */
   --marquee-intro-from: 0px;
   --marquee-intro-duration: 6s;
   --marquee-loop-duration: 30s;
@@ -49,6 +51,37 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.gothic-a1-extralight {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.gothic-a1-light {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.gothic-a1-regular {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.gothic-a1-medium {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.inter-uniquifier {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: weight;
+  font-style: normal;
 }
 
 body {
@@ -71,10 +104,7 @@ body {
   background: var(--color-brand);
   display: flex;
   align-items: center;
-
-  /* ✅ 좌우 여백 통일 */
   padding: 0 var(--page-side-padding);
-
   z-index: 300;
   transform: translateY(0);
   transition: transform 0.3s ease;
@@ -269,8 +299,6 @@ body {
 #portfolio-page {
   background: var(--color-portfolio-bg);
   overflow-y: auto;
-
-  /* ✅ 스크롤바로 레이아웃 흔들림 방지(지원 브라우저에서만) */
   scrollbar-gutter: stable both-edges;
 }
 
@@ -313,10 +341,12 @@ body {
 
   overflow-x: hidden;
   scrollbar-gutter: stable both-edges;
-
   font-weight: 400;
 }
 
+/* ===============================
+   ✅ 상단 상세 네비: “➔ + 반전(왼쪽)”으로 통일
+   =============================== */
 .detail-nav {
   position: fixed;
   top: 4.5rem;
@@ -324,23 +354,23 @@ body {
   width: 100%;
   display: flex;
   justify-content: space-between;
-
   padding: 0 var(--page-side-padding);
-
-  font-size: 40px;
+  font-size: 20px;
   z-index: 210;
-  color: var(--color-muted);
 }
 
-.detail-nav span {
+.detail-nav-arrow {
   cursor: pointer;
   user-select: none;
   color: var(--color-arrow);
-  /* ✅ 클릭 영역을 좌우 동일한 “박스”로 만들기 */
+
   width: 44px;
   height: 44px;
+
   display: flex;
   align-items: center;
+  line-height: 1;
+  padding: 0;
 }
 
 #detail-prev {
@@ -351,85 +381,100 @@ body {
   justify-content: flex-end;
 }
 
-
-/* ===============================
-   detail-nav: ·८· 아이콘용
-   - 오른쪽 버튼만 좌우반전(scaleX(-1))
-   =============================== */
-.detail-face {
-  display: inline-block;
-  /* transform 적용하려면 inline-block이 안전 */
-  line-height: 1;
-  /* 위아래 흔들림 줄이기 */
+/* prev만 좌우반전 */
+.detail-nav-arrow--mirrored {
+  transform: scaleX(-1) translateX(30px);
+  transform-origin: center;
 }
 
-.detail-face--right {
-  transform: scaleX(-1);
-  /* ✅ 좌우 반전 */
-}
-
-
-.detail-nav span:hover {
+.detail-nav-arrow:hover {
   opacity: 0.6;
 }
 
-.detail-nav span.disabled {
+.detail-nav-arrow.disabled {
   color: var(--color-brand);
   cursor: default;
   pointer-events: none;
   opacity: 0;
 }
 
+/* ===============================
+   ✅ 상세 내용 레이아웃 (요청 반영)
+   - 1행: 대표이미지(00.jpg) = 중앙, 전체폭
+   - 2행: 1/5 정보 + (2/5 + 2/5) 이미지 2단
+   =============================== */
 .detail-content {
   display: grid;
-  grid-template-columns: 300px 300px;
+
+  /* ✅ 1/5 + 2/5 + 2/5 구조 */
+  grid-template-columns: 1fr 2fr 2fr;
+  grid-template-rows: auto 1fr;
+
   column-gap: 2rem;
-  align-items: flex-start;
+  row-gap: 1.5rem;
+
+  align-items: start;
+
+  /* ✅ 상단 네비가 fixed라 콘텐츠는 아래로 내려야 함 */
+  padding: 5rem var(--page-side-padding) 2rem var(--page-side-padding);
+
   min-height: 100vh;
-  padding: 7rem 1rem 2rem 1rem;
 }
 
+/* ✅ 대표 이미지(00.jpg) = 1행 전체폭 중앙 */
 .detail-main-image {
-  grid-column: 3 / 5;
-  grid-row: 1 / 3;
+  grid-column: 1 / -1;
+  /* 전체폭 */
+  grid-row: 1;
+
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  /* 중앙 */
   align-items: flex-start;
 }
 
+/* 대표 이미지는 어떤 화면에서도 잘리지 않게 */
 .detail-main-image img {
-  height: auto;
   display: block;
-  margin-bottom: 2rem;
+  height: auto;
   max-height: 60vh;
+  max-width: 100%;
   object-fit: contain;
+  margin-bottom: 0.5rem;
 }
 
+/* 프리셋도 “100%를 넘지 않게” 클램프 */
 .detail-main-image img.main-img-s {
-  width: var(--detail-main-img-s);
+  width: min(var(--detail-main-img-s), 100%);
 }
 
 .detail-main-image img.main-img-m {
-  width: var(--detail-main-img-m);
+  width: min(var(--detail-main-img-m), 100%);
 }
 
 .detail-main-image img.main-img-l {
-  width: var(--detail-main-img-l);
+  width: min(var(--detail-main-img-l), 100%);
 }
 
+/* ✅ 정보 = 2행 1열(1/5) */
 .detail-info {
-  grid-column: 1 / 5;
-  grid-row: 3 / 3;
-  width: 300px;
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  max-width: 320px;
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.2;
   margin-bottom: 1rem;
+  word-break: keep-all;
+  letter-spacing: 0.1px
 }
 
 .detail-info h2 {
   font-family: "Gothic A1", sans-serif;
-  font-size: 19px;
-  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 500;
+  word-break: keep-all;
 }
 
 #detail-subtitle {
@@ -438,7 +483,7 @@ body {
   border: 1px solid var(--color-text-main);
   border-radius: 6px;
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.5;
   margin-top: 0.5rem;
   background-color: transparent;
   word-break: keep-all;
@@ -451,6 +496,7 @@ body {
   margin-top: 0.5rem;
   word-break: keep-all;
   text-align: left;
+  letter-spacing: -0.11px
 }
 
 .detail-meta-item {
@@ -458,14 +504,19 @@ body {
   margin-top: 0.2rem;
 }
 
+/* ✅ 이미지들 = 2행 2~3열(= 4/5) 안에서 2단 */
 .detail-images {
-  width: 1100px;
-  grid-column: 2 / 5;
-  grid-row: 3 / 3;
+  grid-column: 2 / -1;
+  grid-row: 2;
+
+  /* ✅ 내부 2단 */
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  justify-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2rem;
+
+  /* ✅ “오른쪽 영역 안에서” 가운데 느낌 유지 */
+  width: 100%;
+  margin: 0 auto;
 }
 
 .detail-images img {
@@ -476,6 +527,38 @@ body {
 
 .detail-images img.span-2 {
   grid-column: 1 / -1;
+}
+
+/* ===============================
+   ✅ (B) 화면이 좁아지면 자동 1단(세로)
+   =============================== */
+@media (max-width: 1024px) {
+  .detail-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 5rem 0 2rem 0;
+    /* 모바일 규칙과 “느낌” 통일 */
+  }
+
+  .detail-main-image {
+    width: 100%;
+    padding: 0 var(--page-side-padding);
+    box-sizing: border-box;
+  }
+
+  .detail-info {
+    max-width: none;
+    padding: 0 var(--page-side-padding);
+    box-sizing: border-box;
+  }
+
+  .detail-images {
+    grid-template-columns: 1fr;
+    /* 좁으면 1열이 깔끔 */
+    padding: 0 var(--page-side-padding);
+    box-sizing: border-box;
+  }
 }
 
 /* ===============================
@@ -506,7 +589,6 @@ body {
   padding-left: var(--detail-strip-arrow-zone);
   padding-right: var(--detail-strip-arrow-zone);
 
-  /* ✅ outline 잘림 방지 */
   padding-top: var(--detail-strip-active-outline);
   padding-bottom: calc(6px + var(--detail-strip-active-outline));
 
@@ -533,6 +615,7 @@ body {
   background: transparent;
 }
 
+/* ✅ 선택 테두리 두께는 변수(--detail-strip-active-outline)로 제어 */
 .detail-strip-thumb.is-active img {
   outline: var(--detail-strip-active-outline) solid var(--color-muted);
   outline-offset: 0;
@@ -556,28 +639,9 @@ body {
 
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-/* ===============================
-   하단 썸네일 화살표: ·८· 아이콘
-   - 오른쪽만 좌우반전
-   =============================== */
-.detail-strip-face {
-  display: inline-flex;
-  /* 버튼이라 flex로 안정적으로 */
-  align-items: center;
-  justify-content: center;
   line-height: 1;
+  padding: 0;
 }
-
-.detail-strip-face--right {
-  transform: translateY(-130%) scaleX(-1);
-  /* ⚠️ 너는 이미 .detail-strip-arrow에 translateY(-140%)가 있어서,
-     오른쪽 버튼만 transform이 덮어써질 수 있어.
-     그래서 여기서 translateY까지 같이 넣어 "덮어쓰기 문제"를 예방함. */
-}
-
 
 .detail-strip-arrow:hover {
   opacity: 0.6;
@@ -585,27 +649,34 @@ body {
 
 .detail-strip-arrow.left {
   left: 0;
+  justify-content: flex-start;
 }
 
 .detail-strip-arrow.right {
   right: 0;
+  justify-content: flex-end;
+}
+
+.strip-arrow-icon {
+  display: inline-block;
+  line-height: 1;
+}
+
+.strip-arrow-icon--mirrored {
+  transform: scaleX(-1);
+  transform-origin: center;
 }
 
 /* ===============================
    Scrollbar (Portfolio + Detail + Strip)
-   ✅ thumb 색 = var(--color-muted) 로 통일
    =============================== */
-
-/* Firefox */
 #portfolio-page,
 #detail-page,
 .detail-strip-track {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-portfolio-bg) transparent;
-  /* ✅ thumb / track */
+  scrollbar-color: var(--color-muted) transparent;
 }
 
-/* Chrome / Safari / Edge */
 #portfolio-page::-webkit-scrollbar,
 #detail-page::-webkit-scrollbar {
   width: var(--scrollbar-size);
@@ -626,7 +697,6 @@ body {
 #detail-page::-webkit-scrollbar-thumb,
 .detail-strip-track::-webkit-scrollbar-thumb {
   background-color: var(--color-muted);
-  /* ✅ 여기! */
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: padding-box;
@@ -711,7 +781,7 @@ body {
     --detail-page-side-padding: 0px;
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
-    --detail-strip-active-outline: 6px;
+    --detail-strip-active-outline: 2px;
   }
 
   #main-title {
@@ -720,68 +790,6 @@ body {
 
   .title-container {
     bottom: 20vh;
-  }
-
-  .detail-content {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    padding: 7rem 0 2rem 0;
-  }
-
-  .detail-main-image {
-    width: 100%;
-    margin-bottom: 1.5rem;
-    display: flex;
-    justify-content: center;
-    padding: 0 var(--page-side-padding);
-    box-sizing: border-box;
-  }
-
-  .detail-main-image img.main-img-s {
-    width: var(--detail-main-img-s-mobile);
-  }
-
-  .detail-main-image img.main-img-m {
-    width: var(--detail-main-img-m-mobile);
-  }
-
-  .detail-main-image img.main-img-l {
-    width: var(--detail-main-img-l-mobile);
-  }
-
-  .detail-info {
-    width: 100%;
-    padding: 0 var(--page-side-padding);
-    box-sizing: border-box;
-    font-size: 16px;
-  }
-
-  .detail-info h2 {
-    font-size: 18px;
-  }
-
-  .detail-info p {
-    font-size: 16px;
-    text-align: left;
-  }
-
-  .detail-meta-item {
-    font-size: 14px;
-  }
-
-  .detail-images {
-    width: 100%;
-    padding: 0 var(--page-side-padding);
-    box-sizing: border-box;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  .detail-images img {
-    width: 100%;
-    height: auto;
   }
 
   .cv-inner {

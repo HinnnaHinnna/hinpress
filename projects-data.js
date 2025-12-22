@@ -204,7 +204,7 @@ const rawProjects = [
   },
   {
     id: 10,
-    title: '스마일딩벳폰트',
+    title: '스마일 딩벳폰트',
     subtitle: ['폰트'],
     year: '2022',
     specs: '',
@@ -333,7 +333,7 @@ const rawProjects = [
   {
     id: 17,
     title: 'craftm',
-    subtitle: ['포스터, 홍보물, 배너'],
+    subtitle: ['포스터/홍보물/배너'],
     year: '2023',
     specs: ' ',
     size: [' '],
