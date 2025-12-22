@@ -15,9 +15,7 @@
   --bar-height: 2rem;
   --bar-font-size: 0.8rem;
 
-  /* =====================================================
-     ✅ 대표이미지(첫 번째 이미지) 3단계 크기 프리셋
-     ===================================================== */
+  /* ✅ 대표이미지 3단계 프리셋 */
   --detail-main-img-s: 250px;
   --detail-main-img-m: 300px;
   --detail-main-img-l: 450px;
@@ -25,6 +23,17 @@
   --detail-main-img-s-mobile: 50%;
   --detail-main-img-m-mobile: 60%;
   --detail-main-img-l-mobile: 85%;
+
+  /* =====================================================
+     ✅ 마퀴 인트로(처음 1회) + 루프(무한) 제어용 변수
+     - intro-from / intro-duration은 JS가 측정해서 넣어준다.
+     ===================================================== */
+  --marquee-intro-from: 0px;
+  /* JS가 "마퀴바 너비 + 여유" px로 설정 */
+  --marquee-intro-duration: 6s;
+  /* JS가 속도에 맞춰 계산 */
+  --marquee-loop-duration: 70s;
+  /* 기존 감각 유지 */
 }
 
 * {
@@ -168,10 +177,6 @@ body {
 }
 
 /* =============================== 마퀴바 =============================== */
-/* ✅ 수정 포인트(끊김 해결)
-   - 기존: padding-left:100% + translateX(-100%) 구조 → '빈 구간'이 지나가며 텍스트가 사라짐
-   - 변경: 동일 문장 2개를 붙여서, translateX(-50%)까지만 이동 → 끊김 없는 루프
-   - 추가: translate3d + will-change → 모바일(특히 iOS)에서 깜빡임/플리커 감소 */
 .marquee-bar {
   position: fixed;
   top: 20px;
@@ -188,21 +193,32 @@ body {
   background-color: var(--color-maque);
 }
 
-/* ✅ 이 요소가 "움직이는 트랙" 역할을 한다 */
+/* ✅ “처음 1회 인트로” → “무한 루프”로 자연스럽게 이어지게
+   - 1) marqueeIntro: 오른쪽 밖(px)에서 0으로 들어오기 (1회)
+   - 2) marqueeLoop : 0에서 -50%까지 이동(무한) → 끊김 없음 */
 .marquee-inner {
   display: flex;
   flex-wrap: nowrap;
   width: max-content;
   white-space: nowrap;
 
-  /* 끊김 없는 마퀴 */
-  animation: marquee 70s linear infinite;
-
-  /* 모바일 최적화(깜빡임 완화) */
+  /* 모바일 깜빡임 완화 */
   will-change: transform;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+
+  /* ✅ 애니메이션 2개를 “연속 재생” */
+  animation-name: marqueeIntro, marqueeLoop;
+  animation-duration: var(--marquee-intro-duration), var(--marquee-loop-duration);
+  animation-timing-function: linear, linear;
+  animation-iteration-count: 1, infinite;
+
+  /* intro는 끝 프레임(0)을 잠깐 유지해야 loop 시작이 부드럽다 */
+  animation-fill-mode: both, none;
+
+  /* loop는 intro가 끝난 다음부터 시작 */
+  animation-delay: 0s, var(--marquee-intro-duration);
 }
 
 .marquee-text {
@@ -213,16 +229,23 @@ body {
   word-break: keep-all;
   color: #000000;
 
-  /* flex 컨테이너에서 폭이 줄지 않게 고정 */
   flex: 0 0 auto;
-
-  /* 반복 문장 사이 최소 간격 */
   padding-right: 4rem;
 }
 
-/* ✅ 트랙 길이의 절반(-50%)만 이동하면
-   첫 번째 문장이 딱 사라질 즈음 두 번째가 같은 위치로 이어진다 */
-@keyframes marquee {
+/* ✅ 처음 1회: 오른쪽 바깥(px)에서 시작해서 0으로 들어옴 */
+@keyframes marqueeIntro {
+  0% {
+    transform: translate3d(var(--marquee-intro-from), 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ✅ 무한 루프: 0 → -50% (2개 복제 텍스트가 완벽히 이어짐) */
+@keyframes marqueeLoop {
   0% {
     transform: translate3d(0, 0, 0);
   }
