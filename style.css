@@ -17,15 +17,11 @@
 
   /* =====================================================
      ✅ 대표이미지(첫 번째 이미지) 3단계 크기 프리셋
-     - JS는 프로젝트의 mainImageSize 값을 보고
-       img에 main-img-s / main-img-m / main-img-l 클래스를 붙인다.
-     - “폭(px)”은 여기서 한번에 조정 가능.
      ===================================================== */
   --detail-main-img-s: 250px;
   --detail-main-img-m: 300px;
   --detail-main-img-l: 450px;
 
-  /* 모바일은 %로 처리하는 게 안전해서 별도 프리셋 */
   --detail-main-img-s-mobile: 50%;
   --detail-main-img-m-mobile: 60%;
   --detail-main-img-l-mobile: 85%;
@@ -63,7 +59,6 @@ body {
   transition: transform 0.3s ease;
 }
 
-/* 메인 페이지에서 숨김 */
 .top-bar.hidden {
   transform: translateY(-100%);
 }
@@ -75,7 +70,6 @@ body {
   position: relative;
 }
 
-/* 왼쪽 메뉴 */
 .top-nav {
   display: flex;
   gap: 1rem;
@@ -104,7 +98,6 @@ body {
   height: var(--bar-height);
 }
 
-/* 중앙 로고 */
 #top-logo {
   position: absolute;
   left: 50%;
@@ -158,8 +151,6 @@ body {
   transition: opacity 0.2s;
 }
 
-
-
 #main-title:hover {
   opacity: 0.8;
 }
@@ -177,7 +168,10 @@ body {
 }
 
 /* =============================== 마퀴바 =============================== */
-/* 상단 흐르는 글 + (데스크탑) 가로 리사이즈 가능 */
+/* ✅ 수정 포인트(끊김 해결)
+   - 기존: padding-left:100% + translateX(-100%) 구조 → '빈 구간'이 지나가며 텍스트가 사라짐
+   - 변경: 동일 문장 2개를 붙여서, translateX(-50%)까지만 이동 → 끊김 없는 루프
+   - 추가: translate3d + will-change → 모바일(특히 iOS)에서 깜빡임/플리커 감소 */
 .marquee-bar {
   position: fixed;
   top: 20px;
@@ -194,11 +188,21 @@ body {
   background-color: var(--color-maque);
 }
 
+/* ✅ 이 요소가 "움직이는 트랙" 역할을 한다 */
 .marquee-inner {
-  display: inline-block;
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
   white-space: nowrap;
-  padding-left: 100%;
+
+  /* 끊김 없는 마퀴 */
   animation: marquee 70s linear infinite;
+
+  /* 모바일 최적화(깜빡임 완화) */
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .marquee-text {
@@ -207,17 +211,24 @@ body {
   font-size: var(--bar-font-size);
   line-height: 1;
   word-break: keep-all;
-  padding-right: 4rem;
   color: #000000;
+
+  /* flex 컨테이너에서 폭이 줄지 않게 고정 */
+  flex: 0 0 auto;
+
+  /* 반복 문장 사이 최소 간격 */
+  padding-right: 4rem;
 }
 
+/* ✅ 트랙 길이의 절반(-50%)만 이동하면
+   첫 번째 문장이 딱 사라질 즈음 두 번째가 같은 위치로 이어진다 */
 @keyframes marquee {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 
   100% {
-    transform: translateX(-100%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -272,7 +283,6 @@ body {
   font-weight: 400;
 }
 
-/* ← → 네비게이션 */
 .detail-nav {
   position: fixed;
   top: 4.5rem;
@@ -304,7 +314,6 @@ body {
   opacity: 0;
 }
 
-/* 상세 내용 레이아웃 */
 .detail-content {
   display: grid;
   grid-template-columns: 300px 300px;
@@ -314,7 +323,6 @@ body {
   padding: 7rem 1rem 2rem 1rem;
 }
 
-/* 대표(첫 번째) 이미지 컨테이너 */
 .detail-main-image {
   grid-column: 2 / 5;
   grid-row: 1 / 3;
@@ -323,7 +331,6 @@ body {
   align-items: flex-start;
 }
 
-/* 대표 이미지 공통 */
 .detail-main-image img {
   height: auto;
   display: block;
@@ -332,7 +339,6 @@ body {
   object-fit: contain;
 }
 
-/* ✅ 대표이미지 3단계 (데스크탑 px) */
 .detail-main-image img.main-img-s {
   width: var(--detail-main-img-s);
 }
@@ -345,7 +351,6 @@ body {
   width: var(--detail-main-img-l);
 }
 
-/* 오른쪽 상단: 텍스트 */
 .detail-info {
   grid-column: 1 / 5;
   grid-row: 3 / 3;
@@ -387,7 +392,6 @@ body {
   margin-top: 0.2rem;
 }
 
-/* 나머지 이미지들 */
 .detail-images {
   width: 1100px;
   grid-column: 2 / 5;
@@ -442,7 +446,6 @@ body {
   margin-bottom: 0.25rem;
 }
 
-/* 상세 설명 안의 링크 스타일 */
 #detail-description a {
   color: inherit;
   text-decoration: underline;
@@ -452,9 +455,6 @@ body {
   opacity: 0.7;
 }
 
-/* =========================
-   ✅ 대시(-) 목록 스타일
-   ========================= */
 .dash-list {
   list-style: none;
   padding-left: 0;
@@ -507,7 +507,6 @@ body {
     justify-content: center;
   }
 
-  /* ✅ 모바일 대표이미지 3단계(%) */
   .detail-main-image img.main-img-s {
     width: var(--detail-main-img-s-mobile);
   }
