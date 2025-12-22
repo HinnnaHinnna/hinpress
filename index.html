@@ -106,9 +106,10 @@
       <div class="cv-section">
         <h3>연락처</h3>
         <ul>
-          <li>Email: <a href="mailto:hinnahinna3939@gmail.com" target="_blank"
-              rel="noopener">hinnahinna3939@gmail.com</a></li>
-          <li>Instagram: <a href="https://www.instagram.com/chales9/" target="_blank" rel="noopener">@chales9</a></li>
+          <li>Email: <a href="mailto:hinnahinna3939@gmail.com" target="_blank" rel="noopener">
+              hinnahinna3939@gmail.com</a></li>
+          <li>Instagram: <a href="https://www.instagram.com/chales9/" target="_blank" rel="noopener">
+              @chales9</a></li>
         </ul>
       </div>
     </div>
@@ -119,14 +120,16 @@
      ============================ -->
   <div id="detail-page" class="page">
     <div class="detail-nav">
-      <!-- ✅ 상단은 원래대로 유지 -->
-      <span id="detail-prev">☜</span>
-      <span id="detail-next">☞</span>
+      <!-- ✅ “문자”는 둘 다 ➔ 로 통일하고, prev만 CSS로 좌우반전 -->
+      <span id="detail-prev" class="detail-nav-arrow detail-nav-arrow--mirrored" aria-label="이전">➔</span>
+      <span id="detail-next" class="detail-nav-arrow" aria-label="다음">➔</span>
     </div>
 
     <div class="detail-content">
+      <!-- ✅ 1행: 대표이미지(00.jpg)가 여기로 와서 중앙에 뜸 -->
       <div class="detail-main-image" id="detail-main-image"></div>
 
+      <!-- ✅ 2행: 왼쪽 1/5 정보 -->
       <div class="detail-info">
         <h2 id="detail-title"></h2>
         <p id="detail-subtitle"></p>
@@ -153,18 +156,21 @@
         <div id="detail-links" class="detail-links"></div>
       </div>
 
+      <!-- ✅ 2행: 오른쪽 4/5 이미지들(내부 2단) -->
       <div class="detail-images" id="detail-images"></div>
     </div>
 
-    <!-- ✅ 하단 썸네일 스트립: 화살표만 ·८· / 반전 ·८· 로 변경 -->
+    <!-- ✅ 하단 썸네일 스트립 -->
     <div class="detail-bottom-strip" id="detail-bottom-strip">
-      <button class="detail-strip-arrow left detail-strip-face" id="detail-strip-left" type="button"
-        aria-label="썸네일 왼쪽으로">☜</button>
+      <button class="detail-strip-arrow left" id="detail-strip-left" type="button" aria-label="썸네일 왼쪽으로">
+        <span class="strip-arrow-icon">↞</span>
+      </button>
 
       <div class="detail-strip-track" id="detail-strip-track" aria-label="프로젝트 썸네일"></div>
 
-      <button class="detail-strip-arrow right detail-strip-face detail-strip-face--right" id="detail-strip-right"
-        type="button" aria-label="썸네일 오른쪽으로">☜</button>
+      <button class="detail-strip-arrow right" id="detail-strip-right" type="button" aria-label="썸네일 오른쪽으로">
+        <span class="strip-arrow-icon strip-arrow-icon--mirrored">↞</span>
+      </button>
     </div>
   </div>
 
