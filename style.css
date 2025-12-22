@@ -15,6 +15,12 @@
   --bar-height: 2rem;
   --bar-font-size: 0.8rem;
 
+  /* ✅ 공통 좌우 여백(모바일에서 top-bar/콘텐츠/스트립을 똑같이 맞출 변수) */
+  --page-side-padding: 1rem;
+
+  /* ✅ 상세페이지 좌우 패딩(데스크탑) */
+  --detail-page-side-padding: 10vw;
+
   /* ✅ 대표이미지 3단계 프리셋 */
   --detail-main-img-s: 250px;
   --detail-main-img-m: 300px;
@@ -24,16 +30,19 @@
   --detail-main-img-m-mobile: 60%;
   --detail-main-img-l-mobile: 85%;
 
-  /* =====================================================
-     ✅ 마퀴 인트로(처음 1회) + 루프(무한) 제어용 변수
-     - intro-from / intro-duration은 JS가 측정해서 넣어준다.
-     ===================================================== */
+  /* ✅ 스크롤바 두께 통일 */
+  --scrollbar-size: 10px;
+
+  /* ✅ 상세 하단 썸네일 스트립 */
+  --detail-strip-thumb-maxh: 88px;
+  --detail-strip-gap: 16px;
+  --detail-strip-arrow-zone: 60px;
+  --detail-strip-active-outline: 4px;
+
+  /* 마퀴(필요 변수는 그대로) */
   --marquee-intro-from: 0px;
-  /* JS가 "마퀴바 너비 + 여유" px로 설정 */
   --marquee-intro-duration: 6s;
-  /* JS가 속도에 맞춰 계산 */
   --marquee-loop-duration: 30s;
-  /* 기존 감각 유지 */
 }
 
 * {
@@ -62,7 +71,10 @@ body {
   background: var(--color-brand);
   display: flex;
   align-items: center;
-  padding: 0 1rem;
+
+  /* ✅ 좌우 여백 통일 */
+  padding: 0 var(--page-side-padding);
+
   z-index: 300;
   transform: translateY(0);
   transition: transform 0.3s ease;
@@ -82,6 +94,11 @@ body {
 .top-nav {
   display: flex;
   gap: 1rem;
+  width: 100%;
+}
+
+#contact-btn {
+  margin-left: auto;
 }
 
 .top-nav-item {
@@ -150,7 +167,7 @@ body {
 
 #main-title {
   white-space: nowrap;
-  font-size: min(20vw, 55vh);
+  font-size: min(20vw, 30vh);
   font-family: 'Inter', Helvetica, Arial, sans-serif;
   font-weight: 900;
   letter-spacing: -0.027em;
@@ -193,31 +210,21 @@ body {
   background-color: var(--color-maque);
 }
 
-/* ✅ “처음 1회 인트로” → “무한 루프”로 자연스럽게 이어지게
-   - 1) marqueeIntro: 오른쪽 밖(px)에서 0으로 들어오기 (1회)
-   - 2) marqueeLoop : 0에서 -50%까지 이동(무한) → 끊김 없음 */
 .marquee-inner {
   display: flex;
   flex-wrap: nowrap;
   width: max-content;
   white-space: nowrap;
-
-  /* 모바일 깜빡임 완화 */
   will-change: transform;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 
-  /* ✅ 애니메이션 2개를 “연속 재생” */
   animation-name: marqueeIntro, marqueeLoop;
   animation-duration: var(--marquee-intro-duration), var(--marquee-loop-duration);
   animation-timing-function: linear, linear;
   animation-iteration-count: 1, infinite;
-
-  /* intro는 끝 프레임(0)을 잠깐 유지해야 loop 시작이 부드럽다 */
   animation-fill-mode: both, none;
-
-  /* loop는 intro가 끝난 다음부터 시작 */
   animation-delay: 0s, var(--marquee-intro-duration);
 }
 
@@ -228,12 +235,10 @@ body {
   line-height: 1;
   word-break: keep-all;
   color: #000000;
-
   flex: 0 0 auto;
   padding-right: 4rem;
 }
 
-/* ✅ 처음 1회: 오른쪽 바깥(px)에서 시작해서 0으로 들어옴 */
 @keyframes marqueeIntro {
   0% {
     transform: translate3d(var(--marquee-intro-from), 0, 0);
@@ -244,7 +249,6 @@ body {
   }
 }
 
-/* ✅ 무한 루프: 0 → -50% (2개 복제 텍스트가 완벽히 이어짐) */
 @keyframes marqueeLoop {
   0% {
     transform: translate3d(0, 0, 0);
@@ -255,7 +259,6 @@ body {
   }
 }
 
-/* 캔버스 */
 #canvas {
   width: 100%;
   height: 100%;
@@ -266,12 +269,15 @@ body {
 #portfolio-page {
   background: var(--color-portfolio-bg);
   overflow-y: auto;
+
+  /* ✅ 스크롤바로 레이아웃 흔들림 방지(지원 브라우저에서만) */
+  scrollbar-gutter: stable both-edges;
 }
 
 #thumbnails-container {
   position: relative;
   width: 100%;
-  padding: 4.5rem 1rem 1rem 1rem;
+  padding: 4.5rem var(--page-side-padding) 1rem var(--page-side-padding);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -301,8 +307,13 @@ body {
 #detail-page {
   background: var(--color-brand);
   overflow-y: auto;
-  padding-left: 10vw;
-  padding-right: 10vw;
+
+  padding-left: var(--detail-page-side-padding);
+  padding-right: var(--detail-page-side-padding);
+
+  overflow-x: hidden;
+  scrollbar-gutter: stable both-edges;
+
   font-weight: 400;
 }
 
@@ -313,8 +324,10 @@ body {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 0 1rem;
-  font-size: 28px;
+
+  padding: 0 var(--page-side-padding);
+
+  font-size: 40px;
   z-index: 210;
   color: var(--color-muted);
 }
@@ -323,8 +336,38 @@ body {
   cursor: pointer;
   user-select: none;
   color: var(--color-arrow);
-  padding-right: 10px;
+  /* ✅ 클릭 영역을 좌우 동일한 “박스”로 만들기 */
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
 }
+
+#detail-prev {
+  justify-content: flex-start;
+}
+
+#detail-next {
+  justify-content: flex-end;
+}
+
+
+/* ===============================
+   detail-nav: ·८· 아이콘용
+   - 오른쪽 버튼만 좌우반전(scaleX(-1))
+   =============================== */
+.detail-face {
+  display: inline-block;
+  /* transform 적용하려면 inline-block이 안전 */
+  line-height: 1;
+  /* 위아래 흔들림 줄이기 */
+}
+
+.detail-face--right {
+  transform: scaleX(-1);
+  /* ✅ 좌우 반전 */
+}
+
 
 .detail-nav span:hover {
   opacity: 0.6;
@@ -347,7 +390,7 @@ body {
 }
 
 .detail-main-image {
-  grid-column: 2 / 5;
+  grid-column: 3 / 5;
   grid-row: 1 / 3;
   display: flex;
   justify-content: flex-start;
@@ -431,12 +474,169 @@ body {
   display: block;
 }
 
-/* ✅ detail-images에서 특정 이미지를 "2칸(2열) 전체"로 쓰고 싶을 때 */
 .detail-images img.span-2 {
   grid-column: 1 / -1;
-  /* 1열부터 끝열까지 = 한 줄 전체 */
 }
 
+/* ===============================
+   ✅ 상세페이지 맨 아래 썸네일 스트립
+   =============================== */
+.detail-bottom-strip {
+  background: transparent;
+  margin-top: 3rem;
+
+  width: calc(100% + (var(--detail-page-side-padding) * 2));
+  margin-left: calc(-1 * var(--detail-page-side-padding));
+  margin-right: calc(-1 * var(--detail-page-side-padding));
+
+  padding: 0.5rem var(--page-side-padding) 1.25rem var(--page-side-padding);
+  box-sizing: border-box;
+
+  position: relative;
+}
+
+.detail-strip-track {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--detail-strip-gap);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding-left: var(--detail-strip-arrow-zone);
+  padding-right: var(--detail-strip-arrow-zone);
+
+  /* ✅ outline 잘림 방지 */
+  padding-top: var(--detail-strip-active-outline);
+  padding-bottom: calc(6px + var(--detail-strip-active-outline));
+
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-strip-thumb {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.detail-strip-thumb img {
+  display: block;
+  width: auto;
+  max-height: var(--detail-strip-thumb-maxh);
+  object-fit: contain;
+  background: transparent;
+}
+
+.detail-strip-thumb.is-active img {
+  outline: var(--detail-strip-active-outline) solid var(--color-muted);
+  outline-offset: 0;
+}
+
+.detail-strip-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-130%);
+
+  width: var(--detail-strip-arrow-zone);
+  height: calc(var(--detail-strip-thumb-maxh) + 14px);
+
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  color: var(--color-arrow);
+  font-size: 30px;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   하단 썸네일 화살표: ·८· 아이콘
+   - 오른쪽만 좌우반전
+   =============================== */
+.detail-strip-face {
+  display: inline-flex;
+  /* 버튼이라 flex로 안정적으로 */
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.detail-strip-face--right {
+  transform: translateY(-130%) scaleX(-1);
+  /* ⚠️ 너는 이미 .detail-strip-arrow에 translateY(-140%)가 있어서,
+     오른쪽 버튼만 transform이 덮어써질 수 있어.
+     그래서 여기서 translateY까지 같이 넣어 "덮어쓰기 문제"를 예방함. */
+}
+
+
+.detail-strip-arrow:hover {
+  opacity: 0.6;
+}
+
+.detail-strip-arrow.left {
+  left: 0;
+}
+
+.detail-strip-arrow.right {
+  right: 0;
+}
+
+/* ===============================
+   Scrollbar (Portfolio + Detail + Strip)
+   ✅ thumb 색 = var(--color-muted) 로 통일
+   =============================== */
+
+/* Firefox */
+#portfolio-page,
+#detail-page,
+.detail-strip-track {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-portfolio-bg) transparent;
+  /* ✅ thumb / track */
+}
+
+/* Chrome / Safari / Edge */
+#portfolio-page::-webkit-scrollbar,
+#detail-page::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+.detail-strip-track::-webkit-scrollbar {
+  height: var(--scrollbar-size);
+}
+
+#portfolio-page::-webkit-scrollbar-track,
+#detail-page::-webkit-scrollbar-track,
+.detail-strip-track::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#portfolio-page::-webkit-scrollbar-thumb,
+#detail-page::-webkit-scrollbar-thumb,
+.detail-strip-track::-webkit-scrollbar-thumb {
+  background-color: var(--color-muted);
+  /* ✅ 여기! */
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+#portfolio-page::-webkit-scrollbar-corner,
+#detail-page::-webkit-scrollbar-corner,
+.detail-strip-track::-webkit-scrollbar-corner {
+  background: transparent;
+}
 
 /* =============================== CV 페이지 =============================== */
 #cv-page {
@@ -508,6 +708,10 @@ body {
 @media (max-width: 768px) {
   :root {
     --bar-height: 2.5rem;
+    --detail-page-side-padding: 0px;
+    --detail-strip-thumb-maxh: 72px;
+    --detail-strip-arrow-zone: 42px;
+    --detail-strip-active-outline: 6px;
   }
 
   #main-title {
@@ -516,11 +720,6 @@ body {
 
   .title-container {
     bottom: 20vh;
-  }
-
-  #detail-page {
-    padding-left: 0;
-    padding-right: 0;
   }
 
   .detail-content {
@@ -535,6 +734,8 @@ body {
     margin-bottom: 1.5rem;
     display: flex;
     justify-content: center;
+    padding: 0 var(--page-side-padding);
+    box-sizing: border-box;
   }
 
   .detail-main-image img.main-img-s {
@@ -551,7 +752,7 @@ body {
 
   .detail-info {
     width: 100%;
-    padding: 0 1rem;
+    padding: 0 var(--page-side-padding);
     box-sizing: border-box;
     font-size: 16px;
   }
@@ -571,7 +772,7 @@ body {
 
   .detail-images {
     width: 100%;
-    padding: 0 1rem;
+    padding: 0 var(--page-side-padding);
     box-sizing: border-box;
     display: grid;
     grid-template-columns: 1fr;
@@ -581,11 +782,6 @@ body {
   .detail-images img {
     width: 100%;
     height: auto;
-  }
-
-  #cv-page {
-    padding-left: 0;
-    padding-right: 0;
   }
 
   .cv-inner {
