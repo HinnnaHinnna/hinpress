@@ -32,7 +32,7 @@
   /* JS가 "마퀴바 너비 + 여유" px로 설정 */
   --marquee-intro-duration: 6s;
   /* JS가 속도에 맞춰 계산 */
-  --marquee-loop-duration: 70s;
+  --marquee-loop-duration: 30s;
   /* 기존 감각 유지 */
 }
 
@@ -430,6 +430,13 @@ body {
   height: auto;
   display: block;
 }
+
+/* ✅ detail-images에서 특정 이미지를 "2칸(2열) 전체"로 쓰고 싶을 때 */
+.detail-images img.span-2 {
+  grid-column: 1 / -1;
+  /* 1열부터 끝열까지 = 한 줄 전체 */
+}
+
 
 /* =============================== CV 페이지 =============================== */
 #cv-page {
