@@ -112,10 +112,12 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const marqueeBar = document.querySelector('.marquee-bar');
 
+// ✅ 마퀴 “처음 1회 인트로(오른쪽 밖에서 진입)”를 위해 선택
+const marqueeInner = document.getElementById('marquee-inner');
+const marqueeText1 = document.getElementById('marquee-text-1');
+
 /**
  * ✅ 패들(마퀴바)의 실제 위치/크기
- * - paddleX ~ paddleX+paddleWidth : 패들 가로 범위
- * - paddleTop ~ paddleBottom      : 패들 세로 범위(두께)
  */
 let paddleWidth = 0;
 let paddleHeight = 0;
@@ -150,12 +152,16 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
+/**
+ * ✅ 초기 마퀴바 폭 설정 (이후 사용자의 resize는 존중)
+ * - 여기서 width를 잡아주기 때문에, “인트로 시작 위치(px)” 계산도
+ *   이 함수 실행 이후에 해야 정확하다.
+ */
 function initPaddle() {
   if (!marqueeBar) return;
 
   const viewportWidth = window.innerWidth;
 
-  // ✅ 초기 한 번만 폭 설정(이후 사용자의 resize 폭은 존중)
   let initialWidth = 0;
   if (viewportWidth <= 768) initialWidth = Math.min(viewportWidth * 0.4, viewportWidth);
   else initialWidth = Math.min(viewportWidth * 0.2, viewportWidth);
@@ -169,8 +175,70 @@ function initPaddle() {
   syncPaddleFromDom();
 }
 
+/**
+ * ✅ (핵심) 마퀴 “첫 로딩 인트로” 세팅
+ * - 목표: 첫 로딩 시 텍스트가 "오른쪽 바깥"에서 들어오도록
+ * - 방식: CSS 변수로
+ *   --marquee-intro-from: (마퀴바 폭 + 여유) px
+ *   --marquee-intro-duration: 루프 속도와 비슷하게 보이도록 계산
+ *
+ * 왜 duration을 계산하냐?
+ * - intro가 너무 빠르면 “휙 들어오고”,
+ * - 너무 느리면 “초반에 텅 빈 시간이 길어져서”
+ *   다시 끊긴 것처럼 느껴질 수 있다.
+ */
+function setupMarqueeIntroOnce() {
+  if (!marqueeBar || !marqueeInner || !marqueeText1) return;
+
+  // 마퀴바가 “최종 폭”을 가진 상태에서 측정해야 함
+  const barWidth = marqueeBar.getBoundingClientRect().width;
+
+  // 첫 번째 문장(복제 2개 중 1개)의 실제 폭(px)
+  const copyWidth = marqueeText1.getBoundingClientRect().width;
+
+  // 안전장치: 폭을 못 읽는 경우(0)엔 그냥 기본값으로 둔다
+  if (!barWidth || !copyWidth) return;
+
+  // “오른쪽 바깥에서 시작” 여유(픽셀)
+  const EXTRA = 30;
+
+  // 인트로 시작 위치(px): 마퀴바 오른쪽 끝 + 약간 더 바깥
+  const introFromPx = barWidth + EXTRA;
+
+  // 루프 시간(기존 감각 유지)
+  const LOOP_SECONDS = 70;
+
+  // 루프에서의 “속도”를 기준으로 intro 시간을 계산
+  // - 루프는 한 “문장 길이(copyWidth)”를 LOOP_SECONDS 동안 이동한다고 보면 된다.
+  // - px/sec = copyWidth / LOOP_SECONDS
+  const pxPerSec = copyWidth / LOOP_SECONDS;
+
+  // intro는 introFromPx 만큼 이동해야 하니까, 시간 = 거리 / 속도
+  const introSeconds = introFromPx / pxPerSec;
+
+  marqueeInner.style.setProperty('--marquee-intro-from', `${introFromPx}px`);
+  marqueeInner.style.setProperty('--marquee-intro-duration', `${introSeconds.toFixed(3)}s`);
+  marqueeInner.style.setProperty('--marquee-loop-duration', `${LOOP_SECONDS}s`);
+}
+
 resizeCanvas();
 initPaddle();
+
+/**
+ * ✅ 폰트 로딩 후 측정해야 copyWidth가 정확해진다.
+ * - 특히 모바일에서 폰트 로딩 타이밍 때문에
+ *   측정이 너무 빨리 되면 폭이 달라져 intro가 어색해질 수 있음.
+ */
+function initAfterFontsReady() {
+  // 패들/마퀴바 폭이 잡힌 뒤에 intro 측정
+  setupMarqueeIntroOnce();
+}
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(initAfterFontsReady);
+} else {
+  window.addEventListener('load', initAfterFontsReady);
+}
 
 // ✅ 사용자가 마퀴바 폭을 리사이즈하면 공 충돌 영역도 즉시 갱신
 if (marqueeBar && 'ResizeObserver' in window) {
@@ -200,7 +268,6 @@ window.addEventListener('resize', () => {
 
 // ==============================
 // 패들 드래그(이동): 마우스 + 터치
-// - 오른쪽 끝(핸들 영역) 잡으면 브라우저 resize가 우선
 // ==============================
 let isDraggingPaddle = false;
 let lastPointerX = 0;
@@ -230,7 +297,6 @@ if (marqueeBar) {
     const dx = e.clientX - lastPointerX;
     const dt = now - lastPointerTime || 16;
 
-    // 패들 속도(공이 “맞았을 때” 가로힘을 주기 위해)
     paddleVX = (dx / dt) * 16;
 
     syncPaddleFromDom();
@@ -314,7 +380,6 @@ class Ball {
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
-    // 스마일 입
     ctx.strokeStyle = '#fcff54';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -324,23 +389,12 @@ class Ball {
     ctx.restore();
   }
 
-  /**
-   * ✅ 중요 변경점:
-   * - 예전: 마퀴바가 "천장"이라서 x와 상관없이 무조건 막힘
-   * - 지금: 마퀴바는 "패들"이라서
-   *         패들 범위 안에서 부딪힐 때만 튕김
-   *         못 맞추면 위로 통과 → 화면 밖으로 빠져나감
-   */
   update() {
-    // 이동 전 위치(충돌 판정을 위해 저장)
-    const prevX = this.x;
     const prevY = this.y;
 
-    // 이동
     this.x += this.vx;
     this.y += this.vy;
 
-    // 좌우 벽
     if (this.x + this.radius > canvas.width) {
       this.x = canvas.width - this.radius;
       this.vx = -Math.abs(this.vx);
@@ -349,64 +403,41 @@ class Ball {
       this.vx = Math.abs(this.vx);
     }
 
-    // =====================================================
-    // ✅ 패들(마퀴바) 충돌: "맞으면 튕김 / 빗나가면 통과"
-    // - 패들은 '막대'니까 위/아래 면 둘 다 반사 가능
-    // - 하지만 "패들 가로 범위 안"일 때만 반사한다.
-    // =====================================================
     if (paddleHeight > 0) {
-      // 패들에 “맞았는지” 판단할 때, 공의 반지름까지 고려해서 살짝 넓게 잡아준다.
       const withinPaddleX =
         this.x >= (paddleX - this.radius) &&
         this.x <= (paddleX + paddleWidth + this.radius);
 
-      // 1) 아래에서 위로 올라오다가( vy < 0 ) 패들의 '아래면(bottom)'을 통과하면 반사
-      //    - prevTop > paddleBottom 이었다가 currTop <= paddleBottom 이 되면 "아래면을 건드림"
       if (this.vy < 0 && withinPaddleX) {
         const prevTop = (prevY - this.radius);
         const currTop = (this.y - this.radius);
-
         const crossedBottomSurface = (prevTop > paddleBottom) && (currTop <= paddleBottom);
 
         if (crossedBottomSurface) {
-          // 패들 아래쪽 면에서 튕겨 내려가게
           this.y = paddleBottom + this.radius;
-          this.vy = Math.abs(this.vy); // 아래로
-
-          // 패들을 움직이고 있을 때, 공에 가로힘 추가
+          this.vy = Math.abs(this.vy);
           this.vx += paddleVX * 0.8;
         }
       }
 
-      // 2) 위에서 아래로 내려오다가( vy > 0 ) 패들의 '윗면(top)'을 통과하면 반사
-      //    - prevBottom < paddleTop 이었다가 currBottom >= paddleTop 이 되면 "윗면을 건드림"
       if (this.vy > 0 && withinPaddleX) {
         const prevBottom = (prevY + this.radius);
         const currBottom = (this.y + this.radius);
-
         const crossedTopSurface = (prevBottom < paddleTop) && (currBottom >= paddleTop);
 
         if (crossedTopSurface) {
-          // 패들 윗면에서 튕겨 올라가게
           this.y = paddleTop - this.radius;
-          this.vy = -Math.abs(this.vy); // 위로
-
+          this.vy = -Math.abs(this.vy);
           this.vx += paddleVX * 0.8;
         }
       }
     }
 
-    // 바닥
     if (this.y + this.radius > canvas.height) {
       this.y = canvas.height - this.radius;
       this.vy = -Math.abs(this.vy);
     }
 
-    // =====================================================
-    // ✅ 위쪽 화면 밖으로 "빠져나가게" 만들기
-    // - (천장 없음) y가 완전히 화면 밖으로 나가면 공을 “재생성”해서 계속 흐르게 함
-    // - 만약 "그냥 사라지게" 하고 싶으면, 아래 recycleBall() 대신 return false로 처리하면 됨.
-    // =====================================================
     if (this.y + this.radius < 0) {
       this.recycleBall();
     }
@@ -415,15 +446,10 @@ class Ball {
     this.draw();
   }
 
-  /**
-   * ✅ 공이 위로 빠져나갔을 때 “새 공”처럼 아래에서 다시 시작
-   * - 관객 입장에서는: 공이 위로 탈출하면 사라지고, 아래에서 새로 등장하는 느낌
-   */
   recycleBall() {
     this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
     this.y = canvas.height - this.radius - 5;
 
-    // 아래에서 위로 올라가게 초기화
     this.vx = (Math.random() - 0.5) * 10;
     this.vy = -(Math.random() * 8 + 3);
 
@@ -458,7 +484,6 @@ function checkCollision(ball1, ball2) {
     ball2.vx = vx1 * cos - vy2 * sin;
     ball2.vy = vy2 * cos + vx1 * sin;
 
-    // 충돌 시 증식(너무 빨리 늘지 않게 제한)
     const now = performance.now();
     if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
       const newBall = new Ball(
@@ -473,7 +498,6 @@ function checkCollision(ball1, ball2) {
   }
 }
 
-// 초기 공 생성(캔버스 내부에서)
 for (let i = 0; i < numBalls; i++) {
   const radius = 16;
   const x = radius + Math.random() * (canvas.width - radius * 2);
@@ -483,8 +507,6 @@ for (let i = 0; i < numBalls; i++) {
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // 매 프레임 패들 위치/크기 최신화
   syncPaddleFromDom();
 
   balls.forEach((b) => b.update());
@@ -532,7 +554,6 @@ function createThumbnails(options = {}) {
   });
 }
 
-// 최초 한 번 뿌리기
 createThumbnails({ shuffle: true });
 
 function normalizeMainImageSize(value) {
@@ -593,7 +614,6 @@ function showProjectDetail(projectId) {
   detailImagesEl.innerHTML = '';
 
   const mainSize = normalizeMainImageSize(project.mainImageSize);
-  const mainClass = `main-img-${mainSize}`;
 
   if (images.length > 0) {
     if (detailMainImageEl) {
