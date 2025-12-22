@@ -1,8 +1,6 @@
 // =====================================================
 // script.js
-// ⚠️ index.html에서 projects-data.js가 script.js보다 먼저 로드되어야 함!
-// 예) <script src="projects-data.js"></script>
-//     <script src="script.js"></script>
+// projects-data.js가 먼저 로드되어야 함!
 // =====================================================
 
 // =====================================================
@@ -41,6 +39,11 @@ const detailSpecsContainer = document.getElementById('detail-specs-container');
 const detailSizeContainer = document.getElementById('detail-size-container');
 const detailClientContainer = document.getElementById('detail-client-container');
 
+// ✅ 하단 썸네일 스트립 요소
+const detailStripTrack = document.getElementById('detail-strip-track');
+const detailStripLeft = document.getElementById('detail-strip-left');
+const detailStripRight = document.getElementById('detail-strip-right');
+
 let currentProjectIndex = -1;
 
 // =====================================================
@@ -75,18 +78,10 @@ function showPage(page) {
 showPage(mainPage);
 
 // 네비게이션
-if (mainTitle) {
-  mainTitle.addEventListener('click', () => showPage(portfolioPage));
-}
-if (topLogo) {
-  topLogo.addEventListener('click', () => showPage(portfolioPage));
-}
-if (aboutBtn) {
-  aboutBtn.addEventListener('click', () => showPage(mainPage));
-}
-if (cvBtn) {
-  cvBtn.addEventListener('click', () => showPage(cvPage));
-}
+if (mainTitle) mainTitle.addEventListener('click', () => showPage(portfolioPage));
+if (topLogo) topLogo.addEventListener('click', () => showPage(portfolioPage));
+if (aboutBtn) aboutBtn.addEventListener('click', () => showPage(mainPage));
+if (cvBtn) cvBtn.addEventListener('click', () => showPage(cvPage));
 if (contactBtn) {
   contactBtn.addEventListener('click', () => {
     window.open('https://www.instagram.com/chales9/', '_blank', 'noopener');
@@ -125,19 +120,14 @@ if (detailNext) {
 }
 
 // =====================================================
-// 3) 캔버스 + 마퀴바(패들) 연동
+// 3) 캔버스 + 마퀴바(패들) 연동 (너 기존 코드 유지)
 // =====================================================
 const canvas = document.getElementById('canvas');
 const ctx = canvas?.getContext('2d');
 const marqueeBar = document.querySelector('.marquee-bar');
-
-// ✅ 마퀴 “첫 로딩 인트로” 세팅용
 const marqueeInner = document.getElementById('marquee-inner');
 const marqueeText1 = document.getElementById('marquee-text-1');
 
-/**
- * ✅ 패들(마퀴바)의 실제 위치/크기
- */
 let paddleWidth = 0;
 let paddleHeight = 0;
 let paddleX = 0;
@@ -173,9 +163,6 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
-/**
- * ✅ 초기 마퀴바 폭 설정 (이후 사용자의 resize는 존중)
- */
 function initPaddle() {
   if (!marqueeBar) return;
 
@@ -194,29 +181,17 @@ function initPaddle() {
   syncPaddleFromDom();
 }
 
-/**
- * ✅ 마퀴 “첫 로딩 인트로” 시작 위치/시간 세팅
- * - 목표: 처음 프레임에서 텍스트가 "1/3 정도 보이는 상태"로 시작
- *
- * ✅ 속도 조절:
- *   const LOOP_SECONDS 값을 줄이면 빨라지고, 늘리면 느려짐.
- */
 function setupMarqueeIntroOnce() {
   if (!marqueeBar || !marqueeInner || !marqueeText1) return;
 
   const barWidth = marqueeBar.getBoundingClientRect().width;
   const copyWidth = marqueeText1.getBoundingClientRect().width;
-
   if (!barWidth || !copyWidth) return;
 
-  // 1/3 정도 보이게 시작
   const START_VISIBLE_RATIO = 1 / 3;
   const introFromPx = Math.max(0, barWidth * (1 - START_VISIBLE_RATIO));
 
-  // ✅ 여기서 속도 조절 (작을수록 더 빠름)
   const LOOP_SECONDS = 30;
-
-  // 루프 속도를 기준으로 intro duration 계산(속도감 통일)
   const pxPerSec = copyWidth / LOOP_SECONDS;
   const introSeconds = introFromPx / pxPerSec;
 
@@ -228,9 +203,6 @@ function setupMarqueeIntroOnce() {
 resizeCanvas();
 initPaddle();
 
-/**
- * ✅ 폰트 로딩 후 측정해야 폭이 정확하다.
- */
 function initAfterFontsReady() {
   setupMarqueeIntroOnce();
 }
@@ -241,7 +213,6 @@ if (document.fonts && document.fonts.ready) {
   window.addEventListener('load', initAfterFontsReady);
 }
 
-// ✅ 사용자가 마퀴바 폭을 리사이즈하면 공 충돌 영역 갱신
 if (marqueeBar && 'ResizeObserver' in window) {
   let isAdjusting = false;
   const ro = new ResizeObserver(() => {
@@ -258,21 +229,16 @@ if (marqueeBar && 'ResizeObserver' in window) {
   ro.observe(marqueeBar);
 }
 
-// 창 크기 변화: 캔버스 리사이즈 + 패들 left만 보정
 window.addEventListener('resize', () => {
   resizeCanvas();
   syncPaddleFromDom();
   clampPaddleX();
   updatePaddleDomLeftOnly();
   syncPaddleFromDom();
-
-  // ✅ 창 리사이즈 시 마퀴 인트로 계산도 다시 (원하면 유지, 싫으면 지워도 됨)
   setupMarqueeIntroOnce();
 });
 
-// ==============================
-// 패들 드래그(이동): 마우스 + 터치
-// ==============================
+// 패들 드래그
 let isDraggingPaddle = false;
 let lastPointerX = 0;
 let lastPointerTime = 0;
@@ -357,7 +323,7 @@ if (marqueeBar) {
 }
 
 // =====================================================
-// 4) 스마일 볼
+// 4) 스마일 볼 (기존 유지)
 // =====================================================
 class Ball {
   constructor(x, y, radius, color) {
@@ -399,7 +365,6 @@ class Ball {
     if (!canvas) return;
 
     const prevY = this.y;
-
     this.x += this.vx;
     this.y += this.vy;
 
@@ -584,6 +549,62 @@ function normalizeText(value) {
   return '';
 }
 
+// =====================================================
+// ✅ 하단 “프로젝트 썸네일 스트립” 생성/갱신
+// =====================================================
+function buildDetailBottomStrip() {
+  if (!detailStripTrack) return;
+  if (!Array.isArray(projects)) return;
+
+  detailStripTrack.innerHTML = '';
+
+  projects.forEach((p) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'detail-strip-thumb';
+    btn.dataset.projectId = String(p.id);
+
+    const img = document.createElement('img');
+    const first = (p.images && p.images[0]) ? p.images[0] : '';
+    img.src = getImageSrc(first);
+    img.alt = p.title || '';
+    btn.appendChild(img);
+
+    btn.addEventListener('click', () => showProjectDetail(p.id));
+    detailStripTrack.appendChild(btn);
+  });
+}
+
+function setActiveStrip(projectId) {
+  if (!detailStripTrack) return;
+  const id = String(projectId);
+
+  const thumbs = detailStripTrack.querySelectorAll('.detail-strip-thumb');
+  thumbs.forEach((t) => {
+    if (t.dataset.projectId === id) t.classList.add('is-active');
+    else t.classList.remove('is-active');
+  });
+
+  // ✅ 활성 썸네일이 화면에 자연스럽게 보이도록 살짝 스크롤
+  const active = detailStripTrack.querySelector('.detail-strip-thumb.is-active');
+  if (active && typeof active.scrollIntoView === 'function') {
+    active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+}
+
+// 화살표 스크롤
+function scrollStripBy(direction) {
+  if (!detailStripTrack) return;
+  const amount = Math.max(240, Math.floor(window.innerWidth * 0.65));
+  detailStripTrack.scrollBy({ left: direction * amount, behavior: 'smooth' });
+}
+
+if (detailStripLeft) detailStripLeft.addEventListener('click', () => scrollStripBy(-1));
+if (detailStripRight) detailStripRight.addEventListener('click', () => scrollStripBy(1));
+
+// 페이지 로딩 시 1회 생성
+buildDetailBottomStrip();
+
 function showProjectDetail(projectId) {
   if (!Array.isArray(projects)) return;
 
@@ -653,7 +674,7 @@ function showProjectDetail(projectId) {
     }
   }
 
-  // ✅ 나머지 이미지들 (여기서 span:2 처리!)
+  // ✅ 나머지 이미지들
   if (detailImagesEl && images.length > 1) {
     for (let i = 1; i < images.length; i++) {
       const item = images[i];
@@ -664,16 +685,18 @@ function showProjectDetail(projectId) {
       img.src = src;
       img.alt = project.title || '';
 
-      // ✅ span 처리: {src:"...", span:2}면 2열 전체를 먹게
+      // span:2 처리
       if (item && typeof item === 'object' && item.span === 2) {
-        // CSS 없어도 확실히 풀폭 되도록 "1 / -1"로 강제
         img.style.gridColumn = '1 / -1';
-        img.classList.add('is-span-2'); // CSS로도 쓰고 싶으면 사용
+        img.classList.add('span-2');
       }
 
       detailImagesEl.appendChild(img);
     }
   }
+
+  // ✅ 하단 스트립 활성 표시 갱신
+  setActiveStrip(project.id);
 
   showPage(detailPage);
   if (detailPage) detailPage.scrollTop = 0;
@@ -681,7 +704,7 @@ function showProjectDetail(projectId) {
 }
 
 // =====================================================
-// 6) 모바일: 상세페이지 스와이프(prev/next)
+// 6) 모바일: 상세페이지 스와이프(prev/next) (기존 유지)
 // =====================================================
 if (detailPage) {
   let touchStartX = 0;

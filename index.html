@@ -36,10 +36,7 @@
        메인 페이지
        ============================ -->
   <div id="main-page" class="page active">
-    <!-- 마퀴바 (캔버스 공의 ‘천장’ 역할 + 드래그 이동 + (데스크탑) 가로 리사이즈) -->
     <div class="marquee-bar" id="marquee-bar">
-      <!-- ✅ 끊김 없는 루프를 위해 동일 문장 2개를 "붙여서" 둔다
-           (span 사이 공백/줄바꿈이 폭을 만들 수 있어서 붙여쓰기) -->
       <div class="marquee-inner" id="marquee-inner">
         <span class="marquee-text" id="marquee-text-1">
           원래 힌(hin)은 고대에 쓰이던 액체 용량 단위입니다. 1 hin = 물 한동이, 약 3.8L 안팎으로
@@ -55,14 +52,12 @@
       </div>
     </div>
 
-    <!-- 타이틀 -->
     <div class="title-container">
       <h1 id="main-title">
         hin<span class="press-text">P</span>ress
       </h1>
     </div>
 
-    <!-- 스마일 볼 애니메이션 캔버스 -->
     <canvas id="canvas"></canvas>
   </div>
 
@@ -120,10 +115,11 @@
   </div>
 
   <!-- ============================
-       상세 페이지
-       ============================ -->
+     상세 페이지
+     ============================ -->
   <div id="detail-page" class="page">
     <div class="detail-nav">
+      <!-- ✅ 상단은 원래대로 유지 -->
       <span id="detail-prev">☜</span>
       <span id="detail-next">☞</span>
     </div>
@@ -158,6 +154,17 @@
       </div>
 
       <div class="detail-images" id="detail-images"></div>
+    </div>
+
+    <!-- ✅ 하단 썸네일 스트립: 화살표만 ·८· / 반전 ·८· 로 변경 -->
+    <div class="detail-bottom-strip" id="detail-bottom-strip">
+      <button class="detail-strip-arrow left detail-strip-face" id="detail-strip-left" type="button"
+        aria-label="썸네일 왼쪽으로">☜</button>
+
+      <div class="detail-strip-track" id="detail-strip-track" aria-label="프로젝트 썸네일"></div>
+
+      <button class="detail-strip-arrow right detail-strip-face detail-strip-face--right" id="detail-strip-right"
+        type="button" aria-label="썸네일 오른쪽으로">☜</button>
     </div>
   </div>
 

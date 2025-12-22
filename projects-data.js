@@ -62,6 +62,7 @@ const rawProjects = [
     client: ['개인 작업, 대학원 수업과제'],
     imageFolder: '2024/deepmind',
     imageBaseName: 'deepmind',
+    span2Indexes: [5, 8],
     imageCount: 9,
     imageExt: 'jpg',
     padLength: 2,
@@ -341,10 +342,10 @@ const rawProjects = [
     client: ['서울공예박물관'],
     imageFolder: '2024/craftm',
     imageBaseName: 'craftm',
+    span2Indexes: [1],
     imageCount: 4,
     imageExt: 'jpg',
     padLength: 2,
-
     mainImageSize: 'l'
   }
 ];
