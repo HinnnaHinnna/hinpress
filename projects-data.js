@@ -41,6 +41,7 @@ const rawProjects = [
     client: ['개인 작업, 서울시립대학교 디자인석사청구'],
     imageFolder: '2024/write',
     imageBaseName: 'write',
+    span2Indexes: [13],
     imageCount: 16,
     imageExt: 'jpg',
     padLength: 2,
@@ -64,7 +65,6 @@ const rawProjects = [
     imageCount: 9,
     imageExt: 'jpg',
     padLength: 2,
-
     mainImageSize: 'l'
   },
   {
@@ -99,10 +99,10 @@ const rawProjects = [
     client: ['충무로영화제-감독주간, box8'],
     imageFolder: '2024/parkchanwuk',
     imageBaseName: 'parkchanwuk',
+    span2Indexes: [15], // parkchanwuk_15.jpg만 2칸(span:2)
     imageCount: 23,
     imageExt: 'jpg',
     padLength: 2,
-
     mainImageSize: 'l'
   },
   {
@@ -352,7 +352,7 @@ const rawProjects = [
 
 
 // ============================================
-// 최종 projects 배열 생성
+// 최종 projects 배열 생성 (✅ span2Indexes 지원)
 // ============================================
 const projects = rawProjects.map((p) => {
   let images = [];
@@ -372,8 +372,20 @@ const projects = rawProjects.map((p) => {
     );
   }
 
+  // ✅ span2Indexes가 있으면 해당 인덱스만 { src, span:2 }로 변환
+  if (Array.isArray(p.span2Indexes) && p.span2Indexes.length > 0) {
+    images = images.map((item, idx) => {
+      // item이 이미 객체면 그대로 둠(수동 images에서 객체를 넣었을 수도 있으니까)
+      if (item && typeof item === 'object') return item;
+
+      const isSpan2 = p.span2Indexes.includes(idx);
+      return isSpan2 ? { src: item, span: 2 } : item;
+    });
+  }
+
   return { ...p, images };
 });
 
 // 디버그
 console.log('최종 projects:', projects);
+
