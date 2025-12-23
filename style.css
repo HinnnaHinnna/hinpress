@@ -9,10 +9,10 @@
   --color-muted: #0008ff;
   --color-main-gray: rgb(246, 238, 227);
 
-  --color-arrow: rgb(46, 100, 225);
+  --color-arrow: #0008ff;
   --color-maque: #fafb8d;
 
-  --bar-height: 2rem;
+  --bar-height: 1.5rem;
   --bar-font-size: 0.8rem;
 
   /* ✅ 공통 좌우 여백 */
@@ -237,7 +237,8 @@ body {
   z-index: 100;
   display: flex;
   align-items: center;
-  background-color: var(--color-maque);
+  background-color: var(--color-muted);
+  padding-top: 3px;
 }
 
 .marquee-inner {
@@ -264,7 +265,7 @@ body {
   font-size: var(--bar-font-size);
   line-height: 1;
   word-break: keep-all;
-  color: #000000;
+  color: rgb(246, 238, 227);
   flex: 0 0 auto;
   padding-right: 4rem;
 }
@@ -791,7 +792,7 @@ body {
 /* =============================== 반응형: 모바일 =============================== */
 @media (max-width: 768px) {
   :root {
-    --bar-height: 2.5rem;
+    --bar-height: 1.5rem;
     --detail-page-side-padding: 0px;
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
