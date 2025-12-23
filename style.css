@@ -503,10 +503,20 @@ body {
 
 /* 연도, 제본 */
 .detail-meta-item {
-  font-size: 11px;
   margin-top: 0.2rem;
   line-height: 1.3;
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 11px;
+}
 
+/* 라벨 폭을 고정해서 줄맞춤 + emsp 제거 가능 */
+.detail-meta-item strong {
+  display: inline-block;
+  min-width: 3em;
+  /* 필요하면 3.5em 등으로 조절 */
+  font-weight: 500;
 }
 
 /* ✅ 이미지들 = 2행 2~3열(= 4/5) 안에서 2단 */
