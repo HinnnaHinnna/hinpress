@@ -332,8 +332,8 @@ const rawProjects = [
   },
   {
     id: 17,
-    title: 'craftm',
-    subtitle: ['포스터/홍보물/배너'],
+    title: '입고 꾸미기 위한 공예',
+    subtitle: ['포스터', '홍보물', '배너'],
     year: '2023',
     specs: ' ',
     size: [' '],
