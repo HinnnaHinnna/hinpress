@@ -57,6 +57,89 @@ function getImageSrc(item) {
 }
 
 // =====================================================
+// ✅ [핵심] 이미지 확장자 fallback 지원 (jpg -> gif, png 등)
+// -----------------------------------------------------
+// 왜 필요?
+// - projects-data.js에서 기본은 .jpg로 경로를 만들고 있는데
+// - 실제 폴더에 .gif가 있으면, .jpg가 404(없음)일 때 자동으로 .gif를 시도해서 표시해준다.
+//
+// 중요한 점!
+// - "jpg도 있고 gif도 있을 때" 무조건 gif를 우선하고 싶다면,
+//   데이터(projects-data.js)에서 애초에 .gif로 경로를 만들어야 한다.
+//   (fallback은 '실패했을 때만' 다음 후보를 시도하기 때문!)
+// =====================================================
+function buildFallbackCandidates(src) {
+  if (!src) return [];
+
+  // 쿼리스트링이 있을 수 있으니 분리 (예: image.jpg?v=1)
+  const [path, query] = src.split('?');
+  const q = query ? `?${query}` : '';
+
+  // 확장자가 없는 경우는 그대로 반환
+  const m = path.match(/^(.*)\.([^.\/]+)$/);
+  if (!m) return [src];
+
+  const base = m[1];
+  const ext = (m[2] || '').toLowerCase();
+
+  // 확장자별로 "다음에 시도할 후보" 순서를 정의
+  // - jpg가 실패하면 gif를 먼저 시도하도록 배치!
+  const map = {
+    jpg: ['gif', 'png'],
+    jpeg: ['gif', 'png'],
+    gif: ['jpg', 'png'],
+    png: ['gif', 'jpg'],
+    webp: ['gif', 'jpg'],
+  };
+
+  const alts = map[ext] || ['gif', 'jpg'];
+
+  // 중복 제거 + 최대 3개(원본 + 2개)만 시도 (404 너무 많이 내지 않게)
+  const candidates = [`${base}.${ext}${q}`, ...alts.map(e => `${base}.${e}${q}`)];
+  const uniq = [...new Set(candidates)];
+
+  return uniq.slice(0, 3);
+}
+
+/**
+ * img 엘리먼트에 src를 넣을 때 이 함수를 사용하면
+ * - 첫 시도 실패 시(gif/png 등) 자동 재시도한다.
+ */
+function setImageSrcWithFallback(imgEl, src) {
+  if (!imgEl) return;
+
+  const attempts = buildFallbackCandidates(src);
+
+  if (!attempts.length) {
+    imgEl.removeAttribute('src');
+    return;
+  }
+
+  // 시도 목록 저장
+  imgEl.dataset.srcAttempts = JSON.stringify(attempts);
+  imgEl.dataset.srcAttemptIndex = '0';
+
+  // 첫번째 시도
+  imgEl.src = attempts[0];
+
+  // 실패하면 다음 후보로 교체
+  imgEl.onerror = () => {
+    const list = JSON.parse(imgEl.dataset.srcAttempts || '[]');
+    let i = parseInt(imgEl.dataset.srcAttemptIndex || '0', 10);
+
+    i += 1;
+    if (i < list.length) {
+      imgEl.dataset.srcAttemptIndex = String(i);
+      imgEl.src = list[i];
+      return;
+    }
+
+    // 더 시도할 게 없으면 onerror 해제(무한 루프 방지)
+    imgEl.onerror = null;
+  };
+}
+
+// =====================================================
 // 1) 페이지 전환
 // =====================================================
 function showPage(page) {
@@ -203,15 +286,10 @@ function setupMarqueeIntroOnce() {
 resizeCanvas();
 initPaddle();
 
-function initAfterFontsReady() {
-  setupMarqueeIntroOnce();
-}
+function initAfterFontsReady() { setupMarqueeIntroOnce(); }
 
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(initAfterFontsReady);
-} else {
-  window.addEventListener('load', initAfterFontsReady);
-}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(initAfterFontsReady);
+else window.addEventListener('load', initAfterFontsReady);
 
 if (marqueeBar && 'ResizeObserver' in window) {
   let isAdjusting = false;
@@ -381,6 +459,7 @@ class Ball {
         this.x >= (paddleX - this.radius) &&
         this.x <= (paddleX + paddleWidth + this.radius);
 
+      // 위로 가는 볼이 패들 아래면에 부딪히는 경우
       if (this.vy < 0 && withinPaddleX) {
         const prevTop = (prevY - this.radius);
         const currTop = (this.y - this.radius);
@@ -393,6 +472,7 @@ class Ball {
         }
       }
 
+      // 아래로 가는 볼이 패들 윗면에 부딪히는 경우
       if (this.vy > 0 && withinPaddleX) {
         const prevBottom = (prevY + this.radius);
         const currBottom = (this.y + this.radius);
@@ -406,11 +486,13 @@ class Ball {
       }
     }
 
+    // 바닥
     if (this.y + this.radius > canvas.height) {
       this.y = canvas.height - this.radius;
       this.vy = -Math.abs(this.vy);
     }
 
+    // 천장 밖으로 나가면 리사이클
     if (this.y + this.radius < 0) {
       this.recycleBall();
     }
@@ -421,7 +503,6 @@ class Ball {
 
   recycleBall() {
     if (!canvas) return;
-
     this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
     this.y = canvas.height - this.radius - 5;
 
@@ -524,8 +605,11 @@ function createThumbnails(options = {}) {
     thumbnail.className = 'thumbnail';
 
     const img = document.createElement('img');
+
+    // ✅ 여기서도 fallback 적용 (jpg 없으면 gif로)
     const first = (project.images && project.images[0]) ? project.images[0] : '';
-    img.src = getImageSrc(first);
+    setImageSrcWithFallback(img, getImageSrc(first));
+
     img.alt = project.title || '';
 
     thumbnail.appendChild(img);
@@ -552,35 +636,22 @@ function normalizeText(value) {
 // =====================================================
 // ✅ [핵심] 하단 스트립: "슬라이드(스크롤) 중엔 선택(클릭) 금지" 가드
 // =====================================================
-let stripIsPointerDown = false;     // 손가락/마우스가 눌린 상태
-let stripMoved = false;             // 눌린 뒤 일정 거리 이상 이동했는지
+let stripIsPointerDown = false;
+let stripMoved = false;
 let stripStartX = 0;
 let stripStartY = 0;
 let stripStartScrollLeft = 0;
-
-// ✅ 클릭 억제 타이머(모바일에서 touchend 뒤 click이 늦게 발생하는 케이스 방지)
 let stripSuppressClickUntil = 0;
 
-/**
- * 지금 발생한 "선택 클릭"을 무시해야 하는 상황인가?
- * - 방금 스크롤/드래그 했거나
- * - 관성 스크롤 직후(짧은 시간)인 경우
- */
 function shouldSuppressStripClick() {
   return stripMoved || Date.now() < stripSuppressClickUntil;
 }
 
-/**
- * 스트립에서 "스크롤로 판단"하는 기준
- * - 손가락이 조금만 움직여도 탭으로 오작동할 수 있어
- * - 그래서 threshold를 둬서 '이 정도 이상' 움직였을 때만 스크롤로 판단
- */
-const STRIP_MOVE_THRESHOLD = 10; // px (필요하면 8~14 사이로 조절)
+const STRIP_MOVE_THRESHOLD = 10;
 
 function initStripDragGuard() {
   if (!detailStripTrack) return;
 
-  // 1) 터치 시작
   detailStripTrack.addEventListener('touchstart', (e) => {
     if (e.touches.length === 0) return;
     const t = e.touches[0];
@@ -593,29 +664,22 @@ function initStripDragGuard() {
     stripStartScrollLeft = detailStripTrack.scrollLeft;
   }, { passive: true });
 
-  // 2) 터치 이동(스크롤 중)
   detailStripTrack.addEventListener('touchmove', (e) => {
     if (!stripIsPointerDown || e.touches.length === 0) return;
     const t = e.touches[0];
 
     const dx = Math.abs(t.clientX - stripStartX);
     const dy = Math.abs(t.clientY - stripStartY);
-
-    // 손가락 이동이 일정 이상이거나, 실제 스크롤이 변했으면 "슬라이드"로 판단
     const scrolled = Math.abs(detailStripTrack.scrollLeft - stripStartScrollLeft) > 2;
 
     if (dx > STRIP_MOVE_THRESHOLD || dy > STRIP_MOVE_THRESHOLD || scrolled) {
       stripMoved = true;
-
-      // ✅ touchend 후에 click이 튀는 걸 막기 위해, 잠깐 클릭 억제
       stripSuppressClickUntil = Date.now() + 350;
     }
   }, { passive: true });
 
-  // 3) 터치 종료
   detailStripTrack.addEventListener('touchend', () => {
     stripIsPointerDown = false;
-    // stripMoved는 바로 false로 만들지 말고, suppress 타이머로 안전하게 처리
   }, { passive: true });
 
   detailStripTrack.addEventListener('touchcancel', () => {
@@ -623,22 +687,16 @@ function initStripDragGuard() {
     stripMoved = false;
   }, { passive: true });
 
-  // 4) 스크롤 이벤트(관성 스크롤 포함)
   detailStripTrack.addEventListener('scroll', () => {
-    // 사용자가 스크롤하고 있으면(특히 모바일 관성), 선택 클릭이 튀지 않게 잠깐 막기
-    // scroll은 아주 자주 발생하므로 "짧게 갱신"만 해준다.
     stripSuppressClickUntil = Date.now() + 250;
   }, { passive: true });
 
-  // 5) 캡처 단계에서 click 자체를 차단(버튼 click 핸들러보다 먼저)
   detailStripTrack.addEventListener('click', (e) => {
     if (!shouldSuppressStripClick()) return;
     e.preventDefault();
     e.stopPropagation();
   }, true);
 }
-
-// ✅ 1회 초기화
 initStripDragGuard();
 
 // =====================================================
@@ -657,12 +715,14 @@ function buildDetailBottomStrip() {
     btn.dataset.projectId = String(p.id);
 
     const img = document.createElement('img');
+
+    // ✅ 여기서도 fallback 적용
     const first = (p.images && p.images[0]) ? p.images[0] : '';
-    img.src = getImageSrc(first);
+    setImageSrcWithFallback(img, getImageSrc(first));
+
     img.alt = p.title || '';
     btn.appendChild(img);
 
-    // ✅ [핵심] "슬라이드 중"이면 클릭(선택) 무시
     btn.addEventListener('click', (e) => {
       if (shouldSuppressStripClick()) {
         e.preventDefault();
@@ -686,27 +746,22 @@ function setActiveStrip(projectId) {
     else t.classList.remove('is-active');
   });
 
-  // ✅ 활성 썸네일이 화면에 자연스럽게 보이도록 살짝 스크롤
   const active = detailStripTrack.querySelector('.detail-strip-thumb.is-active');
   if (active && typeof active.scrollIntoView === 'function') {
     active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }
 }
 
-// 화살표 스크롤
 function scrollStripBy(direction) {
   if (!detailStripTrack) return;
   const amount = Math.max(240, Math.floor(window.innerWidth * 0.65));
   detailStripTrack.scrollBy({ left: direction * amount, behavior: 'smooth' });
-
-  // ✅ 화살표로 움직인 직후에도 클릭 튀는 걸 약간 방지
   stripSuppressClickUntil = Date.now() + 250;
 }
 
 if (detailStripLeft) detailStripLeft.addEventListener('click', () => scrollStripBy(-1));
 if (detailStripRight) detailStripRight.addEventListener('click', () => scrollStripBy(1));
 
-// 페이지 로딩 시 1회 생성
 buildDetailBottomStrip();
 
 function showProjectDetail(projectId) {
@@ -771,7 +826,10 @@ function showProjectDetail(projectId) {
 
     if (firstSrc) {
       const firstImg = document.createElement('img');
-      firstImg.src = firstSrc;
+
+      // ✅ 여기서도 fallback 적용 (jpg 없으면 gif로)
+      setImageSrcWithFallback(firstImg, firstSrc);
+
       firstImg.alt = project.title || '';
       firstImg.classList.add(`main-img-${mainSize}`);
       detailMainImageEl.appendChild(firstImg);
@@ -786,10 +844,12 @@ function showProjectDetail(projectId) {
       if (!src) continue;
 
       const img = document.createElement('img');
-      img.src = src;
+
+      // ✅ 여기서도 fallback 적용
+      setImageSrcWithFallback(img, src);
+
       img.alt = project.title || '';
 
-      // span:2 처리
       if (item && typeof item === 'object' && item.span === 2) {
         img.style.gridColumn = '1 / -1';
         img.classList.add('span-2');
@@ -799,7 +859,6 @@ function showProjectDetail(projectId) {
     }
   }
 
-  // ✅ 하단 스트립 활성 표시 갱신
   setActiveStrip(project.id);
 
   showPage(detailPage);
