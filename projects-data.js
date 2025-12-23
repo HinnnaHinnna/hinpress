@@ -309,7 +309,6 @@ const rawProjects = [
     imageCount: 2,
     imageExt: 'jpg',
     padLength: 2,
-
     mainImageSize: 'l'
   },
   {
@@ -319,15 +318,14 @@ const rawProjects = [
     year: '2024',
     specs: '웹',
     size: [' '],
-    description: '서울시립대학교 디자인전문대학원 시각디자인 국외 디자이너 XYZ 랩: 자오완칭(Zhao Wanqing), 샤오녠(Shao Nian) 초빙 특강/워크숍 포스터.',
+    description: '서울시립대학교 디자인전문대학원 시각디자인과 국외 디자이너 XYZ 랩: 자오완칭(Zhao Wanqing), 샤오녠(Shao Nian) 초빙 특강/워크숍 포스터.',
     category: 'Graphic Design',
     client: ['개인 작업'],
     imageFolder: '2024/xyz',
     imageBaseName: 'xyz',
-    imageCount: 2,
-    imageExt: 'jpg',
+    imageCount: 3,
+    imageExt: ['gif', 'jpg'],
     padLength: 2,
-
     mainImageSize: 'l'
   },
   {
@@ -343,6 +341,23 @@ const rawProjects = [
     imageFolder: '2024/craftm',
     imageBaseName: 'craftm',
     span2Indexes: [1],
+    imageCount: 4,
+    imageExt: 'jpg',
+    padLength: 2,
+    mainImageSize: 'l'
+  },
+  {
+    id: 18,
+    title: '6699 특강',
+    subtitle: ['포스터', '배너'],
+    year: '2022',
+    specs: ' ',
+    size: [' '],
+    description: '서울시립대학교 디자인전문대학원 시각디자인과 국내 디자이너 <6699 특강> 포스터, 인스타 홍보물. ',
+    category: 'Graphic Design',
+    client: ['개인작업'],
+    imageFolder: '2024/6699',
+    imageBaseName: '6699',
     imageCount: 4,
     imageExt: 'jpg',
     padLength: 2,
