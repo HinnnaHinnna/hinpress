@@ -101,7 +101,7 @@ const rawProjects = [
     imageFolder: '2024/parkchanwuk',
     imageBaseName: 'parkchanwuk',
     span2Indexes: [15], // parkchanwuk_15.jpg만 2칸(span:2)
-    imageCount: 23,
+    imageCount: 18,
     imageExt: 'jpg',
     padLength: 2,
     mainImageSize: 'l'
