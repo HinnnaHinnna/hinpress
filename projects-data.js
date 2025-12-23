@@ -41,8 +41,8 @@ const rawProjects = [
     client: ['개인 작업, 서울시립대학교 디자인석사청구'],
     imageFolder: '2024/write',
     imageBaseName: 'write',
-    span2Indexes: [13],
-    imageCount: 16,
+    span2Indexes: [5, 14],
+    imageCount: 20,
     imageExt: 'jpg',
     padLength: 2,
 
