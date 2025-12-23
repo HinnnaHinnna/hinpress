@@ -120,7 +120,7 @@ if (detailNext) {
 }
 
 // =====================================================
-// 3) 캔버스 + 마퀴바(패들) 연동 (너 기존 코드 유지)
+// 3) 캔버스 + 마퀴바(패들) 연동
 // =====================================================
 const canvas = document.getElementById('canvas');
 const ctx = canvas?.getContext('2d');
@@ -323,7 +323,7 @@ if (marqueeBar) {
 }
 
 // =====================================================
-// 4) 스마일 볼 (기존 유지)
+// 4) 스마일 볼
 // =====================================================
 class Ball {
   constructor(x, y, radius, color) {
@@ -550,6 +550,98 @@ function normalizeText(value) {
 }
 
 // =====================================================
+// ✅ [핵심] 하단 스트립: "슬라이드(스크롤) 중엔 선택(클릭) 금지" 가드
+// =====================================================
+let stripIsPointerDown = false;     // 손가락/마우스가 눌린 상태
+let stripMoved = false;             // 눌린 뒤 일정 거리 이상 이동했는지
+let stripStartX = 0;
+let stripStartY = 0;
+let stripStartScrollLeft = 0;
+
+// ✅ 클릭 억제 타이머(모바일에서 touchend 뒤 click이 늦게 발생하는 케이스 방지)
+let stripSuppressClickUntil = 0;
+
+/**
+ * 지금 발생한 "선택 클릭"을 무시해야 하는 상황인가?
+ * - 방금 스크롤/드래그 했거나
+ * - 관성 스크롤 직후(짧은 시간)인 경우
+ */
+function shouldSuppressStripClick() {
+  return stripMoved || Date.now() < stripSuppressClickUntil;
+}
+
+/**
+ * 스트립에서 "스크롤로 판단"하는 기준
+ * - 손가락이 조금만 움직여도 탭으로 오작동할 수 있어
+ * - 그래서 threshold를 둬서 '이 정도 이상' 움직였을 때만 스크롤로 판단
+ */
+const STRIP_MOVE_THRESHOLD = 10; // px (필요하면 8~14 사이로 조절)
+
+function initStripDragGuard() {
+  if (!detailStripTrack) return;
+
+  // 1) 터치 시작
+  detailStripTrack.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 0) return;
+    const t = e.touches[0];
+
+    stripIsPointerDown = true;
+    stripMoved = false;
+
+    stripStartX = t.clientX;
+    stripStartY = t.clientY;
+    stripStartScrollLeft = detailStripTrack.scrollLeft;
+  }, { passive: true });
+
+  // 2) 터치 이동(스크롤 중)
+  detailStripTrack.addEventListener('touchmove', (e) => {
+    if (!stripIsPointerDown || e.touches.length === 0) return;
+    const t = e.touches[0];
+
+    const dx = Math.abs(t.clientX - stripStartX);
+    const dy = Math.abs(t.clientY - stripStartY);
+
+    // 손가락 이동이 일정 이상이거나, 실제 스크롤이 변했으면 "슬라이드"로 판단
+    const scrolled = Math.abs(detailStripTrack.scrollLeft - stripStartScrollLeft) > 2;
+
+    if (dx > STRIP_MOVE_THRESHOLD || dy > STRIP_MOVE_THRESHOLD || scrolled) {
+      stripMoved = true;
+
+      // ✅ touchend 후에 click이 튀는 걸 막기 위해, 잠깐 클릭 억제
+      stripSuppressClickUntil = Date.now() + 350;
+    }
+  }, { passive: true });
+
+  // 3) 터치 종료
+  detailStripTrack.addEventListener('touchend', () => {
+    stripIsPointerDown = false;
+    // stripMoved는 바로 false로 만들지 말고, suppress 타이머로 안전하게 처리
+  }, { passive: true });
+
+  detailStripTrack.addEventListener('touchcancel', () => {
+    stripIsPointerDown = false;
+    stripMoved = false;
+  }, { passive: true });
+
+  // 4) 스크롤 이벤트(관성 스크롤 포함)
+  detailStripTrack.addEventListener('scroll', () => {
+    // 사용자가 스크롤하고 있으면(특히 모바일 관성), 선택 클릭이 튀지 않게 잠깐 막기
+    // scroll은 아주 자주 발생하므로 "짧게 갱신"만 해준다.
+    stripSuppressClickUntil = Date.now() + 250;
+  }, { passive: true });
+
+  // 5) 캡처 단계에서 click 자체를 차단(버튼 click 핸들러보다 먼저)
+  detailStripTrack.addEventListener('click', (e) => {
+    if (!shouldSuppressStripClick()) return;
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+}
+
+// ✅ 1회 초기화
+initStripDragGuard();
+
+// =====================================================
 // ✅ 하단 “프로젝트 썸네일 스트립” 생성/갱신
 // =====================================================
 function buildDetailBottomStrip() {
@@ -570,7 +662,16 @@ function buildDetailBottomStrip() {
     img.alt = p.title || '';
     btn.appendChild(img);
 
-    btn.addEventListener('click', () => showProjectDetail(p.id));
+    // ✅ [핵심] "슬라이드 중"이면 클릭(선택) 무시
+    btn.addEventListener('click', (e) => {
+      if (shouldSuppressStripClick()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      showProjectDetail(p.id);
+    });
+
     detailStripTrack.appendChild(btn);
   });
 }
@@ -597,6 +698,9 @@ function scrollStripBy(direction) {
   if (!detailStripTrack) return;
   const amount = Math.max(240, Math.floor(window.innerWidth * 0.65));
   detailStripTrack.scrollBy({ left: direction * amount, behavior: 'smooth' });
+
+  // ✅ 화살표로 움직인 직후에도 클릭 튀는 걸 약간 방지
+  stripSuppressClickUntil = Date.now() + 250;
 }
 
 if (detailStripLeft) detailStripLeft.addEventListener('click', () => scrollStripBy(-1));
@@ -704,7 +808,7 @@ function showProjectDetail(projectId) {
 }
 
 // =====================================================
-// 6) 모바일: 상세페이지 스와이프(prev/next) (기존 유지)
+// 6) 모바일: 상세페이지 스와이프(prev/next)
 // =====================================================
 if (detailPage) {
   let touchStartX = 0;
