@@ -314,7 +314,7 @@ const rawProjects = [
   },
   {
     id: 16,
-    title: 'xyz',
+    title: 'xyz 워크샵 포스터',
     subtitle: ['포스터'],
     year: '2024',
     specs: '웹',
