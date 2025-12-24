@@ -133,7 +133,7 @@ const rawProjects = [
     specs: '무선제본',
     size: ['180x280mm', '114p'],
     description:
-      '부서진 유물 조각을 의미를 찾는 전시의 포스터. 전시 제목을 부서진 유물조각으로 이미지화 했다.',
+      '부서진 유물 조각을 의미를 찾는 전시의 포스터. 전시 제목을 부서진 유물 조각으로 레터링 했다.',
     category: 'Graphic Design',
     client: ['양주시립박물관'],
     imageFolder: 'bc/sansan',
@@ -172,7 +172,7 @@ const rawProjects = [
     specs: '무선제본',
     size: ['240x240mm', '128p'],
     description:
-      '여주에 위치한 영릉에 관련된 전시의 도록.',
+      '여주에 위치한 영릉에 관련된 전시의 도록. 무덤을 심볼화한 반원이 표지 후가공, 포스터 레터링, 하시라 등에 적용되었다.',
     category: 'Graphic Design',
     client: ['국립민속박물관'],
     imageFolder: 'bc/yeuju',
@@ -239,7 +239,7 @@ const rawProjects = [
     subtitle: ['책'],
     year: '2025',
     specs: '무선제본',
-    description: '국립민속박물관 전시 도록 시안',
+    description: '국립민속박물관 전시 도록 시안. 표지 왼쪽 위에는 책 전체를 관통하는 구멍이 있다. 이 구멍에 일생을 상징하는 실이 통과하고 실은 책끈의 역할을 한다. 표지 디자인은 일생을 상징하는 실을 모티브로 레터링한 글자로 디자인했다. ',
     category: 'Graphic Design',
     client: ['국립민속박물관'],
     imageFolder: '2024/life',
