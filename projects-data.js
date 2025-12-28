@@ -349,6 +349,20 @@ const rawProjects = [
     imageExt: ['gif', 'jpg'],
     padLength: 2,
     mainImageSize: 'l'
+  },
+  {
+    id: 19,
+    title: '메타공백',
+    year: '2025',
+    description: '공백문자에는 빈 칸, 폭없는 공백, En Space, Punctuation Space 등 여러 종류의 공백문자가 있다. 비어있는 것처럼 보이지만 각각의 너비와 쓰임이 다르며 고유의 유니코드도 있는 모순적 문자이다. 이 모순적 특징을 주제 삼아 공백문자로만 단락을 섞어짜기 하려 했는데 작업 환경을 고려해 웹의 공백 기능 중 CSS 속성의 패딩과 블러도 추가 적용했다. ‘메타공백’은 공백이 아닌 공백으로 공백을 만들어가는 작업이다.',
+    category: '웹',
+    client: ['개인작업'],
+    imageFolder: '2024/meta',
+    imageBaseName: 'meta',
+    imageCount: 4,
+    imageExt: ['gif', 'jpg'],
+    padLength: 2,
+    mainImageSize: 'l'
   }
 ];
 
