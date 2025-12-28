@@ -359,7 +359,7 @@ const rawProjects = [
     client: ['개인작업'],
     imageFolder: '2024/meta',
     imageBaseName: 'meta',
-    imageCount: 5,
+    imageCount: 4,
     imageExt: ['jpg'],
     padLength: 2,
     mainImageSize: 'l'
