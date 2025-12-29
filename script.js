@@ -58,32 +58,19 @@ function getImageSrc(item) {
 
 // =====================================================
 // ✅ [핵심] 이미지 확장자 fallback 지원 (jpg -> gif, png 등)
-// -----------------------------------------------------
-// 왜 필요?
-// - projects-data.js에서 기본은 .jpg로 경로를 만들고 있는데
-// - 실제 폴더에 .gif가 있으면, .jpg가 404(없음)일 때 자동으로 .gif를 시도해서 표시해준다.
-//
-// 중요한 점!
-// - "jpg도 있고 gif도 있을 때" 무조건 gif를 우선하고 싶다면,
-//   데이터(projects-data.js)에서 애초에 .gif로 경로를 만들어야 한다.
-//   (fallback은 '실패했을 때만' 다음 후보를 시도하기 때문!)
 // =====================================================
 function buildFallbackCandidates(src) {
   if (!src) return [];
 
-  // 쿼리스트링이 있을 수 있으니 분리 (예: image.jpg?v=1)
   const [path, query] = src.split('?');
   const q = query ? `?${query}` : '';
 
-  // 확장자가 없는 경우는 그대로 반환
   const m = path.match(/^(.*)\.([^.\/]+)$/);
   if (!m) return [src];
 
   const base = m[1];
   const ext = (m[2] || '').toLowerCase();
 
-  // 확장자별로 "다음에 시도할 후보" 순서를 정의
-  // - jpg가 실패하면 gif를 먼저 시도하도록 배치!
   const map = {
     jpg: ['gif', 'png'],
     jpeg: ['gif', 'png'],
@@ -94,17 +81,12 @@ function buildFallbackCandidates(src) {
 
   const alts = map[ext] || ['gif', 'jpg'];
 
-  // 중복 제거 + 최대 3개(원본 + 2개)만 시도 (404 너무 많이 내지 않게)
   const candidates = [`${base}.${ext}${q}`, ...alts.map(e => `${base}.${e}${q}`)];
   const uniq = [...new Set(candidates)];
 
   return uniq.slice(0, 3);
 }
 
-/**
- * img 엘리먼트에 src를 넣을 때 이 함수를 사용하면
- * - 첫 시도 실패 시(gif/png 등) 자동 재시도한다.
- */
 function setImageSrcWithFallback(imgEl, src) {
   if (!imgEl) return;
 
@@ -115,14 +97,11 @@ function setImageSrcWithFallback(imgEl, src) {
     return;
   }
 
-  // 시도 목록 저장
   imgEl.dataset.srcAttempts = JSON.stringify(attempts);
   imgEl.dataset.srcAttemptIndex = '0';
 
-  // 첫번째 시도
   imgEl.src = attempts[0];
 
-  // 실패하면 다음 후보로 교체
   imgEl.onerror = () => {
     const list = JSON.parse(imgEl.dataset.srcAttempts || '[]');
     let i = parseInt(imgEl.dataset.srcAttemptIndex || '0', 10);
@@ -134,7 +113,6 @@ function setImageSrcWithFallback(imgEl, src) {
       return;
     }
 
-    // 더 시도할 게 없으면 onerror 해제(무한 루프 방지)
     imgEl.onerror = null;
   };
 }
@@ -409,8 +387,9 @@ class Ball {
     this.radius = radius;
     this.color = color;
 
-    this.vx = (Math.random() - 0.5) * 10;
-    this.vy = (Math.random() - 0.5) * 10;
+    // ✅ 초기 속도(랜덤) — 여기 범위를 줄이면 전체적으로 느려짐
+    this.vx = (Math.random() - 0.5) * 5;
+    this.vy = (Math.random() - 0.5) * 5;
 
     this.rotation = Math.random() * Math.PI * 2;
     this.rotationSpeed = (Math.random() - 0.5) * 0.05;
@@ -446,6 +425,7 @@ class Ball {
     this.x += this.vx;
     this.y += this.vy;
 
+    // 좌/우 벽 반사
     if (this.x + this.radius > canvas.width) {
       this.x = canvas.width - this.radius;
       this.vx = -Math.abs(this.vx);
@@ -454,6 +434,7 @@ class Ball {
       this.vx = Math.abs(this.vx);
     }
 
+    // 패들(마퀴바) 충돌
     if (paddleHeight > 0) {
       const withinPaddleX =
         this.x >= (paddleX - this.radius) &&
@@ -468,7 +449,9 @@ class Ball {
         if (crossedBottomSurface) {
           this.y = paddleBottom + this.radius;
           this.vy = Math.abs(this.vy);
-          this.vx += paddleVX * 0.8;
+
+          // ✅ 패들 움직임이 공에 옆속도로 전달됨 (여기가 vx가 커지는 지점)
+          this.vx += paddleVX * 0.2;
         }
       }
 
@@ -481,12 +464,14 @@ class Ball {
         if (crossedTopSurface) {
           this.y = paddleTop - this.radius;
           this.vy = -Math.abs(this.vy);
-          this.vx += paddleVX * 0.8;
+
+          // ✅ 여기도 동일
+          this.vx += paddleVX * 0.2;
         }
       }
     }
 
-    // 바닥
+    // 바닥 반사
     if (this.y + this.radius > canvas.height) {
       this.y = canvas.height - this.radius;
       this.vy = -Math.abs(this.vy);
@@ -506,8 +491,8 @@ class Ball {
     this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
     this.y = canvas.height - this.radius - 5;
 
-    this.vx = (Math.random() - 0.5) * 10;
-    this.vy = -(Math.random() * 8 + 3);
+    this.vx = (Math.random() - 0.5) * 2;
+    this.vy = -(Math.random() * 2 + 1);
 
     this.rotation = Math.random() * Math.PI * 2;
     this.rotationSpeed = (Math.random() - 0.5) * 0.05;
@@ -515,42 +500,134 @@ class Ball {
 }
 
 const balls = [];
-const numBalls = 12;
+
+// ✅ 초기 공 개수
+const numBalls = 6;
+
 const ballColor = '#fcff54';
-const MAX_BALLS = 410;
+const MAX_BALLS = 900;
 let lastSpawnTime = 0;
 
+// =====================================================
+// ✅ (B) “겹치면 밀어내서 분리”를 위한 충돌 설정
+// -----------------------------------------------------
+// - overlapCorrectionPercent: 겹친 양을 몇 %까지 분리할지
+//   1.0에 가까울수록 더 강하게 분리(붙어있는 현상 감소)
+// - overlapSlop: 아주 미세한 겹침은 허용(너무 ‘덜컥’거리는 느낌 방지)
+// - restitution: 튕김(탄성). 1.0이면 완전 탄성(에너지 보존 느낌)
+// =====================================================
+const COLLISION_CONFIG = {
+  overlapCorrectionPercent: 0.9,
+  overlapSlop: 0.1,
+  restitution: 1.0,
+};
+
+// =====================================================
+// ✅ 공-공 충돌 처리 (겹침 분리 + 물리 반응)
+// -----------------------------------------------------
+// 기존 문제(속도 갑자기 튀는 이유)
+// - 공이 서로 겹친 채로 남아 있으면 다음 프레임에도 계속 충돌로 판정됨
+// - 그러면 매 프레임 속도 교환/계산이 반복되면서 “갑자기 빨라진 것처럼” 보임
+//
+// 해결(B)
+// 1) 겹친 만큼 먼저 서로 밀어내서 분리(포지션 보정)
+// 2) 이미 서로 멀어지는 중이면(velAlongNormal > 0) 충돌 임펄스는 생략
+//    → 겹침만 풀고, 속도는 불필요하게 튀지 않게 함
+// =====================================================
 function checkCollision(ball1, ball2) {
+  if (!canvas) return;
+
   const dx = ball2.x - ball1.x;
   const dy = ball2.y - ball1.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (distance < ball1.radius + ball2.radius) {
-    const angle = Math.atan2(dy, dx);
-    const sin = Math.sin(angle);
-    const cos = Math.cos(angle);
+  // 거리(0이면 나눗셈 터지니 아주 작은 값으로 보정)
+  let dist = Math.hypot(dx, dy);
+  if (dist === 0) dist = 0.0001;
 
-    const vx1 = ball1.vx * cos + ball1.vy * sin;
-    const vy1 = ball1.vy * cos - ball1.vx * sin;
-    const vx2 = ball2.vx * cos + ball2.vy * sin;
-    const vy2 = ball2.vy * cos - ball2.vx * sin;
+  const minDist = ball1.radius + ball2.radius;
 
-    ball1.vx = vx2 * cos - vy1 * sin;
-    ball1.vy = vy1 * cos + vx2 * sin;
-    ball2.vx = vx1 * cos - vy2 * sin;
-    ball2.vy = vy2 * cos + vx1 * sin;
+  // 안 겹치면 종료
+  if (dist >= minDist) return;
 
-    const now = performance.now();
-    if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
-      const newBall = new Ball(
-        (ball1.x + ball2.x) / 2,
-        (ball1.y + ball2.y) / 2,
-        ball1.radius,
-        ballColor
-      );
-      balls.push(newBall);
-      lastSpawnTime = now;
-    }
+  // ----------------------------
+  // 1) 겹침 분리(포지션 보정)
+  // ----------------------------
+  const nx = dx / dist;   // 충돌 노말(단위벡터)
+  const ny = dy / dist;
+
+  const overlap = minDist - dist;
+
+  // 너무 미세한 겹침까지 다 보정하면 떨림이 생길 수 있어서 slop를 둠
+  const slop = COLLISION_CONFIG.overlapSlop;
+  const percent = COLLISION_CONFIG.overlapCorrectionPercent;
+
+  const correctionMag = Math.max(overlap - slop, 0) * percent;
+  const correctionX = nx * (correctionMag / 2);
+  const correctionY = ny * (correctionMag / 2);
+
+  // 두 공을 서로 반대 방향으로 같은 만큼 이동(질량 동일 가정)
+  ball1.x -= correctionX;
+  ball1.y -= correctionY;
+  ball2.x += correctionX;
+  ball2.y += correctionY;
+
+  // 좌/우 화면 밖으로 튀지 않도록 x만 최소한 클램프(위쪽은 나가도 리사이클 되니까 허용)
+  ball1.x = Math.min(canvas.width - ball1.radius, Math.max(ball1.radius, ball1.x));
+  ball2.x = Math.min(canvas.width - ball2.radius, Math.max(ball2.radius, ball2.x));
+
+  // ----------------------------
+  // 2) 충돌 임펄스(속도 반응)
+  // ----------------------------
+  // 상대속도
+  const rvx = ball2.vx - ball1.vx;
+  const rvy = ball2.vy - ball1.vy;
+
+  // 노말 방향 상대속도(+)면 이미 멀어지는 중
+  const velAlongNormal = rvx * nx + rvy * ny;
+
+  // ✅ 이미 멀어지는 중이면, 속도는 건드리지 않는다.
+  //    (겹침만 풀고 끝 → “반응 속도 갑자기 빨라짐” 방지에 매우 중요)
+  if (velAlongNormal > 0) {
+    // 그래도 “증식(공 추가)”은 겹침 순간의 이벤트로 보고 여기서 처리해도 됨
+    // 하지만 멀어지는 중인데도 계속 겹쳤던 프레임이면 또 스폰될 수 있어서
+    // 아래 스폰은 velAlongNormal <= 0일 때만 실행하는 걸 추천.
+    return;
+  }
+
+  const e = COLLISION_CONFIG.restitution;
+
+  // 질량 동일(m1=m2=1) 가정
+  const invMass1 = 1;
+  const invMass2 = 1;
+
+  // 임펄스 스칼라
+  const j = -(1 + e) * velAlongNormal / (invMass1 + invMass2);
+
+  const impulseX = j * nx;
+  const impulseY = j * ny;
+
+  // 속도 업데이트
+  ball1.vx -= impulseX * invMass1;
+  ball1.vy -= impulseY * invMass1;
+
+  ball2.vx += impulseX * invMass2;
+  ball2.vy += impulseY * invMass2;
+
+  // ----------------------------
+  // 3) “충돌하면 공 늘어나기(증식)” 로직
+  // ----------------------------
+  // 여기서는 ‘진짜로 부딪힌(approaching)’ 순간에만 스폰되도록
+  // velAlongNormal <= 0일 때(여기 구간)만 실행되는 구조가 됨.
+  const now = performance.now();
+  if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
+    const newBall = new Ball(
+      (ball1.x + ball2.x) / 2,
+      (ball1.y + ball2.y) / 2,
+      ball1.radius,
+      ballColor
+    );
+    balls.push(newBall);
+    lastSpawnTime = now;
   }
 }
 
@@ -568,6 +645,7 @@ if (canvas && ctx) {
 
     balls.forEach((b) => b.update());
 
+    // 공-공 충돌 검사(모든 쌍)
     for (let i = 0; i < balls.length; i++) {
       for (let j = i + 1; j < balls.length; j++) {
         checkCollision(balls[i], balls[j]);
@@ -606,7 +684,6 @@ function createThumbnails(options = {}) {
 
     const img = document.createElement('img');
 
-    // ✅ 여기서도 fallback 적용 (jpg 없으면 gif로)
     const first = (project.images && project.images[0]) ? project.images[0] : '';
     setImageSrcWithFallback(img, getImageSrc(first));
 
@@ -716,7 +793,6 @@ function buildDetailBottomStrip() {
 
     const img = document.createElement('img');
 
-    // ✅ 여기서도 fallback 적용
     const first = (p.images && p.images[0]) ? p.images[0] : '';
     setImageSrcWithFallback(img, getImageSrc(first));
 
@@ -827,7 +903,6 @@ function showProjectDetail(projectId) {
     if (firstSrc) {
       const firstImg = document.createElement('img');
 
-      // ✅ 여기서도 fallback 적용 (jpg 없으면 gif로)
       setImageSrcWithFallback(firstImg, firstSrc);
 
       firstImg.alt = project.title || '';
@@ -844,8 +919,6 @@ function showProjectDetail(projectId) {
       if (!src) continue;
 
       const img = document.createElement('img');
-
-      // ✅ 여기서도 fallback 적용
       setImageSrcWithFallback(img, src);
 
       img.alt = project.title || '';
