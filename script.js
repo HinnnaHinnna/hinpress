@@ -388,10 +388,10 @@ class Ball {
     this.color = color;
 
     // ✅ 초기 속도(랜덤) — 여기 범위를 줄이면 전체적으로 느려짐
-    this.vx = (Math.random() - 0.5) * 5;
-    this.vy = (Math.random() - 0.5) * 5;
+    this.vx = (Math.random() - 0.5) * 15;
+    this.vy = (Math.random() - 0.5) * 15;
 
-    this.rotation = Math.random() * Math.PI * 2;
+    this.rotation = Math.random() * Math.PI * 3;
     this.rotationSpeed = (Math.random() - 0.5) * 0.05;
   }
 
