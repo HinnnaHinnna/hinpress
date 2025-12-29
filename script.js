@@ -405,12 +405,12 @@ class Ball {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
     ctx.strokeStyle = '#fcff54';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(0, this.radius * 0.1, this.radius * 0.5, 0, Math.PI);
     ctx.stroke();
@@ -451,7 +451,7 @@ class Ball {
           this.vy = Math.abs(this.vy);
 
           // ✅ 패들 움직임이 공에 옆속도로 전달됨 (여기가 vx가 커지는 지점)
-          this.vx += paddleVX * 0.2;
+          this.vx += paddleVX * 0.8;
         }
       }
 
@@ -505,7 +505,7 @@ const balls = [];
 const numBalls = 6;
 
 const ballColor = '#fcff54';
-const MAX_BALLS = 900;
+const MAX_BALLS = 100;
 let lastSpawnTime = 0;
 
 // =====================================================
