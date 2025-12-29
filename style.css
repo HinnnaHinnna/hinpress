@@ -311,14 +311,14 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-end;
-  gap: 3em;
+  gap: 1em;
 }
 
 .thumbnail {
   cursor: pointer;
   transition: opacity 0.2s;
   flex-shrink: 0;
-  width: 260px;
+  width: 200px;
 }
 
 .thumbnail:hover {
