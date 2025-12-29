@@ -379,6 +379,125 @@ if (marqueeBar) {
 }
 
 // =====================================================
+// ✅ TILT(기울임) 컨트롤: 폰 기울기에 따라 패들 좌/우 이동
+// -----------------------------------------------------
+// 핵심 포인트
+// 1) iOS는 권한 요청이 필요 (사용자 제스처 안에서만 가능)
+// 2) 드래그 중(isDraggingPaddle)에는 기울임 제어를 잠시 꺼서 충돌 방지
+// 3) 민감도/데드존/부드러움(스무딩) 조절 가능
+// =====================================================
+let tiltEnabled = false;       // 실제로 deviceorientation 리스너가 붙었는지
+let tiltHasData = false;       // 센서 값이 들어오기 시작했는지
+let tiltPermissionTried = false;
+
+let tiltGamma = 0;             // 좌우 기울임(주로 portrait에서 사용)
+let tiltBeta = 0;              // 앞뒤 기울임(landscape에서 보조로 사용)
+
+// ✅ 튜닝 포인트(여기 숫자만 바꾸면 느낌이 확 달라짐)
+const TILT_CONFIG = {
+  maxDeg: 25,        // 이 각도까지만 반응(너무 크게 기울이면 과민해지니까 클램프)
+  deadzone: 2,       // 이 각도 이하는 무시(손떨림/센서 노이즈 방지)
+  sensitivity: 1.0,  // 1.0 = 기본, 0.6 더 둔감, 1.4 더 민감
+  smooth: 0.12,      // 0.05 더 느리고 부드러움, 0.2 더 즉각적
+};
+
+function onDeviceOrientation(e) {
+  // 일부 브라우저/상황에서는 null이 들어올 수 있음
+  if (typeof e.gamma !== 'number' || typeof e.beta !== 'number') return;
+  tiltHasData = true;
+  tiltGamma = e.gamma;
+  tiltBeta = e.beta;
+}
+
+/**
+ * iOS: DeviceOrientationEvent.requestPermission() 필요
+ * Android/대부분: 그냥 addEventListener로 동작
+ */
+async function enableTiltControl() {
+  if (!('DeviceOrientationEvent' in window)) return false;
+
+  // iOS 13+ 권한 요청 (반드시 사용자 제스처 안에서 호출되어야 함)
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const res = await DeviceOrientationEvent.requestPermission();
+      if (res !== 'granted') return false;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  // 리스너 등록
+  window.addEventListener('deviceorientation', onDeviceOrientation, true);
+  tiltEnabled = true;
+  return true;
+}
+
+/**
+ * “첫 탭/첫 터치”에서 권한 요청을 시도
+ * - 사용자가 뭔가 한번 눌러줘야 iOS에서 센서가 열림
+ */
+function setupTiltPermissionGate() {
+  const requestOnce = async () => {
+    if (tiltPermissionTried) return;
+    tiltPermissionTried = true;
+
+    // 시도
+    await enableTiltControl();
+
+    // 여기서 tiltEnabled가 false면: 브라우저/환경이 막았거나 사용자가 거부한 것
+    // (원하면 안내 UI를 띄울 수도 있는데, 지금은 조용히 넘어가게 했어)
+  };
+
+  // touchstart는 iOS에서 제스처로 인정되는 경우가 많음
+  document.addEventListener('touchstart', requestOnce, { passive: true });
+  document.addEventListener('click', requestOnce);
+}
+setupTiltPermissionGate();
+
+/**
+ * 매 프레임(animate)에서 호출:
+ * - 기울임값을 paddleX로 매핑해서 패들을 움직인다.
+ */
+function applyTiltToPaddle() {
+  if (!tiltEnabled || !tiltHasData) return;
+  if (!canvas || !marqueeBar) return;
+
+  // ✅ 드래그 중에는 기울임 제어를 잠깐 끔 (서로 싸우면 이상해짐)
+  if (isDraggingPaddle) return;
+
+  // 화면 방향에 따라 사용 축을 바꿔줌
+  // - portrait: gamma(좌우 기울임)가 직관적
+  // - landscape: beta가 더 자연스러운 경우가 많아서 beta를 사용
+  const isLandscape = window.matchMedia && window.matchMedia('(orientation: landscape)').matches;
+
+  let deg = isLandscape ? tiltBeta : tiltGamma;
+  if (!Number.isFinite(deg)) return;
+
+  // 데드존 처리
+  if (Math.abs(deg) < TILT_CONFIG.deadzone) deg = 0;
+
+  // 과한 기울임은 클램프
+  const maxDeg = TILT_CONFIG.maxDeg;
+  deg = Math.max(-maxDeg, Math.min(maxDeg, deg));
+
+  // -1 ~ +1 로 정규화
+  const norm = deg / maxDeg;
+
+  // 패들이 움직일 수 있는 범위(0 ~ maxX)
+  const maxX = canvas.width - paddleWidth;
+  const centerX = maxX / 2;
+
+  // 목표 위치: 가운데를 기준으로 좌우 이동
+  const targetX = centerX + norm * centerX * TILT_CONFIG.sensitivity;
+
+  // 스무딩(부드럽게 따라가기)
+  paddleX += (targetX - paddleX) * TILT_CONFIG.smooth;
+
+  clampPaddleX();
+  updatePaddleDomLeftOnly();
+}
+
+// =====================================================
 // 4) 스마일 볼
 // =====================================================
 class Ball {
@@ -510,11 +629,6 @@ let lastSpawnTime = 0;
 
 // =====================================================
 // ✅ (B) “겹치면 밀어내서 분리”를 위한 충돌 설정
-// -----------------------------------------------------
-// - overlapCorrectionPercent: 겹친 양을 몇 %까지 분리할지
-//   1.0에 가까울수록 더 강하게 분리(붙어있는 현상 감소)
-// - overlapSlop: 아주 미세한 겹침은 허용(너무 ‘덜컥’거리는 느낌 방지)
-// - restitution: 튕김(탄성). 1.0이면 완전 탄성(에너지 보존 느낌)
 // =====================================================
 const COLLISION_CONFIG = {
   overlapCorrectionPercent: 0.9,
@@ -524,15 +638,6 @@ const COLLISION_CONFIG = {
 
 // =====================================================
 // ✅ 공-공 충돌 처리 (겹침 분리 + 물리 반응)
-// -----------------------------------------------------
-// 기존 문제(속도 갑자기 튀는 이유)
-// - 공이 서로 겹친 채로 남아 있으면 다음 프레임에도 계속 충돌로 판정됨
-// - 그러면 매 프레임 속도 교환/계산이 반복되면서 “갑자기 빨라진 것처럼” 보임
-//
-// 해결(B)
-// 1) 겹친 만큼 먼저 서로 밀어내서 분리(포지션 보정)
-// 2) 이미 서로 멀어지는 중이면(velAlongNormal > 0) 충돌 임펄스는 생략
-//    → 겹침만 풀고, 속도는 불필요하게 튀지 않게 함
 // =====================================================
 function checkCollision(ball1, ball2) {
   if (!canvas) return;
@@ -540,24 +645,17 @@ function checkCollision(ball1, ball2) {
   const dx = ball2.x - ball1.x;
   const dy = ball2.y - ball1.y;
 
-  // 거리(0이면 나눗셈 터지니 아주 작은 값으로 보정)
   let dist = Math.hypot(dx, dy);
   if (dist === 0) dist = 0.0001;
 
   const minDist = ball1.radius + ball2.radius;
-
-  // 안 겹치면 종료
   if (dist >= minDist) return;
 
-  // ----------------------------
-  // 1) 겹침 분리(포지션 보정)
-  // ----------------------------
-  const nx = dx / dist;   // 충돌 노말(단위벡터)
+  const nx = dx / dist;
   const ny = dy / dist;
 
   const overlap = minDist - dist;
 
-  // 너무 미세한 겹침까지 다 보정하면 떨림이 생길 수 있어서 slop를 둠
   const slop = COLLISION_CONFIG.overlapSlop;
   const percent = COLLISION_CONFIG.overlapCorrectionPercent;
 
@@ -565,59 +663,39 @@ function checkCollision(ball1, ball2) {
   const correctionX = nx * (correctionMag / 2);
   const correctionY = ny * (correctionMag / 2);
 
-  // 두 공을 서로 반대 방향으로 같은 만큼 이동(질량 동일 가정)
   ball1.x -= correctionX;
   ball1.y -= correctionY;
   ball2.x += correctionX;
   ball2.y += correctionY;
 
-  // 좌/우 화면 밖으로 튀지 않도록 x만 최소한 클램프(위쪽은 나가도 리사이클 되니까 허용)
   ball1.x = Math.min(canvas.width - ball1.radius, Math.max(ball1.radius, ball1.x));
   ball2.x = Math.min(canvas.width - ball2.radius, Math.max(ball2.radius, ball2.x));
 
-  // ----------------------------
-  // 2) 충돌 임펄스(속도 반응)
-  // ----------------------------
-  // 상대속도
   const rvx = ball2.vx - ball1.vx;
   const rvy = ball2.vy - ball1.vy;
 
-  // 노말 방향 상대속도(+)면 이미 멀어지는 중
   const velAlongNormal = rvx * nx + rvy * ny;
 
-  // ✅ 이미 멀어지는 중이면, 속도는 건드리지 않는다.
-  //    (겹침만 풀고 끝 → “반응 속도 갑자기 빨라짐” 방지에 매우 중요)
   if (velAlongNormal > 0) {
-    // 그래도 “증식(공 추가)”은 겹침 순간의 이벤트로 보고 여기서 처리해도 됨
-    // 하지만 멀어지는 중인데도 계속 겹쳤던 프레임이면 또 스폰될 수 있어서
-    // 아래 스폰은 velAlongNormal <= 0일 때만 실행하는 걸 추천.
     return;
   }
 
   const e = COLLISION_CONFIG.restitution;
 
-  // 질량 동일(m1=m2=1) 가정
   const invMass1 = 1;
   const invMass2 = 1;
 
-  // 임펄스 스칼라
   const j = -(1 + e) * velAlongNormal / (invMass1 + invMass2);
 
   const impulseX = j * nx;
   const impulseY = j * ny;
 
-  // 속도 업데이트
   ball1.vx -= impulseX * invMass1;
   ball1.vy -= impulseY * invMass1;
 
   ball2.vx += impulseX * invMass2;
   ball2.vy += impulseY * invMass2;
 
-  // ----------------------------
-  // 3) “충돌하면 공 늘어나기(증식)” 로직
-  // ----------------------------
-  // 여기서는 ‘진짜로 부딪힌(approaching)’ 순간에만 스폰되도록
-  // velAlongNormal <= 0일 때(여기 구간)만 실행되는 구조가 됨.
   const now = performance.now();
   if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
     const newBall = new Ball(
@@ -641,11 +719,15 @@ if (canvas && ctx) {
 
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // ✅ 매 프레임 패들 정보 업데이트
     syncPaddleFromDom();
+
+    // ✅ 기울임 적용(드래그 중이면 자동으로 무시됨)
+    applyTiltToPaddle();
 
     balls.forEach((b) => b.update());
 
-    // 공-공 충돌 검사(모든 쌍)
     for (let i = 0; i < balls.length; i++) {
       for (let j = i + 1; j < balls.length; j++) {
         checkCollision(balls[i], balls[j]);
@@ -895,14 +977,12 @@ function showProjectDetail(projectId) {
 
   const mainSize = normalizeMainImageSize(project.mainImageSize);
 
-  // ✅ 대표이미지(첫 번째)
   if (images.length > 0 && detailMainImageEl) {
     const firstImgItem = images[0];
     const firstSrc = getImageSrc(firstImgItem);
 
     if (firstSrc) {
       const firstImg = document.createElement('img');
-
       setImageSrcWithFallback(firstImg, firstSrc);
 
       firstImg.alt = project.title || '';
@@ -911,7 +991,6 @@ function showProjectDetail(projectId) {
     }
   }
 
-  // ✅ 나머지 이미지들
   if (detailImagesEl && images.length > 1) {
     for (let i = 1; i < images.length; i++) {
       const item = images[i];
