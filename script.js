@@ -409,7 +409,7 @@ class Ball {
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
-    ctx.strokeStyle = '#ffff6aff';
+    ctx.strokeStyle = '#b3fa47ff';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(0, this.radius * 0.1, this.radius * 0.5, 0, Math.PI);
@@ -504,7 +504,7 @@ const balls = [];
 // ✅ 초기 공 개수
 const numBalls = 7;
 
-const ballColor = '#ffff6aff';
+const ballColor = '#b3fa47ff';
 const MAX_BALLS = 100;
 let lastSpawnTime = 0;
 
