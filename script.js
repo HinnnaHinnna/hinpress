@@ -4,12 +4,12 @@
 // =====================================================
 
 // =====================================================
-// 0) 공통 요소 선택
+// 0) 공통 페이지 요소 선택
 // =====================================================
 const mainPage = document.getElementById('main-page');
 const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
-const cvPage = document.getElementById('cv-page');
+const cvPage = document.getElementById('cv-page'); // CV 페이지
 
 const mainTitle = document.getElementById('main-title');
 
@@ -24,6 +24,7 @@ const thumbnailsContainer = document.getElementById('thumbnails-container');
 const detailPrev = document.getElementById('detail-prev');
 const detailNext = document.getElementById('detail-next');
 
+// 상세 정보 요소
 const detailTitleEl = document.getElementById('detail-title');
 const detailSubtitleEl = document.getElementById('detail-subtitle');
 const detailYearEl = document.getElementById('detail-year');
@@ -131,8 +132,18 @@ function showPage(page) {
   }
 
   // 메인에서는 상단바 숨김
-  if (page === mainPage) topBar?.classList.add('hidden');
-  else topBar?.classList.remove('hidden');
+  if (page === mainPage) {
+    topBar?.classList.add('hidden');
+
+    // ✅ 메인으로 돌아올 때도 타이틀/마퀴 정렬을 다시 한 번 보장
+    requestAnimationFrame(() => {
+      alignMarqueeToTitleUnderline();
+      setupMarqueeIntroOnce();
+      syncPaddleFromDom();
+    });
+  } else {
+    topBar?.classList.remove('hidden');
+  }
 }
 
 // 최초 메인
@@ -185,7 +196,7 @@ if (detailNext) {
 // =====================================================
 const canvas = document.getElementById('canvas');
 const ctx = canvas?.getContext('2d');
-const marqueeBar = document.querySelector('.marquee-bar');
+const marqueeBar = document.getElementById('marquee-bar');
 const marqueeInner = document.getElementById('marquee-inner');
 const marqueeText1 = document.getElementById('marquee-text-1');
 
@@ -224,19 +235,35 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
-function initPaddle() {
-  if (!marqueeBar) return;
+/*
+  ✅✅ 핵심: 마퀴바를 “타이틀 밑줄처럼” 정렬
+  - 간격: 2px
+  - 폭: 타이틀(글자)의 실제 폭과 완전 동일
+  - viewport가 커져도(타이틀이 clamp로 멈춰도) 그대로 연동
+*/
+function alignMarqueeToTitleUnderline() {
+  if (!marqueeBar || !mainTitle) return;
+  if (!mainPage?.classList.contains('active')) return;
 
-  const viewportWidth = window.innerWidth;
+  const titleRect = mainTitle.getBoundingClientRect();
+  if (!titleRect.width || !titleRect.height) {
+    requestAnimationFrame(alignMarqueeToTitleUnderline);
+    return;
+  }
 
-  let initialWidth = 0;
-  if (viewportWidth <= 768) initialWidth = Math.min(viewportWidth * 0.4, viewportWidth);
-  else initialWidth = Math.min(viewportWidth * 0.2, viewportWidth);
+  const GAP = -20;
 
-  marqueeBar.style.width = `${initialWidth}px`;
+  // ✅ 올림/반올림 안 함: 소수 px 그대로 적용 → “완전 동일” 느낌
+  marqueeBar.style.width = `${titleRect.width}px`;
+
+  marqueeBar.style.top = `${titleRect.bottom + GAP}px`;
+  marqueeBar.style.bottom = 'auto';
+
+  // ✅ 왼쪽도 타이틀 left에 정확히 붙임
+  paddleX = titleRect.left;
+  updatePaddleDomLeftOnly();
 
   syncPaddleFromDom();
-  paddleX = (viewportWidth - paddleWidth) / 2;
   clampPaddleX();
   updatePaddleDomLeftOnly();
   syncPaddleFromDom();
@@ -262,36 +289,40 @@ function setupMarqueeIntroOnce() {
 }
 
 resizeCanvas();
-initPaddle();
 
-function initAfterFontsReady() { setupMarqueeIntroOnce(); }
+// ✅ 초기 정렬은 “한 프레임 뒤”에 실행(레이아웃 확정 후)
+requestAnimationFrame(() => {
+  alignMarqueeToTitleUnderline();
+  setupMarqueeIntroOnce();
+  syncPaddleFromDom();
+});
 
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(initAfterFontsReady);
-else window.addEventListener('load', initAfterFontsReady);
-
-if (marqueeBar && 'ResizeObserver' in window) {
-  let isAdjusting = false;
-  const ro = new ResizeObserver(() => {
-    if (isAdjusting) return;
-    isAdjusting = true;
-
-    syncPaddleFromDom();
-    clampPaddleX();
-    updatePaddleDomLeftOnly();
-    syncPaddleFromDom();
-
-    isAdjusting = false;
+// ✅ 폰트 로딩 후 타이틀 폭이 확정되면 다시 1번 더
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    requestAnimationFrame(() => {
+      alignMarqueeToTitleUnderline();
+      setupMarqueeIntroOnce();
+      syncPaddleFromDom();
+    });
   });
-  ro.observe(marqueeBar);
+} else {
+  window.addEventListener('load', () => {
+    requestAnimationFrame(() => {
+      alignMarqueeToTitleUnderline();
+      setupMarqueeIntroOnce();
+      syncPaddleFromDom();
+    });
+  });
 }
 
 window.addEventListener('resize', () => {
   resizeCanvas();
-  syncPaddleFromDom();
-  clampPaddleX();
-  updatePaddleDomLeftOnly();
-  syncPaddleFromDom();
-  setupMarqueeIntroOnce();
+  requestAnimationFrame(() => {
+    alignMarqueeToTitleUnderline();
+    setupMarqueeIntroOnce();
+    syncPaddleFromDom();
+  });
 });
 
 // 패들 드래그
@@ -387,12 +418,11 @@ class Ball {
     this.radius = radius;
     this.color = color;
 
-    // ✅ 초기 속도(랜덤) — 여기 범위를 줄이면 전체적으로 느려짐
-    this.vx = (Math.random() - 0.5) * 15;
-    this.vy = (Math.random() - 0.5) * 15;
+    this.vx = (Math.random() - 0.5) * 25;
+    this.vy = (Math.random() - 0.5) * 25;
 
     this.rotation = Math.random() * Math.PI * 3;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+    this.rotationSpeed = (Math.random() - 0.5) * 0.6;
   }
 
   draw() {
@@ -409,7 +439,7 @@ class Ball {
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
-    ctx.strokeStyle = '#b3fa47ff';
+    ctx.strokeStyle = '#ffffffff';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(0, this.radius * 0.1, this.radius * 0.5, 0, Math.PI);
@@ -425,7 +455,6 @@ class Ball {
     this.x += this.vx;
     this.y += this.vy;
 
-    // 좌/우 벽 반사
     if (this.x + this.radius > canvas.width) {
       this.x = canvas.width - this.radius;
       this.vx = -Math.abs(this.vx);
@@ -434,13 +463,11 @@ class Ball {
       this.vx = Math.abs(this.vx);
     }
 
-    // 패들(마퀴바) 충돌
     if (paddleHeight > 0) {
       const withinPaddleX =
         this.x >= (paddleX - this.radius) &&
         this.x <= (paddleX + paddleWidth + this.radius);
 
-      // 위로 가는 볼이 패들 아래면에 부딪히는 경우
       if (this.vy < 0 && withinPaddleX) {
         const prevTop = (prevY - this.radius);
         const currTop = (this.y - this.radius);
@@ -449,13 +476,10 @@ class Ball {
         if (crossedBottomSurface) {
           this.y = paddleBottom + this.radius;
           this.vy = Math.abs(this.vy);
-
-          // ✅ 패들 움직임이 공에 옆속도로 전달됨 (여기가 vx가 커지는 지점)
           this.vx += paddleVX * 0.8;
         }
       }
 
-      // 아래로 가는 볼이 패들 윗면에 부딪히는 경우
       if (this.vy > 0 && withinPaddleX) {
         const prevBottom = (prevY + this.radius);
         const currBottom = (this.y + this.radius);
@@ -464,20 +488,16 @@ class Ball {
         if (crossedTopSurface) {
           this.y = paddleTop - this.radius;
           this.vy = -Math.abs(this.vy);
-
-          // ✅ 여기도 동일
           this.vx += paddleVX * 0.2;
         }
       }
     }
 
-    // 바닥 반사
     if (this.y + this.radius > canvas.height) {
       this.y = canvas.height - this.radius;
       this.vy = -Math.abs(this.vy);
     }
 
-    // 천장 밖으로 나가면 리사이클
     if (this.y + this.radius < 0) {
       this.recycleBall();
     }
@@ -500,64 +520,35 @@ class Ball {
 }
 
 const balls = [];
-
-// ✅ 초기 공 개수
 const numBalls = 7;
 
-const ballColor = '#b3fa47ff';
+const ballColor = '#ffffffff';
 const MAX_BALLS = 100;
 let lastSpawnTime = 0;
 
-// =====================================================
-// ✅ (B) “겹치면 밀어내서 분리”를 위한 충돌 설정
-// -----------------------------------------------------
-// - overlapCorrectionPercent: 겹친 양을 몇 %까지 분리할지
-//   1.0에 가까울수록 더 강하게 분리(붙어있는 현상 감소)
-// - overlapSlop: 아주 미세한 겹침은 허용(너무 ‘덜컥’거리는 느낌 방지)
-// - restitution: 튕김(탄성). 1.0이면 완전 탄성(에너지 보존 느낌)
-// =====================================================
 const COLLISION_CONFIG = {
   overlapCorrectionPercent: 0.9,
   overlapSlop: 0.1,
   restitution: 1.0,
 };
 
-// =====================================================
-// ✅ 공-공 충돌 처리 (겹침 분리 + 물리 반응)
-// -----------------------------------------------------
-// 기존 문제(속도 갑자기 튀는 이유)
-// - 공이 서로 겹친 채로 남아 있으면 다음 프레임에도 계속 충돌로 판정됨
-// - 그러면 매 프레임 속도 교환/계산이 반복되면서 “갑자기 빨라진 것처럼” 보임
-//
-// 해결(B)
-// 1) 겹친 만큼 먼저 서로 밀어내서 분리(포지션 보정)
-// 2) 이미 서로 멀어지는 중이면(velAlongNormal > 0) 충돌 임펄스는 생략
-//    → 겹침만 풀고, 속도는 불필요하게 튀지 않게 함
-// =====================================================
 function checkCollision(ball1, ball2) {
   if (!canvas) return;
 
   const dx = ball2.x - ball1.x;
   const dy = ball2.y - ball1.y;
 
-  // 거리(0이면 나눗셈 터지니 아주 작은 값으로 보정)
   let dist = Math.hypot(dx, dy);
   if (dist === 0) dist = 0.0001;
 
   const minDist = ball1.radius + ball2.radius;
-
-  // 안 겹치면 종료
   if (dist >= minDist) return;
 
-  // ----------------------------
-  // 1) 겹침 분리(포지션 보정)
-  // ----------------------------
-  const nx = dx / dist;   // 충돌 노말(단위벡터)
+  const nx = dx / dist;
   const ny = dy / dist;
 
   const overlap = minDist - dist;
 
-  // 너무 미세한 겹침까지 다 보정하면 떨림이 생길 수 있어서 slop를 둠
   const slop = COLLISION_CONFIG.overlapSlop;
   const percent = COLLISION_CONFIG.overlapCorrectionPercent;
 
@@ -565,59 +556,35 @@ function checkCollision(ball1, ball2) {
   const correctionX = nx * (correctionMag / 2);
   const correctionY = ny * (correctionMag / 2);
 
-  // 두 공을 서로 반대 방향으로 같은 만큼 이동(질량 동일 가정)
   ball1.x -= correctionX;
   ball1.y -= correctionY;
   ball2.x += correctionX;
   ball2.y += correctionY;
 
-  // 좌/우 화면 밖으로 튀지 않도록 x만 최소한 클램프(위쪽은 나가도 리사이클 되니까 허용)
   ball1.x = Math.min(canvas.width - ball1.radius, Math.max(ball1.radius, ball1.x));
   ball2.x = Math.min(canvas.width - ball2.radius, Math.max(ball2.radius, ball2.x));
 
-  // ----------------------------
-  // 2) 충돌 임펄스(속도 반응)
-  // ----------------------------
-  // 상대속도
   const rvx = ball2.vx - ball1.vx;
   const rvy = ball2.vy - ball1.vy;
 
-  // 노말 방향 상대속도(+)면 이미 멀어지는 중
   const velAlongNormal = rvx * nx + rvy * ny;
-
-  // ✅ 이미 멀어지는 중이면, 속도는 건드리지 않는다.
-  //    (겹침만 풀고 끝 → “반응 속도 갑자기 빨라짐” 방지에 매우 중요)
-  if (velAlongNormal > 0) {
-    // 그래도 “증식(공 추가)”은 겹침 순간의 이벤트로 보고 여기서 처리해도 됨
-    // 하지만 멀어지는 중인데도 계속 겹쳤던 프레임이면 또 스폰될 수 있어서
-    // 아래 스폰은 velAlongNormal <= 0일 때만 실행하는 걸 추천.
-    return;
-  }
+  if (velAlongNormal > 0) return;
 
   const e = COLLISION_CONFIG.restitution;
-
-  // 질량 동일(m1=m2=1) 가정
   const invMass1 = 1;
   const invMass2 = 1;
 
-  // 임펄스 스칼라
   const j = -(1 + e) * velAlongNormal / (invMass1 + invMass2);
 
   const impulseX = j * nx;
   const impulseY = j * ny;
 
-  // 속도 업데이트
   ball1.vx -= impulseX * invMass1;
   ball1.vy -= impulseY * invMass1;
 
   ball2.vx += impulseX * invMass2;
   ball2.vy += impulseY * invMass2;
 
-  // ----------------------------
-  // 3) “충돌하면 공 늘어나기(증식)” 로직
-  // ----------------------------
-  // 여기서는 ‘진짜로 부딪힌(approaching)’ 순간에만 스폰되도록
-  // velAlongNormal <= 0일 때(여기 구간)만 실행되는 구조가 됨.
   const now = performance.now();
   if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
     const newBall = new Ball(
@@ -645,7 +612,6 @@ if (canvas && ctx) {
 
     balls.forEach((b) => b.update());
 
-    // 공-공 충돌 검사(모든 쌍)
     for (let i = 0; i < balls.length; i++) {
       for (let j = i + 1; j < balls.length; j++) {
         checkCollision(balls[i], balls[j]);
@@ -658,7 +624,7 @@ if (canvas && ctx) {
 }
 
 // =====================================================
-// 5) 썸네일 생성 & 상세 표시
+// 5) 썸네일 생성 & 상세 표시 (이하 네 기존 그대로)
 // =====================================================
 function shuffleArray(inputArray) {
   const arr = inputArray.slice();
@@ -895,23 +861,19 @@ function showProjectDetail(projectId) {
 
   const mainSize = normalizeMainImageSize(project.mainImageSize);
 
-  // ✅ 대표이미지(첫 번째)
   if (images.length > 0 && detailMainImageEl) {
     const firstImgItem = images[0];
     const firstSrc = getImageSrc(firstImgItem);
 
     if (firstSrc) {
       const firstImg = document.createElement('img');
-
       setImageSrcWithFallback(firstImg, firstSrc);
-
       firstImg.alt = project.title || '';
       firstImg.classList.add(`main-img-${mainSize}`);
       detailMainImageEl.appendChild(firstImg);
     }
   }
 
-  // ✅ 나머지 이미지들
   if (detailImagesEl && images.length > 1) {
     for (let i = 1; i < images.length; i++) {
       const item = images[i];
@@ -920,7 +882,6 @@ function showProjectDetail(projectId) {
 
       const img = document.createElement('img');
       setImageSrcWithFallback(img, src);
-
       img.alt = project.title || '';
 
       if (item && typeof item === 'object' && item.span === 2) {

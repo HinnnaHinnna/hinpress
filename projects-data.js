@@ -391,3 +391,4 @@ const projects = rawProjects.map((p) => {
 // 디버그
 console.log('최종 projects:', projects);
 
+window.projects = projects;
