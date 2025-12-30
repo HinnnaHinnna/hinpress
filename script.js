@@ -177,7 +177,7 @@ function getMarqueeTuningByViewport() {
 
   // ✅ 너가 준 모바일 기준값
   const BASE_GAP = -15;
-  const BASE_LEFT_NUDGE = 10;
+  const BASE_LEFT_NUDGE = 5;
 
   // ✅ 화면이 매우 큰 경우 무한정 커지는 걸 막고 싶으면 상한을 줄이면 됨
   // 지금은 "비율 연동"을 최대한 지키기 위해 상한만 아주 넉넉히 둠.
