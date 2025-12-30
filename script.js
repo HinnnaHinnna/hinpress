@@ -247,7 +247,7 @@ function setupMarqueeIntroOnce() {
   const copyWidth = marqueeText1.getBoundingClientRect().width;
   if (!barWidth || !copyWidth) return;
 
-  const START_VISIBLE_RATIO = 1 / 3;
+  const START_VISIBLE_RATIO = 4 / 5;
   const introFromPx = Math.max(0, barWidth * (1 - START_VISIBLE_RATIO));
 
   const LOOP_SECONDS = 30;
@@ -527,7 +527,7 @@ function checkCollision(ball1, ball2) {
 
 if (canvas && ctx) {
   for (let i = 0; i < numBalls; i++) {
-    const radius = 16;
+    const radius = 10;
     const x = radius + Math.random() * (canvas.width - radius * 2);
     const y = radius + Math.random() * (canvas.height - radius * 2);
     balls.push(new Ball(x, y, radius, ballColor));

@@ -11,8 +11,8 @@
   --color-arrow: #0008ff;
   --color-maque: #daffa2;
 
-  --bar-height: 1.5rem;
-  --bar-font-size: 0.8rem;
+  --bar-height: 12px;
+  --bar-font-size: 0.7rem;
 
   --page-side-padding: 1rem;
   --detail-page-side-padding: 10vw;
@@ -257,8 +257,7 @@ body {
   z-index: 100;
   display: flex;
   align-items: center;
-
-  background-color: var(--color-muted);
+  background-color: transparent;
 
   /* (원하면 유지) */
   padding-top: 3px;
@@ -284,11 +283,13 @@ body {
 
 .marquee-text {
   font-family: "Pretendard", sans-serif;
-  font-weight: 300;
+  font-weight: 600;
   font-size: var(--bar-font-size);
-  line-height: 1;
+  line-height: .7;
   word-break: keep-all;
-  color: rgb(246, 238, 227);
+  color: var(--color-muted);
+  letter-spacing: 0.03cap;
+
   flex: 0 0 auto;
   padding-right: 4rem;
 }
@@ -752,7 +753,7 @@ body {
 /* =============================== 모바일 =============================== */
 @media (max-width: 768px) {
   :root {
-    --bar-height: 1.5rem;
+    --bar-height: 1rem;
     --detail-page-side-padding: 0px;
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
