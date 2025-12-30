@@ -1,15 +1,14 @@
 // =====================================================
 // script.js
-// projects-data.js가 먼저 로드되어야 함!
 // =====================================================
 
 // =====================================================
-// 0) 공통 페이지 요소 선택
+// 0) 공통 요소 선택
 // =====================================================
 const mainPage = document.getElementById('main-page');
 const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
-const cvPage = document.getElementById('cv-page'); // CV 페이지
+const cvPage = document.getElementById('cv-page');
 
 const mainTitle = document.getElementById('main-title');
 
@@ -24,7 +23,6 @@ const thumbnailsContainer = document.getElementById('thumbnails-container');
 const detailPrev = document.getElementById('detail-prev');
 const detailNext = document.getElementById('detail-next');
 
-// 상세 정보 요소
 const detailTitleEl = document.getElementById('detail-title');
 const detailSubtitleEl = document.getElementById('detail-subtitle');
 const detailYearEl = document.getElementById('detail-year');
@@ -40,7 +38,6 @@ const detailSpecsContainer = document.getElementById('detail-specs-container');
 const detailSizeContainer = document.getElementById('detail-size-container');
 const detailClientContainer = document.getElementById('detail-client-container');
 
-// ✅ 하단 썸네일 스트립 요소
 const detailStripTrack = document.getElementById('detail-strip-track');
 const detailStripLeft = document.getElementById('detail-strip-left');
 const detailStripRight = document.getElementById('detail-strip-right');
@@ -48,7 +45,7 @@ const detailStripRight = document.getElementById('detail-strip-right');
 let currentProjectIndex = -1;
 
 // =====================================================
-// ✅ 유틸: images 아이템이 문자열이든 객체든 src 꺼내기
+// ✅ 유틸
 // =====================================================
 function getImageSrc(item) {
   if (!item) return '';
@@ -57,116 +54,70 @@ function getImageSrc(item) {
   return '';
 }
 
-// =====================================================
-// ✅ [핵심] 이미지 확장자 fallback 지원 (jpg -> gif, png 등)
-// =====================================================
 function buildFallbackCandidates(src) {
   if (!src) return [];
-
   const [path, query] = src.split('?');
   const q = query ? `?${query}` : '';
-
   const m = path.match(/^(.*)\.([^.\/]+)$/);
   if (!m) return [src];
-
   const base = m[1];
   const ext = (m[2] || '').toLowerCase();
 
-  const map = {
-    jpg: ['gif', 'png'],
-    jpeg: ['gif', 'png'],
-    gif: ['jpg', 'png'],
-    png: ['gif', 'jpg'],
-    webp: ['gif', 'jpg'],
-  };
-
+  const map = { jpg: ['gif', 'png'], jpeg: ['gif', 'png'], gif: ['jpg', 'png'], png: ['gif', 'jpg'], webp: ['gif', 'jpg'] };
   const alts = map[ext] || ['gif', 'jpg'];
-
   const candidates = [`${base}.${ext}${q}`, ...alts.map(e => `${base}.${e}${q}`)];
-  const uniq = [...new Set(candidates)];
-
-  return uniq.slice(0, 3);
+  return [...new Set(candidates)].slice(0, 3);
 }
 
 function setImageSrcWithFallback(imgEl, src) {
   if (!imgEl) return;
-
   const attempts = buildFallbackCandidates(src);
-
-  if (!attempts.length) {
-    imgEl.removeAttribute('src');
-    return;
-  }
+  if (!attempts.length) { imgEl.removeAttribute('src'); return; }
 
   imgEl.dataset.srcAttempts = JSON.stringify(attempts);
   imgEl.dataset.srcAttemptIndex = '0';
-
   imgEl.src = attempts[0];
 
   imgEl.onerror = () => {
     const list = JSON.parse(imgEl.dataset.srcAttempts || '[]');
     let i = parseInt(imgEl.dataset.srcAttemptIndex || '0', 10);
-
     i += 1;
     if (i < list.length) {
       imgEl.dataset.srcAttemptIndex = String(i);
       imgEl.src = list[i];
       return;
     }
-
     imgEl.onerror = null;
   };
 }
+
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
 // =====================================================
 // 1) 페이지 전환
 // =====================================================
 function showPage(page) {
-  const pages = document.querySelectorAll('.page');
-  pages.forEach((p) => p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   page.classList.add('active');
 
-  // 포트폴리오 페이지 열릴 때마다 썸네일 랜덤
-  if (page === portfolioPage) {
-    createThumbnails({ shuffle: true });
-  }
+  if (page === portfolioPage) createThumbnails({ shuffle: true });
 
-  // 메인에서는 상단바 숨김
-  if (page === mainPage) {
-    topBar?.classList.add('hidden');
-
-    // ✅ 메인으로 돌아올 때도 타이틀/마퀴 정렬을 다시 한 번 보장
-    requestAnimationFrame(() => {
-      alignMarqueeToTitleUnderline();
-      setupMarqueeIntroOnce();
-      syncPaddleFromDom();
-    });
-  } else {
-    topBar?.classList.remove('hidden');
-  }
+  if (page === mainPage) topBar?.classList.add('hidden');
+  else topBar?.classList.remove('hidden');
 }
-
-// 최초 메인
 showPage(mainPage);
 
-// 네비게이션
-if (mainTitle) mainTitle.addEventListener('click', () => showPage(portfolioPage));
-if (topLogo) topLogo.addEventListener('click', () => showPage(portfolioPage));
-if (aboutBtn) aboutBtn.addEventListener('click', () => showPage(mainPage));
-if (cvBtn) cvBtn.addEventListener('click', () => showPage(cvPage));
-if (contactBtn) {
-  contactBtn.addEventListener('click', () => {
-    window.open('https://www.instagram.com/chales9/', '_blank', 'noopener');
-  });
-}
+mainTitle?.addEventListener('click', () => showPage(portfolioPage));
+topLogo?.addEventListener('click', () => showPage(portfolioPage));
+aboutBtn?.addEventListener('click', () => showPage(mainPage));
+cvBtn?.addEventListener('click', () => showPage(cvPage));
+contactBtn?.addEventListener('click', () => window.open('https://www.instagram.com/chales9/', '_blank', 'noopener'));
 
 // =====================================================
-// 2) 상세 페이지 prev/next
+// 2) 상세 prev/next
 // =====================================================
 function updateDetailNavButtons() {
-  if (!detailPrev || !detailNext) return;
-  if (!Array.isArray(projects)) return;
-
+  if (!detailPrev || !detailNext || !Array.isArray(projects)) return;
   if (currentProjectIndex <= 0) detailPrev.classList.add('disabled');
   else detailPrev.classList.remove('disabled');
 
@@ -174,25 +125,21 @@ function updateDetailNavButtons() {
   else detailNext.classList.remove('disabled');
 }
 
-if (detailPrev) {
-  detailPrev.addEventListener('click', () => {
-    if (currentProjectIndex <= 0) return;
-    const prev = projects[currentProjectIndex - 1];
-    if (prev) showProjectDetail(prev.id);
-  });
-}
+detailPrev?.addEventListener('click', () => {
+  if (currentProjectIndex <= 0) return;
+  const prev = projects[currentProjectIndex - 1];
+  if (prev) showProjectDetail(prev.id);
+});
 
-if (detailNext) {
-  detailNext.addEventListener('click', () => {
-    if (!Array.isArray(projects)) return;
-    if (currentProjectIndex >= projects.length - 1) return;
-    const next = projects[currentProjectIndex + 1];
-    if (next) showProjectDetail(next.id);
-  });
-}
+detailNext?.addEventListener('click', () => {
+  if (!Array.isArray(projects)) return;
+  if (currentProjectIndex >= projects.length - 1) return;
+  const next = projects[currentProjectIndex + 1];
+  if (next) showProjectDetail(next.id);
+});
 
 // =====================================================
-// 3) 캔버스 + 마퀴바(패들) 연동
+// 3) 캔버스 + 마퀴바(패들)
 // =====================================================
 const canvas = document.getElementById('canvas');
 const ctx = canvas?.getContext('2d');
@@ -207,6 +154,65 @@ let paddleTop = 0;
 let paddleBottom = 0;
 let paddleVX = 0;
 
+// -----------------------------------------------------
+// ✅ 텍스트 잉크 박스
+// -----------------------------------------------------
+function getTextInkRect(el) {
+  if (!el) return null;
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const rect = range.getBoundingClientRect();
+  range.detach?.();
+  return rect;
+}
+
+// -----------------------------------------------------
+// ✅ (핵심) 모바일 기준값을 화면폭 비율로 스케일링
+// - 너가 말한 "모바일 적절한 값"을 기준으로,
+//   화면 폭이 커지면 동일한 비율로 커지도록 함.
+// -----------------------------------------------------
+function getMarqueeTuningByViewport() {
+  // ✅ 모바일 기준 폭(원하면 숫자만 바꾸면 됨)
+  const BASE_W = 390;
+
+  // ✅ 너가 준 모바일 기준값
+  const BASE_GAP = -15;
+  const BASE_LEFT_NUDGE = 3;
+
+  // ✅ 화면이 매우 큰 경우 무한정 커지는 걸 막고 싶으면 상한을 줄이면 됨
+  // 지금은 "비율 연동"을 최대한 지키기 위해 상한만 아주 넉넉히 둠.
+  const scale = clamp(window.innerWidth / BASE_W, 0.7, 3.2);
+
+  return {
+    GAP: BASE_GAP * scale,
+    LEFT_NUDGE: BASE_LEFT_NUDGE * scale,
+    RIGHT_NUDGE: 0
+  };
+}
+
+// -----------------------------------------------------
+// ✅ 타이틀 아래 마퀴바 정렬 (폭/시작점/간격 모두 비율 연동)
+// -----------------------------------------------------
+function alignMarqueeToTitleUnderline() {
+  if (!mainTitle || !marqueeBar) return;
+
+  const rect = getTextInkRect(mainTitle);
+  if (!rect || !rect.width) return;
+
+  const { GAP, LEFT_NUDGE, RIGHT_NUDGE } = getMarqueeTuningByViewport();
+
+  const left = rect.left + LEFT_NUDGE;
+  const width = Math.max(0, rect.width - LEFT_NUDGE - RIGHT_NUDGE);
+  const top = rect.bottom + GAP;
+
+  marqueeBar.style.left = `${left.toFixed(2)}px`;
+  marqueeBar.style.width = `${width.toFixed(2)}px`;
+  marqueeBar.style.top = `${top.toFixed(2)}px`;
+  marqueeBar.style.bottom = 'auto';
+
+  syncPaddleFromDom();
+}
+
 function syncPaddleFromDom() {
   if (!marqueeBar) return;
   const rect = marqueeBar.getBoundingClientRect();
@@ -218,8 +224,7 @@ function syncPaddleFromDom() {
 }
 
 function updatePaddleDomLeftOnly() {
-  if (!marqueeBar) return;
-  marqueeBar.style.left = `${paddleX}px`;
+  marqueeBar.style.left = `${paddleX.toFixed(2)}px`;
 }
 
 function clampPaddleX() {
@@ -233,40 +238,6 @@ function resizeCanvas() {
   if (!canvas) return;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-}
-
-/*
-  ✅✅ 핵심: 마퀴바를 “타이틀 밑줄처럼” 정렬
-  - 간격: 2px
-  - 폭: 타이틀(글자)의 실제 폭과 완전 동일
-  - viewport가 커져도(타이틀이 clamp로 멈춰도) 그대로 연동
-*/
-function alignMarqueeToTitleUnderline() {
-  if (!marqueeBar || !mainTitle) return;
-  if (!mainPage?.classList.contains('active')) return;
-
-  const titleRect = mainTitle.getBoundingClientRect();
-  if (!titleRect.width || !titleRect.height) {
-    requestAnimationFrame(alignMarqueeToTitleUnderline);
-    return;
-  }
-
-  const GAP = -20;
-
-  // ✅ 올림/반올림 안 함: 소수 px 그대로 적용 → “완전 동일” 느낌
-  marqueeBar.style.width = `${titleRect.width}px`;
-
-  marqueeBar.style.top = `${titleRect.bottom + GAP}px`;
-  marqueeBar.style.bottom = 'auto';
-
-  // ✅ 왼쪽도 타이틀 left에 정확히 붙임
-  paddleX = titleRect.left;
-  updatePaddleDomLeftOnly();
-
-  syncPaddleFromDom();
-  clampPaddleX();
-  updatePaddleDomLeftOnly();
-  syncPaddleFromDom();
 }
 
 function setupMarqueeIntroOnce() {
@@ -290,124 +261,100 @@ function setupMarqueeIntroOnce() {
 
 resizeCanvas();
 
-// ✅ 초기 정렬은 “한 프레임 뒤”에 실행(레이아웃 확정 후)
-requestAnimationFrame(() => {
+function initAfterFontsReady() {
+  alignMarqueeToTitleUnderline();
+  setupMarqueeIntroOnce();
+  syncPaddleFromDom();
+}
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(initAfterFontsReady);
+} else {
+  window.addEventListener('load', initAfterFontsReady);
+}
+
+window.addEventListener('resize', () => {
+  resizeCanvas();
   alignMarqueeToTitleUnderline();
   setupMarqueeIntroOnce();
   syncPaddleFromDom();
 });
 
-// ✅ 폰트 로딩 후 타이틀 폭이 확정되면 다시 1번 더
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => {
-    requestAnimationFrame(() => {
-      alignMarqueeToTitleUnderline();
-      setupMarqueeIntroOnce();
-      syncPaddleFromDom();
-    });
-  });
-} else {
-  window.addEventListener('load', () => {
-    requestAnimationFrame(() => {
-      alignMarqueeToTitleUnderline();
-      setupMarqueeIntroOnce();
-      syncPaddleFromDom();
-    });
-  });
-}
-
-window.addEventListener('resize', () => {
-  resizeCanvas();
-  requestAnimationFrame(() => {
+if (mainTitle && 'ResizeObserver' in window) {
+  const ro = new ResizeObserver(() => {
     alignMarqueeToTitleUnderline();
     setupMarqueeIntroOnce();
-    syncPaddleFromDom();
   });
-});
+  ro.observe(mainTitle);
+}
 
-// 패들 드래그
+// -----------------------------------------------------
+// ✅ 패들 드래그(좌우만)
+// -----------------------------------------------------
 let isDraggingPaddle = false;
 let lastPointerX = 0;
 let lastPointerTime = 0;
 
-function isOnResizeHandle(clientX, clientY) {
-  if (!marqueeBar) return false;
-  const rect = marqueeBar.getBoundingClientRect();
-  const EDGE = 20;
-  const nearRight = (rect.right - clientX) < EDGE;
-  const nearBottom = (rect.bottom - clientY) < EDGE;
-  return nearRight || (nearRight && nearBottom);
-}
+marqueeBar?.addEventListener('mousedown', (e) => {
+  isDraggingPaddle = true;
+  lastPointerX = e.clientX;
+  lastPointerTime = performance.now();
+  e.preventDefault();
+});
 
-if (marqueeBar) {
-  marqueeBar.addEventListener('mousedown', (e) => {
-    if (isOnResizeHandle(e.clientX, e.clientY)) return;
-    isDraggingPaddle = true;
-    lastPointerX = e.clientX;
-    lastPointerTime = performance.now();
-    e.preventDefault();
-  });
+window.addEventListener('mousemove', (e) => {
+  if (!isDraggingPaddle) return;
+  const now = performance.now();
+  const dx = e.clientX - lastPointerX;
+  const dt = now - lastPointerTime || 16;
 
-  window.addEventListener('mousemove', (e) => {
-    if (!isDraggingPaddle) return;
-    const now = performance.now();
-    const dx = e.clientX - lastPointerX;
-    const dt = now - lastPointerTime || 16;
+  paddleVX = (dx / dt) * 16;
 
-    paddleVX = (dx / dt) * 16;
+  syncPaddleFromDom();
+  paddleX += dx;
+  clampPaddleX();
+  updatePaddleDomLeftOnly();
 
-    syncPaddleFromDom();
-    paddleX += dx;
-    clampPaddleX();
-    updatePaddleDomLeftOnly();
+  lastPointerX = e.clientX;
+  lastPointerTime = now;
+  syncPaddleFromDom();
+});
 
-    lastPointerX = e.clientX;
-    lastPointerTime = now;
-    syncPaddleFromDom();
-  });
+window.addEventListener('mouseup', () => { isDraggingPaddle = false; paddleVX = 0; });
 
-  window.addEventListener('mouseup', () => {
-    isDraggingPaddle = false;
-    paddleVX = 0;
-  });
+marqueeBar?.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 0) return;
+  const t = e.touches[0];
+  isDraggingPaddle = true;
+  lastPointerX = t.clientX;
+  lastPointerTime = performance.now();
+  e.preventDefault();
+}, { passive: false });
 
-  marqueeBar.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 0) return;
-    const t = e.touches[0];
-    isDraggingPaddle = true;
-    lastPointerX = t.clientX;
-    lastPointerTime = performance.now();
-    e.preventDefault();
-  }, { passive: false });
+window.addEventListener('touchmove', (e) => {
+  if (!isDraggingPaddle || e.touches.length === 0) return;
+  const t = e.touches[0];
+  const now = performance.now();
+  const dx = t.clientX - lastPointerX;
+  const dt = now - lastPointerTime || 16;
 
-  window.addEventListener('touchmove', (e) => {
-    if (!isDraggingPaddle || e.touches.length === 0) return;
-    const t = e.touches[0];
-    const now = performance.now();
-    const dx = t.clientX - lastPointerX;
-    const dt = now - lastPointerTime || 16;
+  paddleVX = (dx / dt) * 16;
 
-    paddleVX = (dx / dt) * 16;
+  syncPaddleFromDom();
+  paddleX += dx;
+  clampPaddleX();
+  updatePaddleDomLeftOnly();
 
-    syncPaddleFromDom();
-    paddleX += dx;
-    clampPaddleX();
-    updatePaddleDomLeftOnly();
+  lastPointerX = t.clientX;
+  lastPointerTime = now;
+  syncPaddleFromDom();
 
-    lastPointerX = t.clientX;
-    lastPointerTime = now;
-    syncPaddleFromDom();
+  e.preventDefault();
+}, { passive: false });
 
-    e.preventDefault();
-  }, { passive: false });
-
-  const endTouch = () => {
-    isDraggingPaddle = false;
-    paddleVX = 0;
-  };
-  window.addEventListener('touchend', endTouch);
-  window.addEventListener('touchcancel', endTouch);
-}
+const endTouch = () => { isDraggingPaddle = false; paddleVX = 0; };
+window.addEventListener('touchend', endTouch);
+window.addEventListener('touchcancel', endTouch);
 
 // =====================================================
 // 4) 스마일 볼
@@ -427,7 +374,6 @@ class Ball {
 
   draw() {
     if (!ctx) return;
-
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation);
@@ -455,14 +401,10 @@ class Ball {
     this.x += this.vx;
     this.y += this.vy;
 
-    if (this.x + this.radius > canvas.width) {
-      this.x = canvas.width - this.radius;
-      this.vx = -Math.abs(this.vx);
-    } else if (this.x - this.radius < 0) {
-      this.x = this.radius;
-      this.vx = Math.abs(this.vx);
-    }
+    if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx = -Math.abs(this.vx); }
+    else if (this.x - this.radius < 0) { this.x = this.radius; this.vx = Math.abs(this.vx); }
 
+    // 패들 충돌
     if (paddleHeight > 0) {
       const withinPaddleX =
         this.x >= (paddleX - this.radius) &&
@@ -471,9 +413,9 @@ class Ball {
       if (this.vy < 0 && withinPaddleX) {
         const prevTop = (prevY - this.radius);
         const currTop = (this.y - this.radius);
-        const crossedBottomSurface = (prevTop > paddleBottom) && (currTop <= paddleBottom);
+        const crossedBottom = (prevTop > paddleBottom) && (currTop <= paddleBottom);
 
-        if (crossedBottomSurface) {
+        if (crossedBottom) {
           this.y = paddleBottom + this.radius;
           this.vy = Math.abs(this.vy);
           this.vx += paddleVX * 0.8;
@@ -483,9 +425,9 @@ class Ball {
       if (this.vy > 0 && withinPaddleX) {
         const prevBottom = (prevY + this.radius);
         const currBottom = (this.y + this.radius);
-        const crossedTopSurface = (prevBottom < paddleTop) && (currBottom >= paddleTop);
+        const crossedTop = (prevBottom < paddleTop) && (currBottom >= paddleTop);
 
-        if (crossedTopSurface) {
+        if (crossedTop) {
           this.y = paddleTop - this.radius;
           this.vy = -Math.abs(this.vy);
           this.vx += paddleVX * 0.2;
@@ -493,14 +435,8 @@ class Ball {
       }
     }
 
-    if (this.y + this.radius > canvas.height) {
-      this.y = canvas.height - this.radius;
-      this.vy = -Math.abs(this.vy);
-    }
-
-    if (this.y + this.radius < 0) {
-      this.recycleBall();
-    }
+    if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy = -Math.abs(this.vy); }
+    if (this.y + this.radius < 0) this.recycleBall();
 
     this.rotation += this.rotationSpeed;
     this.draw();
@@ -510,10 +446,8 @@ class Ball {
     if (!canvas) return;
     this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
     this.y = canvas.height - this.radius - 5;
-
     this.vx = (Math.random() - 0.5) * 2;
     this.vy = -(Math.random() * 2 + 1);
-
     this.rotation = Math.random() * Math.PI * 2;
     this.rotationSpeed = (Math.random() - 0.5) * 0.05;
   }
@@ -521,7 +455,6 @@ class Ball {
 
 const balls = [];
 const numBalls = 7;
-
 const ballColor = '#ffffffff';
 const MAX_BALLS = 100;
 let lastSpawnTime = 0;
@@ -587,13 +520,7 @@ function checkCollision(ball1, ball2) {
 
   const now = performance.now();
   if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
-    const newBall = new Ball(
-      (ball1.x + ball2.x) / 2,
-      (ball1.y + ball2.y) / 2,
-      ball1.radius,
-      ballColor
-    );
-    balls.push(newBall);
+    balls.push(new Ball((ball1.x + ball2.x) / 2, (ball1.y + ball2.y) / 2, ball1.radius, ballColor));
     lastSpawnTime = now;
   }
 }
@@ -610,12 +537,10 @@ if (canvas && ctx) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     syncPaddleFromDom();
 
-    balls.forEach((b) => b.update());
+    balls.forEach(b => b.update());
 
     for (let i = 0; i < balls.length; i++) {
-      for (let j = i + 1; j < balls.length; j++) {
-        checkCollision(balls[i], balls[j]);
-      }
+      for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
     }
 
     requestAnimationFrame(animate);
@@ -624,7 +549,7 @@ if (canvas && ctx) {
 }
 
 // =====================================================
-// 5) 썸네일 생성 & 상세 표시 (이하 네 기존 그대로)
+// 5) 썸네일/상세
 // =====================================================
 function shuffleArray(inputArray) {
   const arr = inputArray.slice();
@@ -636,23 +561,18 @@ function shuffleArray(inputArray) {
 }
 
 function createThumbnails(options = {}) {
-  if (!thumbnailsContainer) return;
-  if (!Array.isArray(projects)) return;
-
+  if (!thumbnailsContainer || !Array.isArray(projects)) return;
   thumbnailsContainer.innerHTML = '';
 
-  const { shuffle = true } = options;
-  const list = shuffle ? shuffleArray(projects) : projects;
+  const list = (options.shuffle ?? true) ? shuffleArray(projects) : projects;
 
-  list.forEach((project) => {
+  list.forEach(project => {
     const thumbnail = document.createElement('div');
     thumbnail.className = 'thumbnail';
 
     const img = document.createElement('img');
-
     const first = (project.images && project.images[0]) ? project.images[0] : '';
     setImageSrcWithFallback(img, getImageSrc(first));
-
     img.alt = project.title || '';
 
     thumbnail.appendChild(img);
@@ -660,7 +580,6 @@ function createThumbnails(options = {}) {
     thumbnailsContainer.appendChild(thumbnail);
   });
 }
-
 createThumbnails({ shuffle: true });
 
 function normalizeMainImageSize(value) {
@@ -669,28 +588,24 @@ function normalizeMainImageSize(value) {
   if (v === 'l' || v === 'large') return 'l';
   return 'm';
 }
-
 function normalizeText(value) {
   if (Array.isArray(value)) return value.filter(Boolean).join(' / ');
   if (typeof value === 'string') return value;
   return '';
 }
 
-// =====================================================
-// ✅ [핵심] 하단 스트립: "슬라이드(스크롤) 중엔 선택(클릭) 금지" 가드
-// =====================================================
+// ✅ 스트립 클릭 가드(드래그 중 클릭 방지)
 let stripIsPointerDown = false;
 let stripMoved = false;
 let stripStartX = 0;
 let stripStartY = 0;
 let stripStartScrollLeft = 0;
 let stripSuppressClickUntil = 0;
+const STRIP_MOVE_THRESHOLD = 10;
 
 function shouldSuppressStripClick() {
   return stripMoved || Date.now() < stripSuppressClickUntil;
 }
-
-const STRIP_MOVE_THRESHOLD = 10;
 
 function initStripDragGuard() {
   if (!detailStripTrack) return;
@@ -698,10 +613,8 @@ function initStripDragGuard() {
   detailStripTrack.addEventListener('touchstart', (e) => {
     if (e.touches.length === 0) return;
     const t = e.touches[0];
-
     stripIsPointerDown = true;
     stripMoved = false;
-
     stripStartX = t.clientX;
     stripStartY = t.clientY;
     stripStartScrollLeft = detailStripTrack.scrollLeft;
@@ -710,7 +623,6 @@ function initStripDragGuard() {
   detailStripTrack.addEventListener('touchmove', (e) => {
     if (!stripIsPointerDown || e.touches.length === 0) return;
     const t = e.touches[0];
-
     const dx = Math.abs(t.clientX - stripStartX);
     const dy = Math.abs(t.clientY - stripStartY);
     const scrolled = Math.abs(detailStripTrack.scrollLeft - stripStartScrollLeft) > 2;
@@ -721,18 +633,10 @@ function initStripDragGuard() {
     }
   }, { passive: true });
 
-  detailStripTrack.addEventListener('touchend', () => {
-    stripIsPointerDown = false;
-  }, { passive: true });
+  detailStripTrack.addEventListener('touchend', () => { stripIsPointerDown = false; }, { passive: true });
+  detailStripTrack.addEventListener('touchcancel', () => { stripIsPointerDown = false; stripMoved = false; }, { passive: true });
 
-  detailStripTrack.addEventListener('touchcancel', () => {
-    stripIsPointerDown = false;
-    stripMoved = false;
-  }, { passive: true });
-
-  detailStripTrack.addEventListener('scroll', () => {
-    stripSuppressClickUntil = Date.now() + 250;
-  }, { passive: true });
+  detailStripTrack.addEventListener('scroll', () => { stripSuppressClickUntil = Date.now() + 250; }, { passive: true });
 
   detailStripTrack.addEventListener('click', (e) => {
     if (!shouldSuppressStripClick()) return;
@@ -742,35 +646,24 @@ function initStripDragGuard() {
 }
 initStripDragGuard();
 
-// =====================================================
-// ✅ 하단 “프로젝트 썸네일 스트립” 생성/갱신
-// =====================================================
 function buildDetailBottomStrip() {
-  if (!detailStripTrack) return;
-  if (!Array.isArray(projects)) return;
-
+  if (!detailStripTrack || !Array.isArray(projects)) return;
   detailStripTrack.innerHTML = '';
 
-  projects.forEach((p) => {
+  projects.forEach(p => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'detail-strip-thumb';
     btn.dataset.projectId = String(p.id);
 
     const img = document.createElement('img');
-
     const first = (p.images && p.images[0]) ? p.images[0] : '';
     setImageSrcWithFallback(img, getImageSrc(first));
-
     img.alt = p.title || '';
     btn.appendChild(img);
 
     btn.addEventListener('click', (e) => {
-      if (shouldSuppressStripClick()) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
+      if (shouldSuppressStripClick()) { e.preventDefault(); e.stopPropagation(); return; }
       showProjectDetail(p.id);
     });
 
@@ -781,17 +674,13 @@ function buildDetailBottomStrip() {
 function setActiveStrip(projectId) {
   if (!detailStripTrack) return;
   const id = String(projectId);
-
-  const thumbs = detailStripTrack.querySelectorAll('.detail-strip-thumb');
-  thumbs.forEach((t) => {
+  detailStripTrack.querySelectorAll('.detail-strip-thumb').forEach(t => {
     if (t.dataset.projectId === id) t.classList.add('is-active');
     else t.classList.remove('is-active');
   });
 
   const active = detailStripTrack.querySelector('.detail-strip-thumb.is-active');
-  if (active && typeof active.scrollIntoView === 'function') {
-    active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  }
+  active?.scrollIntoView?.({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 }
 
 function scrollStripBy(direction) {
@@ -801,76 +690,57 @@ function scrollStripBy(direction) {
   stripSuppressClickUntil = Date.now() + 250;
 }
 
-if (detailStripLeft) detailStripLeft.addEventListener('click', () => scrollStripBy(-1));
-if (detailStripRight) detailStripRight.addEventListener('click', () => scrollStripBy(1));
+detailStripLeft?.addEventListener('click', () => scrollStripBy(-1));
+detailStripRight?.addEventListener('click', () => scrollStripBy(1));
 
 buildDetailBottomStrip();
 
 function showProjectDetail(projectId) {
   if (!Array.isArray(projects)) return;
-
-  const index = projects.findIndex((p) => p.id === projectId);
+  const index = projects.findIndex(p => p.id === projectId);
   if (index === -1) return;
 
   currentProjectIndex = index;
   const project = projects[index];
 
-  if (detailTitleEl) detailTitleEl.textContent = project.title || '';
-  if (detailSubtitleEl) detailSubtitleEl.textContent = normalizeText(project.subtitle);
-  if (detailYearEl) detailYearEl.textContent = project.year || '';
+  detailTitleEl && (detailTitleEl.textContent = project.title || '');
+  detailSubtitleEl && (detailSubtitleEl.textContent = normalizeText(project.subtitle));
+  detailYearEl && (detailYearEl.textContent = project.year || '');
 
   const specsText = normalizeText(project.specs);
   if (detailSpecsEl && detailSpecsContainer) {
-    if (specsText) {
-      detailSpecsEl.textContent = specsText;
-      detailSpecsContainer.style.display = 'flex';
-    } else {
-      detailSpecsEl.textContent = '';
-      detailSpecsContainer.style.display = 'none';
-    }
+    if (specsText) { detailSpecsEl.textContent = specsText; detailSpecsContainer.style.display = 'flex'; }
+    else { detailSpecsEl.textContent = ''; detailSpecsContainer.style.display = 'none'; }
   }
 
   const sizeText = normalizeText(project.size);
   if (detailSizeEl && detailSizeContainer) {
-    if (sizeText) {
-      detailSizeEl.textContent = sizeText;
-      detailSizeContainer.style.display = 'flex';
-    } else {
-      detailSizeEl.textContent = '';
-      detailSizeContainer.style.display = 'none';
-    }
+    if (sizeText) { detailSizeEl.textContent = sizeText; detailSizeContainer.style.display = 'flex'; }
+    else { detailSizeEl.textContent = ''; detailSizeContainer.style.display = 'none'; }
   }
 
   const clientText = normalizeText(project.client);
   if (detailClientEl && detailClientContainer) {
-    if (clientText) {
-      detailClientEl.textContent = clientText;
-      detailClientContainer.style.display = 'flex';
-    } else {
-      detailClientEl.textContent = '';
-      detailClientContainer.style.display = 'none';
-    }
+    if (clientText) { detailClientEl.textContent = clientText; detailClientContainer.style.display = 'flex'; }
+    else { detailClientEl.textContent = ''; detailClientContainer.style.display = 'none'; }
   }
 
-  if (detailDescriptionEl) detailDescriptionEl.innerHTML = project.description || '';
+  detailDescriptionEl && (detailDescriptionEl.innerHTML = project.description || '');
 
   const images = project.images || [];
-
-  if (detailMainImageEl) detailMainImageEl.innerHTML = '';
-  if (detailImagesEl) detailImagesEl.innerHTML = '';
+  detailMainImageEl && (detailMainImageEl.innerHTML = '');
+  detailImagesEl && (detailImagesEl.innerHTML = '');
 
   const mainSize = normalizeMainImageSize(project.mainImageSize);
 
   if (images.length > 0 && detailMainImageEl) {
-    const firstImgItem = images[0];
-    const firstSrc = getImageSrc(firstImgItem);
-
-    if (firstSrc) {
-      const firstImg = document.createElement('img');
-      setImageSrcWithFallback(firstImg, firstSrc);
-      firstImg.alt = project.title || '';
-      firstImg.classList.add(`main-img-${mainSize}`);
-      detailMainImageEl.appendChild(firstImg);
+    const src = getImageSrc(images[0]);
+    if (src) {
+      const img = document.createElement('img');
+      setImageSrcWithFallback(img, src);
+      img.alt = project.title || '';
+      img.classList.add(`main-img-${mainSize}`);
+      detailMainImageEl.appendChild(img);
     }
   }
 
@@ -888,20 +758,18 @@ function showProjectDetail(projectId) {
         img.style.gridColumn = '1 / -1';
         img.classList.add('span-2');
       }
-
       detailImagesEl.appendChild(img);
     }
   }
 
   setActiveStrip(project.id);
-
   showPage(detailPage);
-  if (detailPage) detailPage.scrollTop = 0;
+  detailPage && (detailPage.scrollTop = 0);
   updateDetailNavButtons();
 }
 
 // =====================================================
-// 6) 모바일: 상세페이지 스와이프(prev/next)
+// 6) 모바일: 상세 스와이프(prev/next)
 // =====================================================
 if (detailPage) {
   let touchStartX = 0;
@@ -930,15 +798,9 @@ if (detailPage) {
     if (!Array.isArray(projects)) return;
 
     if (dx > 0) {
-      if (currentProjectIndex > 0) {
-        const prev = projects[currentProjectIndex - 1];
-        if (prev) showProjectDetail(prev.id);
-      }
+      if (currentProjectIndex > 0) showProjectDetail(projects[currentProjectIndex - 1].id);
     } else {
-      if (currentProjectIndex < projects.length - 1) {
-        const next = projects[currentProjectIndex + 1];
-        if (next) showProjectDetail(next.id);
-      }
+      if (currentProjectIndex < projects.length - 1) showProjectDetail(projects[currentProjectIndex + 1].id);
     }
   }, { passive: true });
 }
