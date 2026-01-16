@@ -381,7 +381,7 @@ class Ball {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.25;
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
