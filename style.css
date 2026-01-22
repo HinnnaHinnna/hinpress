@@ -779,10 +779,11 @@ body {
     max-width: 100%;
     padding: 4.5rem 1rem 2rem;
     font-size: 13px;
-    line-height: 1.7;
+    line-height: 1.5;
   }
 
   .cv-section h3 {
     font-size: 13px;
+    line-height: 1.5;
   }
 }
