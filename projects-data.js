@@ -49,6 +49,25 @@ const rawProjects = [
   },
   {
     id: 2,
+
+    title: '아카이브 프리즘 - 한국영화 100선',
+    subtitle: '책',
+    year: '2024',
+    specs: '배면인쇄, 먹박, 은박, 흰색실크, 무선제본',
+    size: ['255x297mm', '196p'],
+    description:
+      '『아카이브 프리즘』이라는 계간지 리뉴얼이다. 특히 첫 호는 10년마다 한국영화 100선을 선발하여 기록하는 책이다. 표지에는 100선에 해당하는 영화들이 텍스트로 쓰여 있다. 이 부분은 『아카이브 프리즘』의 아카이브를, 배면 컬러는 암시적 프리즘을 의미한다. 매 호마다 배면 컬러 색이 달라진다.',
+    category: 'Graphic Design',
+    client: ['한국영상자료원, box8'],
+    imageFolder: '2024/achaive',
+    imageBaseName: 'achaive',
+    imageCount: 19,
+    imageExt: 'jpg',
+    padLength: 2,
+    mainImageSize: 'l'
+  },
+  {
+    id: 3,
     title: '심안',
     subtitle: '책',
     year: '2022',
@@ -64,25 +83,6 @@ const rawProjects = [
     imageCount: 9,
     imageExt: 'jpg',
     padLength: 2,
-    mainImageSize: 'l'
-  },
-  {
-    id: 3,
-    title: '아카이브 프리즘 - 한국영화 100선',
-    subtitle: '책',
-    year: '2024',
-    specs: '배면인쇄, 먹박, 은박, 흰색실크, 무선제본',
-    size: ['255x297mm', '196p'],
-    description:
-      '『아카이브 프리즘』이라는 계간지 리뉴얼이다. 특히 첫 호는 10년마다 한국영화 100선을 선발하여 기록하는 책이다. 표지에는 100선에 해당하는 영화들이 텍스트로 쓰여 있다. 이 부분은 『아카이브 프리즘』의 아카이브를, 배면 컬러는 암시적 프리즘을 의미한다. 매 호마다 배면 컬러 색이 달라진다.',
-    category: 'Graphic Design',
-    client: ['한국영상자료원, box8'],
-    imageFolder: '2024/achaive',
-    imageBaseName: 'achaive',
-    imageCount: 19,
-    imageExt: 'jpg',
-    padLength: 2,
-
     mainImageSize: 'l'
   },
   {
