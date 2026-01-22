@@ -100,9 +100,7 @@ function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   page.classList.add('active');
 
-  // ✅ [변경] 포트폴리오 페이지 진입 시 "랜덤 셔플"하지 않고,
-  // projects-data.js에 정의된 원래 순서대로 렌더링
-  if (page === portfolioPage) createThumbnails({ shuffle: false });
+  if (page === portfolioPage) createThumbnails({ shuffle: true });
 
   if (page === mainPage) topBar?.classList.add('hidden');
   else topBar?.classList.remove('hidden');
@@ -169,13 +167,20 @@ function getTextInkRect(el) {
 }
 
 // -----------------------------------------------------
-// ✅ 모바일 기준값을 화면폭 비율로 스케일링
+// ✅ (핵심) 모바일 기준값을 화면폭 비율로 스케일링
+// - 너가 말한 "모바일 적절한 값"을 기준으로,
+//   화면 폭이 커지면 동일한 비율로 커지도록 함.
 // -----------------------------------------------------
 function getMarqueeTuningByViewport() {
+  // ✅ 모바일 기준 폭(원하면 숫자만 바꾸면 됨)
   const BASE_W = 390;
+
+  // ✅ 너가 준 모바일 기준값
   const BASE_GAP = -15;
   const BASE_LEFT_NUDGE = 2.8;
 
+  // ✅ 화면이 매우 큰 경우 무한정 커지는 걸 막고 싶으면 상한을 줄이면 됨
+  // 지금은 "비율 연동"을 최대한 지키기 위해 상한만 아주 넉넉히 둠.
   const scale = clamp(window.innerWidth / BASE_W, 0.7, 3.2);
 
   return {
@@ -186,7 +191,7 @@ function getMarqueeTuningByViewport() {
 }
 
 // -----------------------------------------------------
-// ✅ 타이틀 아래 마퀴바 정렬
+// ✅ 타이틀 아래 마퀴바 정렬 (폭/시작점/간격 모두 비율 연동)
 // -----------------------------------------------------
 function alignMarqueeToTitleUnderline() {
   if (!mainTitle || !marqueeBar) return;
@@ -376,7 +381,7 @@ class Ball {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.25;
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
@@ -546,8 +551,6 @@ if (canvas && ctx) {
 // =====================================================
 // 5) 썸네일/상세
 // =====================================================
-
-// (유지) 셔플 함수는 나중에 "정렬 토글" 만들 때 다시 쓰려고 남겨둠
 function shuffleArray(inputArray) {
   const arr = inputArray.slice();
   for (let i = arr.length - 1; i > 0; i--) {
@@ -561,10 +564,7 @@ function createThumbnails(options = {}) {
   if (!thumbnailsContainer || !Array.isArray(projects)) return;
   thumbnailsContainer.innerHTML = '';
 
-  // ✅ [변경] 기본값을 "셔플 안 함(false)"으로 변경
-  // - 이전: (options.shuffle ?? true)  → 기본이 true라서 항상 랜덤
-  // - 변경: (options.shuffle ?? false) → 기본이 false라서 원래 순서
-  const list = (options.shuffle ?? false) ? shuffleArray(projects) : projects;
+  const list = (options.shuffle ?? true) ? shuffleArray(projects) : projects;
 
   list.forEach(project => {
     const thumbnail = document.createElement('div');
@@ -580,9 +580,7 @@ function createThumbnails(options = {}) {
     thumbnailsContainer.appendChild(thumbnail);
   });
 }
-
-// ✅ [변경] 최초 렌더도 셔플 없이
-createThumbnails({ shuffle: false });
+createThumbnails({ shuffle: true });
 
 function normalizeMainImageSize(value) {
   const v = String(value || '').toLowerCase();
