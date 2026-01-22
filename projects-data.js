@@ -30,23 +30,21 @@ function generateImageArray(folder, baseName, count, padLength = 2, ext = 'jpg')
 const rawProjects = [
   {
     id: 1,
-    title: '쓰기 = 다시말하기;',
+    title: '마침내, 박찬욱',
     subtitle: '책',
-    year: '2024',
-    specs: '에폭시, 무선제본',
-    size: ['185x255mm', '72p'],
+    year: '2023',
+    specs: '노출제본, 먹박, 하드커버 양장제본',
+    size: ['130x190mm', '920p'],
     description:
-      '본 책은 매체를 주요 소재로 삼아 ‘쓰기’라는 행위를 디자인에 대입해 사고의 전환을 시도하고, 코드를 매개로 새로운 커뮤니케이션 방식을 탐구한 연구의 기록이다. 표지의 검은 배경색은 전통적 쓰기를 상징하는 연필 흑심, 그 위에 선택적으로 유광 처리된 부분은 휴대전화 화면의 블랙 미러로서 매체를 상징한다.',
+      '충무로영화제-감독주간에서 발행한 박찬욱 감독 데뷔 30주년 기념도서이다. 박찬욱 감독의 외롭고 화려한 영화 인생을 하드보일드 추리 소설 세계관에 대입했다. 책표지는 2중 구조인데 겉표지는 권총집을 연상하게 하는 검은 인조가죽을 사용했고 오른쪽 면으로 책 배면을 덮는 구조이다. 2개의 책등이 생기는데, 오른쪽 면의 가죽 표지 책등에는 박찬욱 감독이 감독한 22개의 영화 영문 제목이 형압으로 눌려있다. 왼쪽 면의 노출 책등은 원래 실 제본선을 취소선으로 활용해, 본문 제목 중 남의 영화와도 내 영화와도 달라야 했다는 감독의 말을 인용한 Like no other, even like no myself라는 영문 문장으로 디자인하려 했다. 그런데 제작 과정 중 문제가 생겨 현재의 영화 대사 버전으로 바꾸었다. 아쉬워서 이 게시물 마지막에 추가했다. 내지 종이 3종, 별색 3개, 노출 제본, 2개의 책등을 사용했다.',
     category: 'Graphic Design',
-    client: ['개인 작업, 서울시립대학교 디자인석사청구'],
-    imageFolder: '2024/write',
-    imageBaseName: 'write',
-    span2Indexes: [5, 14],
-    imageCount: 20,
+    client: ['충무로영화제-감독주간, box8'],
+    imageFolder: '2024/parkchanwuk',
+    imageBaseName: 'parkchanwuk',
+    span2Indexes: [15], // parkchanwuk_15.jpg만 2칸(span:2)
+    imageCount: 18,
     imageExt: 'jpg',
     padLength: 2,
-
-    // ✅ 대표이미지 크기: 크게 보고 싶으면 'l'
     mainImageSize: 'l'
   },
   {
@@ -89,19 +87,19 @@ const rawProjects = [
   },
   {
     id: 4,
-    title: '마침내, 박찬욱',
+    title: '쓰기 = 다시말하기;',
     subtitle: '책',
-    year: '2023',
-    specs: '노출제본, 먹박, 하드커버 양장제본',
-    size: ['130x190mm', '920p'],
+    year: '2024',
+    specs: '에폭시, 무선제본',
+    size: ['185x255mm', '72p'],
     description:
-      '충무로영화제-감독주간에서 발행한 박찬욱 감독 데뷔 30주년 기념도서이다. 박찬욱 감독의 외롭고 화려한 영화 인생을 하드보일드 추리 소설 세계관에 대입했다. 책표지는 2중 구조인데 겉표지는 권총집을 연상하게 하는 검은 인조가죽을 사용했고 오른쪽 면으로 책 배면을 덮는 구조이다. 2개의 책등이 생기는데, 오른쪽 면의 가죽 표지 책등에는 박찬욱 감독이 감독한 22개의 영화 영문 제목이 형압으로 눌려있다. 왼쪽 면의 노출 책등은 원래 실 제본선을 취소선으로 활용해, 본문 제목 중 남의 영화와도 내 영화와도 달라야 했다는 감독의 말을 인용한 Like no other, even like no myself라는 영문 문장으로 디자인하려 했다. 그런데 제작 과정 중 문제가 생겨 현재의 영화 대사 버전으로 바꾸었다. 아쉬워서 이 게시물 마지막에 추가했다. 내지 종이 3종, 별색 3개, 노출 제본, 2개의 책등을 사용했다.',
+      '본 책은 매체를 주요 소재로 삼아 ‘쓰기’라는 행위를 디자인에 대입해 사고의 전환을 시도하고, 코드를 매개로 새로운 커뮤니케이션 방식을 탐구한 연구의 기록이다. 표지의 검은 배경색은 전통적 쓰기를 상징하는 연필 흑심, 그 위에 선택적으로 유광 처리된 부분은 휴대전화 화면의 블랙 미러로서 매체를 상징한다.',
     category: 'Graphic Design',
-    client: ['충무로영화제-감독주간, box8'],
-    imageFolder: '2024/parkchanwuk',
-    imageBaseName: 'parkchanwuk',
-    span2Indexes: [15], // parkchanwuk_15.jpg만 2칸(span:2)
-    imageCount: 18,
+    client: ['개인 작업, 서울시립대학교 디자인석사청구'],
+    imageFolder: '2024/write',
+    imageBaseName: 'write',
+    span2Indexes: [5, 14],
+    imageCount: 20,
     imageExt: 'jpg',
     padLength: 2,
     mainImageSize: 'l'
