@@ -22,6 +22,7 @@ function generateImageArray(folder, baseName, count, padLength = 2, ext = 'jpg')
   return result;
 }
 
+
 // ============================================
 // 원본 프로젝트 데이터
 // - mainImageSize: 's' | 'm' | 'l'
