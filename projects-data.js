@@ -50,7 +50,6 @@ const rawProjects = [
   },
   {
     id: 2,
-
     title: '아카이브 프리즘 - 한국영화 100선',
     subtitle: '책',
     year: '2024',

@@ -564,7 +564,7 @@ function createThumbnails(options = {}) {
   // ✅ [변경] 기본값을 "셔플 안 함(false)"으로 변경
   // - 이전: (options.shuffle ?? true)  → 기본이 true라서 항상 랜덤
   // - 변경: (options.shuffle ?? false) → 기본이 false라서 원래 순서
-  const list = (options.shuffle ?? false) ? shuffleArray(projects) : projects;
+  const list = (options.shuffle ?? true) ? shuffleArray(projects) : projects;
 
   list.forEach(project => {
     const thumbnail = document.createElement('div');
