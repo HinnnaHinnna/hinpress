@@ -444,7 +444,7 @@ class Ball {
     this.vx = (Math.random() - 0.5) * 2;
     this.vy = -(Math.random() * 2 + 1);
     this.rotation = Math.random() * Math.PI * 2;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+    this.rotationSpeed = (Math.random() - 0.5) * 0.15;
   }
 }
 
