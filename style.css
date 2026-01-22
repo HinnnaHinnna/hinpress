@@ -792,6 +792,7 @@ body {
 
   #main-title {
     animation: mobileTitleBlink 1.2s ease-in-out infinite;
+    letter-spacing: 0em;
   }
 
   .cv-inner {
