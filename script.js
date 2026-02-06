@@ -173,8 +173,11 @@ function getTextInkRect(el) {
 // -----------------------------------------------------
 function getMarqueeTuningByViewport() {
   const BASE_W = 390;
-  const BASE_GAP = -15;
-  const BASE_LEFT_NUDGE = 2.8;
+
+  const isMobile = window.innerWidth <= 768;
+
+  const BASE_GAP = isMobile ? -24 : -15;        // ✅ 모바일만 더 붙이기
+  const BASE_LEFT_NUDGE = isMobile ? 2.8 : 2.8; // 필요하면 같이
 
   const scale = clamp(window.innerWidth / BASE_W, 0.7, 3.2);
 
