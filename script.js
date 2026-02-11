@@ -384,7 +384,7 @@ class Ball {
     ctx.stroke();
 
     ctx.strokeStyle = '#ffffffff';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.arc(0, this.radius * 0.1, this.radius * 0.5, 0, Math.PI);
     ctx.stroke();
