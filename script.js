@@ -379,14 +379,14 @@ class Ball {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.5;
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
     ctx.strokeStyle = '#ffffffff';
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.arc(0, this.radius * 0.1, this.radius * 0.5, 0, Math.PI);
+    ctx.arc(0, this.radius * 0.2, this.radius * 0.7, 0, Math.PI);
     ctx.stroke();
 
     ctx.restore();
@@ -452,9 +452,9 @@ class Ball {
 }
 
 const balls = [];
-const numBalls = 7;
+const numBalls = 5;
 const ballColor = '#ffffffff';
-const MAX_BALLS = 80;
+const MAX_BALLS = 60;
 let lastSpawnTime = 0;
 
 const COLLISION_CONFIG = {
@@ -525,7 +525,7 @@ function checkCollision(ball1, ball2) {
 
 if (canvas && ctx) {
   for (let i = 0; i < numBalls; i++) {
-    const radius = 10;
+    const radius = 30;
     const x = radius + Math.random() * (canvas.width - radius * 2);
     const y = radius + Math.random() * (canvas.height - radius * 2);
     balls.push(new Ball(x, y, radius, ballColor));
