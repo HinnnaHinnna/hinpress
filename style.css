@@ -57,7 +57,7 @@
   font-weight: 800;
   /* ExtraBold에 해당하는 일반적인 값 */
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 /* =====================================================
