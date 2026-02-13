@@ -454,8 +454,26 @@ class Ball {
 const balls = [];
 const numBalls = 5;
 const ballColor = '#ffffffff';
-const MAX_BALLS = 30;
+const MAX_BALLS = 10;
 let lastSpawnTime = 0;
+
+// ✅ 디버그 출력(콘솔 + 화면)
+const debugBallEl = document.getElementById('debug-balls');
+let lastDebugLog = 0;
+function debugBallCount() {
+  const now = performance.now();
+
+  // 화면 표시(매 프레임 업데이트)
+  if (debugBallEl) {
+    debugBallEl.textContent = `balls: ${balls.length} / ${MAX_BALLS}`;
+  }
+
+  // 콘솔은 1초에 1번만(너무 많이 찍히면 보기 힘들어서)
+  if (now - lastDebugLog > 1000) {
+    console.log(`[hinPress] balls: ${balls.length} / ${MAX_BALLS}`);
+    lastDebugLog = now;
+  }
+}
 
 const COLLISION_CONFIG = {
   overlapCorrectionPercent: 0.9,
@@ -517,15 +535,23 @@ function checkCollision(ball1, ball2) {
   ball2.vy += impulseY * invMass2;
 
   const now = performance.now();
+  // ✅ 여기서만 새 볼이 늘어남. balls.length < MAX_BALLS이면 절대 MAX 초과 못 함.
   if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
     balls.push(new Ball((ball1.x + ball2.x) / 2, (ball1.y + ball2.y) / 2, ball1.radius, ballColor));
     lastSpawnTime = now;
   }
 }
 
+// ✅ 중복 실행 방지: 이전 RAF가 있으면 끊고 새로 시작
+if (window.__hinpressBallRAF) {
+  cancelAnimationFrame(window.__hinpressBallRAF);
+  window.__hinpressBallRAF = null;
+}
+
 if (canvas && ctx) {
+  // ✅ 시작 볼 5개 생성 (지름 = radius * 2)
   for (let i = 0; i < numBalls; i++) {
-    const radius = 30;
+    const radius = 30; // ✅ 지름을 바꾸려면 여기 값만 바꾸면 됨 (예: 20 → 지름 40)
     const x = radius + Math.random() * (canvas.width - radius * 2);
     const y = radius + Math.random() * (canvas.height - radius * 2);
     balls.push(new Ball(x, y, radius, ballColor));
@@ -541,10 +567,16 @@ if (canvas && ctx) {
       for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
     }
 
-    requestAnimationFrame(animate);
+    // ✅ 디버그(콘솔 + 화면)
+    debugBallCount();
+
+    window.__hinpressBallRAF = requestAnimationFrame(animate);
   }
+
+  // ✅ 여기! 호출은 그냥 이렇게 깔끔하게
   animate();
 }
+
 
 // =====================================================
 // 5) 썸네일/상세
