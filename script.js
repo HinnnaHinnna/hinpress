@@ -454,7 +454,7 @@ class Ball {
 const balls = [];
 const numBalls = 5;
 const ballColor = '#ffffffff';
-const MAX_BALLS = 60;
+const MAX_BALLS = 30;
 let lastSpawnTime = 0;
 
 const COLLISION_CONFIG = {
