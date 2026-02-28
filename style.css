@@ -1,12 +1,12 @@
 :root {
-  --color-bg-main: #ffffff;
-  --color-brand: #daffa2;
-  --color-portfolio-bg: #daffa2;
-  --color-desc-bg: #daffa2;
+  --color-bg-main: #f5f5f5;
+  --color-brand: #f5f5f5;
+  --color-portfolio-bg: #000000;
+  --color-desc-bg: #000000;
 
   --color-text-main: #000000;
   --color-muted: #0008ff;
-  --color-main-gray: #daffa2;
+  --color-main-gray: #f5f5f5;
 
   --color-arrow: #0008ff;
   --color-maque: #daffa2;
@@ -221,7 +221,7 @@ body {
 
 /* =============================== 메인 페이지 =============================== */
 #main-page {
-  background: var(--color-main-gray);
+  background: var(--color-bg-main);
 }
 
 .title-container {
@@ -246,7 +246,7 @@ body {
   font-weight: 800;
 
   letter-spacing: -0.022em;
-  color: white;
+  color: rgb(0, 0, 0);
   cursor: pointer;
   transition: opacity 0.2s;
   display: inline-block;
@@ -389,7 +389,7 @@ body {
 
 /* =============================== 상세 페이지 =============================== */
 #detail-page {
-  background: var(--color-brand);
+  background: var(#ffffff);
   overflow-y: auto;
   padding-left: var(--detail-page-side-padding);
   padding-right: var(--detail-page-side-padding);
