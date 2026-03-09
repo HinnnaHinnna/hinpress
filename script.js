@@ -113,7 +113,7 @@ mainTitle?.addEventListener('click', () => showPage(portfolioPage));
 topLogo?.addEventListener('click', () => showPage(portfolioPage));
 aboutBtn?.addEventListener('click', () => showPage(mainPage));
 cvBtn?.addEventListener('click', () => showPage(cvPage));
-contactBtn?.addEventListener('click', () => window.open('https://www.instagram.com/chales9/', '_blank', 'noopener'));
+contactBtn?.addEventListener('click', () => window.open('note.html', '_blank'));
 
 // =====================================================
 // 2) 상세 prev/next
