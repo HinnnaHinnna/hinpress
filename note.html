@@ -678,13 +678,12 @@
        2) 아래 객체를 네 값으로 교체
        ==================================================== */
     const firebaseConfig = {
-      apiKey: "AIzaSyAoNf6VdOd4PHWDiVecs8K4n7ArjZEpovM",
-      authDomain: "hinwriting.firebaseapp.com",
-      projectId: "hinwriting",
-      storageBucket: "hinwriting.firebasestorage.app",
-      messagingSenderId: "262077890310",
-      appId: "1:262077890310:web:48dba0a288e081dc83e887",
-      measurementId: "G-DKPK500CKF"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     /* ====================================================
@@ -692,7 +691,7 @@
        - OWNER_EMAIL: 구글 로그인할 네 Gmail 주소
        - OWNER_UID  : 첫 로그인 후 uid를 확인해서 넣으면 더 단단해짐
        ==================================================== */
-    const OWNER_EMAIL = "hinnahinna3939@gmail.com";
+    const OWNER_EMAIL = "your-google-account@gmail.com";
     const OWNER_UID = "";
 
     const app = initializeApp(firebaseConfig);
@@ -719,6 +718,10 @@
     let currentFilter = "all";
     let sideQuery = "";
     let canEdit = false;    // true = 편집 가능 (= 로그인 상태)
+
+    /* Firebase 인증/실시간 구독 상태 */
+    let currentUser = null;       // 현재 로그인한 Firebase 사용자
+    let unsubscribePages = null;  // pages 컬렉션 실시간 구독 해제 함수
 
     /* ====================================================
        ④ Firestore 구독 / 시드 / 인증
