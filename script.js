@@ -115,6 +115,7 @@ aboutBtn?.addEventListener('click', () => showPage(mainPage));
 cvBtn?.addEventListener('click', () => showPage(cvPage));
 contactBtn?.addEventListener('click', () => window.open('note.html', '_blank'));
 
+
 // =====================================================
 // 2) 상세 prev/next
 // =====================================================
