@@ -723,6 +723,7 @@
     /* Firebase 인증/실시간 구독 상태 */
     let currentUser = null;       // 현재 로그인한 Firebase 사용자
     let unsubscribePages = null;  // pages 컬렉션 실시간 구독 해제 함수
+    let hasAttemptedSeed = false;  // 최초 시드 문서 입력 시도 여부
 
     /* ====================================================
        ④ Firestore 구독 / 시드 / 인증
@@ -795,28 +796,33 @@
       if (!canEdit || hasAttemptedSeed) return;
       hasAttemptedSeed = true;
 
-      const snap = await getDocs(collection(db, "pages"));
-      if (!snap.empty) return;
+      try {
+        const snap = await getDocs(collection(db, "pages"));
+        if (!snap.empty) return;
 
-      const seed = Array.isArray(window.SEED_PAGES) ? window.SEED_PAGES : [];
-      if (!seed.length) return;
+        const seed = Array.isArray(window.SEED_PAGES) ? window.SEED_PAGES : [];
+        if (!seed.length) return;
 
-      const now = Date.now();
-      const batch = writeBatch(db);
-      seed.forEach((p) => {
-        const id = toDocId(p.title);
-        batch.set(doc(db, "pages", id), {
-          id,
-          title: p.title,
-          content: p.content || "",
-          createdAt: now,
-          updatedAt: now,
-          updatedBy: getActorLabel(),
-          aliases: [],
-          ...makeOwnerFields()
-        }, { merge: true });
-      });
-      await batch.commit();
+        const now = Date.now();
+        const batch = writeBatch(db);
+        seed.forEach((p) => {
+          const id = toDocId(p.title);
+          batch.set(doc(db, "pages", id), {
+            id,
+            title: p.title,
+            content: p.content || "",
+            createdAt: now,
+            updatedAt: now,
+            updatedBy: getActorLabel(),
+            aliases: [],
+            ...makeOwnerFields()
+          }, { merge: true });
+        });
+        await batch.commit();
+      } catch (error) {
+        hasAttemptedSeed = false;
+        throw error;
+      }
     }
 
     function subscribePages() {
@@ -836,7 +842,10 @@
       }, (error) => {
         console.error(error);
         pagesReady = true;
-        viewEl.innerHTML = `<p class="muted">문서를 불러오는 데 실패했어. Firebase 설정과 규칙을 확인해줘.</p>`;
+        const msg = error?.code === "permission-denied"
+          ? "Firestore 권한이 막혀 있어. rules의 OWNER 이메일/UID를 실제 값으로 바꿨는지 확인해줘."
+          : "문서를 불러오는 데 실패했어. Firebase 설정과 규칙을 확인해줘.";
+        viewEl.innerHTML = `<p class="muted">${msg}</p>`;
       });
     }
 
