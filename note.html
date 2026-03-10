@@ -15,9 +15,9 @@
       --text: #0b0b0b;
       --muted: #6b6b6b;
       --line: #e9e9e9;
-      --link: #0008ff;
+      --link: #ff00ea;
       /* note2 핑크 링크 색상 */
-      --links: #252cfb;
+      --links: #f948eb;
       --chip-bg: #f3f3f3;
       --chip-active: #a3a3a3;
       --content-max: 860px;
@@ -120,564 +120,529 @@
       text-decoration: none
     }
 
-    .top-nav {
+    .actions {
       display: flex;
-      align-items: center;
       gap: 8px;
-      flex-wrap: wrap
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    .nav-btn {
+    .btn {
+      appearance: none;
       border: 1px solid var(--line);
       background: #fff;
+      color: var(--text);
       padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 13px;
+      border-radius: 10px;
       cursor: pointer;
+      font: inherit;
+      font-size: 14px;
     }
 
-    .nav-btn:hover {
-      border-color: #d6d6d6;
-      text-decoration: underline;
-      text-decoration-color: var(--link);
-      text-underline-offset: 3px;
+    .btn:hover {
+      border-color: #d5d5d5
     }
 
-    /* 로그인 상태 알약 표시 */
-    .auth-pill {
-      border: 1px solid var(--line);
-      background: #fff;
-      padding: 7px 10px;
+    .btn.primary {
+      background: var(--text);
+      color: #fff;
+      border-color: var(--text)
+    }
+
+    .btn[disabled] {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
       border-radius: 999px;
+      background: var(--chip-bg);
+      border: 1px solid var(--line);
       font-size: 12px;
-      color: var(--muted);
-      max-width: 42vw;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    }
+
+    .chip.private {
+      background: #fff1f6;
+      border-color: #ffd1e8;
+      color: #9c2f64;
+    }
+
+    .chip.public {
+      background: #f3fff6;
+      border-color: #c8efd2;
+      color: #25623a;
     }
 
     /* ===================== 레이아웃 ===================== */
     .layout {
       display: grid;
-      grid-template-columns: var(--side-w) 1fr;
-      min-height: calc(100vh - 80px);
-      /* back-bar(24) + header(56) */
+      grid-template-columns: var(--side-w) minmax(0, 1fr);
+      min-height: calc(100vh - 24px - 57px);
     }
 
-    /* ===================== 사이드바 ===================== */
-    .side {
+    .sidebar {
       border-right: 1px solid var(--line);
-      padding: 14px
+      padding: 18px 14px;
+      position: sticky;
+      top: 57px;
+      align-self: start;
+      max-height: calc(100vh - 24px - 57px);
+      overflow: auto;
     }
 
-    .side-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 10px
+    .sidebar h2 {
+      margin: 0 0 10px;
+      font-size: 14px;
     }
 
-    .side-title {
-      font-weight: 700
-    }
-
-    .side-hint {
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    .side-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px
-    }
-
-    .chip {
-      border: 1px solid var(--line);
-      background: var(--chip-bg);
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .chip:not(.is-active):hover {
-      background: var(--links);
-      border-color: var(--links);
-      color: #fff;
-    }
-
-    .chip.is-active {
-      background: var(--links);
-      border-color: var(--links);
-      color: #fff;
-    }
-
-    .side-search input {
+    .search {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      outline: none;
-      font-size: 13px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font: inherit;
+      box-sizing: border-box;
     }
 
-    /* 페이지 목록 */
-    .page-list {
-      position: relative;
-      margin: 12px 0 0 0;
-      padding: 0;
-      list-style: none;
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .page-item {
-      position: relative;
-      padding: 10px 0;
-      padding-left: 10px;
-      cursor: pointer;
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid transparent;
     }
 
-    .page-item:not(:last-child)::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 1px;
-      background: var(--line);
+    .item:hover {
+      background: #fafafa;
+      border-color: var(--line)
     }
 
-    .page-item:hover {
-      text-decoration: underline;
-      text-decoration-color: var(--link);
-      text-underline-offset: 3px;
+    .item.active {
+      background: #fafafa;
+      border-color: var(--line)
     }
 
-    .page-item .t {
-      font-weight: 700;
-      font-size: 13px;
-      white-space: nowrap;
+    .item .meta {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .main {
+      min-width: 0;
+      padding: 18px 24px 64px;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    .page-item .m {
+    .wrap {
+      width: min(100%, var(--content-max));
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 13px;
       color: var(--muted);
-      font-size: 9px;
-      letter-spacing: 0.01em
+      margin-bottom: 14px;
     }
 
-    /* ===================== 콘텐츠 영역 ===================== */
-    .content {
-      padding: 18px 16px
-    }
-
-    #view {
-      max-width: var(--content-max)
-    }
-
-    a {
-      color: var(--link);
+    .breadcrumbs a {
+      color: inherit;
       text-decoration: none
     }
 
-    a:hover {
-      text-decoration: underline;
-      text-decoration-color: var(--link);
-      text-underline-offset: 4px;
+    .doc-title {
+      margin: 0 0 6px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      overflow-wrap: anywhere;
+      word-break: break-word
     }
 
-    .page-title {
-      margin: 6px 0 10px 0;
-      font-size: 32px;
-      line-height: 1.2
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .doc-sub {
+      margin: 0 0 16px;
       color: var(--muted);
-      font-size: 11px;
-      margin-bottom: 14px
+      font-size: 14px
     }
 
-    .tools-row {
+    .doc-head-actions {
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
-      margin: 14px 0 0 0
-    }
-
-    .tool-link {
-      display: inline-flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 6px;
-      border: 1px solid var(--line);
-      background: #fff;
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      cursor: pointer;
+      margin-bottom: 18px;
     }
 
-    .tool-link:hover {
-      border-color: #d6d6d6;
+    .doc {
+      font-size: 16px;
+    }
+
+    .doc p,
+    .doc ul,
+    .doc ol,
+    .doc blockquote,
+    .doc pre,
+    .doc h1,
+    .doc h2,
+    .doc h3,
+    .doc h4,
+    .doc h5,
+    .doc h6 {
+      max-width: 100%
+    }
+
+    .doc img,
+    .doc video,
+    .doc iframe,
+    .doc table {
+      max-width: 100%
+    }
+
+    .doc a {
+      color: var(--links);
       text-decoration: underline;
-      text-decoration-color: var(--link);
-      text-underline-offset: 3px;
+      text-decoration-thickness: .08em;
+      text-underline-offset: .12em;
     }
 
-    hr {
-      border: none;
+    .doc hr {
+      border: 0;
       border-top: 1px solid var(--line);
-      margin: 18px 0
+      margin: 28px 0;
     }
 
-    blockquote {
-      margin: 0 0 14px 0;
-      padding: 10px 12px;
-      border-left: 4px solid var(--line);
+    .doc h1,
+    .doc h2,
+    .doc h3 {
+      line-height: 1.25;
+      margin-top: 1.7em;
+    }
+
+    .doc blockquote {
+      margin: 1.2em 0;
+      padding: 0 0 0 14px;
+      border-left: 3px solid #ddd;
+      color: #555;
+    }
+
+    .doc table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+      display: block;
+      overflow: auto
+    }
+
+    .doc th,
+    .doc td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 10px;
+      text-align: left
+    }
+
+    .doc pre {
+      overflow-x: auto;
       background: #fafafa;
+      border: 1px solid #eee;
       border-radius: 10px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word
     }
 
-    ul {
-      margin: 0 0 14px 18px
+    .doc code {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: .1em .35em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .92em;
+      word-break: break-word
     }
 
-    ol {
-      margin: 0 0 14px 18px
+    /* ===================== 에디터 모달 ===================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .25);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 30;
     }
 
-    /* 각주 */
-    sup.ref {
-      font-size: 12px;
-      vertical-align: super
+    .modal-backdrop.open {
+      display: flex
     }
 
-    ol.reflist {
-      margin: 8px 0 14px 20px
-    }
-
-    ol.reflist li {
-      margin-bottom: 6px
-    }
-
-    /* 코드 */
-    code.inline-code {
-      background: #f7f7f7;
-      border: 1px solid var(--line);
-      padding: 2px 6px;
-      border-radius: 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.95em;
-    }
-
-    pre.code-block {
-      background: #f7f7f7;
-      border: 1px solid var(--line);
-      padding: 12px 14px;
-      border-radius: 12px;
+    .modal {
+      width: min(1100px, 100%);
+      max-height: 90vh;
       overflow: auto;
-      margin: 0 0 14px 0;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .12);
     }
 
-    pre.code-block code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 13px;
-      white-space: pre;
+    .modal-head,
+    .modal-foot {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line)
     }
 
-    /* 에디터 */
-    .editor {
+    .modal-foot {
+      border-bottom: 0;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .modal-body {
+      padding: 16px;
       display: grid;
-      gap: 10px
+      gap: 12px;
     }
 
-    .editor label {
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
       font-size: 13px;
       color: var(--muted)
     }
 
-    .editor input[type="text"] {
+    .input,
+    .textarea,
+    .select {
       width: 100%;
-      padding: 10px 12px;
+      padding: 11px 12px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      font-size: 15px;
-      outline: none;
+      border-radius: 10px;
+      font: inherit;
+      box-sizing: border-box;
     }
 
-    .editor textarea {
-      width: 100%;
+    .textarea {
       min-height: 50vh;
       resize: vertical;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      font-size: 14px;
-      line-height: 1.6;
-      outline: none;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
-    .editor .editor-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap
+    .help {
+      font-size: 12px;
+      color: var(--muted)
     }
 
-    .btn {
-      border: 1px solid var(--line);
-      background: #fff;
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      cursor: pointer;
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
-    .btn.primary {
-      border-color: #c9c9ff;
-      background: #f2f2ff
-    }
-
-    /* 이미지 */
-    figure.wiki-figure {
-      margin: 0 0 14px 0
-    }
-
-    .wiki-img-link {
-      display: inline-block
-    }
-
-    img.wiki-img {
-      display: block;
-      max-width: 100%;
-      height: auto;
-      border: 1px solid var(--line);
-      border-radius: 12px
-    }
-
-    figcaption.wiki-caption {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    /* ===================== 숨김(접기) ===================== */
-    /* {{숨김 시작|제목=...}} ... {{숨김 끝}} */
-    details.mw-hide {
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: transparent
-    }
-
-    details.mw-hide>summary {
-      cursor: pointer;
-      color: var(--link);
-      font-weight: inherit;
-      list-style: none;
-      text-decoration: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    details.mw-hide>summary::-webkit-details-marker {
-      display: none
-    }
-
-    details.mw-hide>summary::marker {
-      content: ""
-    }
-
-    details.mw-hide>summary:hover {
-      text-decoration: underline;
-      text-decoration-color: var(--link);
-      text-underline-offset: 3px;
-    }
-
-    details.mw-hide .mw-hide-body {
-      margin: 0;
-      padding: 0;
-      padding-left: 14px
-    }
-
-    details.mw-hide>summary::before {
-      content: "[+] "
-    }
-
-    details.mw-hide[open]>summary::before {
-      content: "[-] "
-    }
-
-    details.mw-hide[open]>summary {
-      margin-bottom: 4px
-    }
-
-    details.mw-hide .mw-hide-body> :first-child {
-      margin-top: 0
-    }
-
-    /* ===================== 반응형 ===================== */
-    @media (max-width: 960px) {
-      .site-title {
-        font-size: 16px;
-        line-height: 20px
-      }
-
+    /* ===================== 모바일 ===================== */
+    @media (max-width: 900px) {
       .layout {
         grid-template-columns: 1fr
       }
 
-      .side {
-        border-right: none;
+      .sidebar {
+        position: static;
+        max-height: none;
+        border-right: 0;
         border-bottom: 1px solid var(--line)
       }
 
-      .auth-pill {
-        max-width: 20vw
+      .main {
+        padding: 18px 16px 56px
       }
 
-      .top-inner {
-        flex-wrap: wrap
-      }
-
-      .top-nav {
-        width: 100%
-      }
-    }
-
-    @media (min-width: 961px) {
-      .layout {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding-left: 24px;
-        padding-right: 24px;
+      .row {
+        grid-template-columns: 1fr
       }
     }
   </style>
 </head>
 
 <body>
-
-  <!-- =====================================================
-    ① 힌프레스 복귀 바
-  ===================================================== -->
+  <!-- ============================================================
+       상단 포트폴리오 복귀 바
+       ============================================================ -->
   <div class="back-bar">
-    <a href="index.html">← hinPress</a>
+    <a href="/">← hinPress 포트폴리오로 돌아가기</a>
   </div>
 
-  <!-- =====================================================
-    ② 헤더 — note2.zip 원본 구조 그대로
-       auth-pill: 로그인 상태 표시
-       auth-btn : 로그인/로그아웃
-       new-btn  : 새 문서 (로그인 시에만 활성)
-  ===================================================== -->
+  <!-- ============================================================
+       상단 헤더
+       - 왼쪽: 사이트 제목
+       - 오른쪽: 로그인 / 로그아웃 / 문서 생성 버튼
+       ============================================================ -->
   <header class="top">
     <div class="top-inner">
-      <h1 class="site-title">
-        <a href="#/">사적 글쓰기</a>
-      </h1>
-      <nav class="top-nav">
-        <button type="button" class="nav-btn" data-nav="recent">최근</button>
-        <button type="button" class="nav-btn" data-nav="search">검색</button>
-        <button type="button" class="nav-btn" data-nav="new" id="new-btn">새 문서</button>
-
-        <!-- 로그인 상태 알약 -->
-        <span class="auth-pill" id="auth-status">읽기 모드</span>
-        <!-- 로그인/로그아웃 버튼 -->
-        <button type="button" class="nav-btn" id="auth-btn">로그인</button>
-      </nav>
+      <h1 class="site-title"><a href="/note.html">사적 글쓰기</a></h1>
+      <div class="actions">
+        <span id="auth-status" class="chip">로그아웃 상태</span>
+        <button id="login-btn" class="btn" type="button">Google 로그인</button>
+        <button id="logout-btn" class="btn" type="button" hidden>로그아웃</button>
+        <button id="new-btn" class="btn primary" type="button" hidden>새 문서</button>
+      </div>
     </div>
   </header>
 
-  <main class="layout">
-    <aside class="side" aria-label="문서 목록">
-      <div class="side-head">
-        <div class="side-title">문서</div>
-        <div class="side-hint">클릭해서 열기</div>
-      </div>
-
-      <!-- 카테고리 칩은 JS에서 생성 (note2.zip 방식 그대로) -->
-      <div class="side-filters" id="category-chips"></div>
-
-      <div class="side-search">
-        <input id="side-search-input" type="text" placeholder="목록에서 찾기..." />
-      </div>
-
-      <ul class="page-list" id="page-list"></ul>
+  <!-- ============================================================
+       본문 레이아웃
+       - 왼쪽: 검색 + 문서 리스트
+       - 오른쪽: 문서 본문
+       ============================================================ -->
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>문서</h2>
+      <input id="search-input" class="search" type="search" placeholder="문서 검색" />
+      <div id="doc-list" class="list"></div>
     </aside>
 
-    <section class="content" aria-label="문서 내용">
-      <div id="view"></div>
-    </section>
-  </main>
+    <main class="main">
+      <div class="wrap">
+        <nav id="breadcrumbs" class="breadcrumbs"></nav>
+
+        <h2 id="doc-title" class="doc-title">문서를 선택해 주세요.</h2>
+        <p id="doc-sub" class="doc-sub muted">사이드바에서 문서를 선택하면 여기에 본문이 표시됩니다.</p>
+
+        <div id="doc-head-actions" class="doc-head-actions" hidden>
+          <span id="visibility-badge" class="chip public">공개</span>
+          <button id="edit-btn" class="btn" type="button" hidden>편집</button>
+          <button id="history-btn" class="btn" type="button">히스토리</button>
+          <button id="delete-btn" class="btn" type="button" hidden>삭제</button>
+        </div>
+
+        <article id="doc-body" class="doc"></article>
+      </div>
+    </main>
+  </div>
+
+  <!-- ============================================================
+       편집 모달
+       - 제목
+       - 슬러그
+       - 공개 여부
+       - 본문(Markdown)
+       ============================================================ -->
+  <div id="editor-backdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+      <div class="modal-head">
+        <strong id="editor-title">문서 편집</strong>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="field">
+            <label for="edit-title">제목</label>
+            <input id="edit-title" class="input" type="text" placeholder="문서 제목" />
+          </div>
+
+          <div class="field">
+            <label for="edit-slug">슬러그(URL)</label>
+            <input id="edit-slug" class="input" type="text" placeholder="my-note" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="edit-visibility">공개 여부</label>
+          <select id="edit-visibility" class="select">
+            <option value="private">비공개</option>
+            <option value="public">공개</option>
+          </select>
+          <div class="help">
+            비공개 문서는 오너만 볼 수 있습니다. 공개 문서는 누구나 읽을 수 있습니다.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="edit-body">본문 (Markdown)</label>
+          <textarea id="edit-body" class="textarea" placeholder="# 제목\n\n문서를 입력하세요."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button id="cancel-edit-btn" class="btn" type="button">취소</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="save-edit-btn" class="btn primary" type="button">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       히스토리 모달
+       ============================================================ -->
+  <div id="history-backdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="history-title" style="width:min(760px,100%)">
+      <div class="modal-head">
+        <strong id="history-title">문서 히스토리</strong>
+      </div>
+      <div class="modal-body">
+        <div id="history-list" class="list"></div>
+      </div>
+      <div class="modal-foot">
+        <button id="close-history-btn" class="btn" type="button">닫기</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     /* ============================================================
-       사적 발행글 위키 — localStorage 버전
-       (note2.zip 디자인·기능 완전 이식)
-       ────────────────────────────────────────────────────────────
-       나중에 Firebase로 바꿀 때 교체할 부분:
-       1) loadAll() → Firestore onSnapshot
-       2) savePage() → setDoc
-       3) addRevision() → addDoc
-       4) deletePageCompletely() → deleteDoc
-       5) login/logout → GoogleAuthProvider
-    ============================================================ */
-
-    /* ====================================================
-       Firebase SDK (CDN / modular)
-       - 정적 HTML 파일이라 npm 대신 브라우저 모듈 방식 사용
-       - Firebase 콘솔에서 발급받은 config로 교체해야 동작함
-    ==================================================== */
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+       Firebase 모듈 import
+       ============================================================ */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth,
       GoogleAuthProvider,
       signInWithPopup,
       signOut,
       onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import {
       getFirestore,
       collection,
       doc,
+      setDoc,
       getDoc,
       getDocs,
-      setDoc,
       deleteDoc,
-      onSnapshot,
+      serverTimestamp,
       query,
       orderBy,
-      limit,
+      onSnapshot,
       writeBatch
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-
-    /* ====================================================
-       ① 설정값 — 여기만 네 프로젝트 값으로 바꾸면 됨
-    ==================================================== */
-
-    /* 왼쪽 카테고리 칩 목록 */
-    const CATEGORY_OPTIONS = ["힌프레스", "책", "노트"];
-
-    /* 첫 화면(홈)에서 자동으로 열 문서 제목
-       — 해당 제목의 문서가 있으면 그 문서를 열고, 없으면 최근 목록을 보여줌 */
-    const HOME_PAGE_TITLE = "사적글쓰기는";
-
-    /* 문서당 히스토리 최대 보관 개수 */
-    const MAX_REVISIONS = 10;
-
-    /* ====================================================
-       Firebase 프로젝트 설정값
-       1) Firebase 콘솔 > 프로젝트 설정 > 내 앱 > SDK 설정 및 구성
-       2) 아래 객체를 네 값으로 교체
-       ==================================================== */
+    /* ============================================================
+       Firebase 설정
+       - 여기에는 네 프로젝트의 실제 firebaseConfig를 넣어야 한다.
+       - 아래 값은 현재 네 hinwriting 프로젝트 기준 예시다.
+       ============================================================ */
     const firebaseConfig = {
       apiKey: "AIzaSyCckUTMoJP5fLMaQgWsKk82uB-zf1u9ep8",
       authDomain: "hinwriting.firebaseapp.com",
@@ -688,1239 +653,547 @@
       measurementId: "G-DKPK500CKF"
     };
 
-    /* ====================================================
-       오너 계정 설정
-       - OWNER_EMAIL: 구글 로그인할 네 Gmail 주소
-       - OWNER_UID  : 첫 로그인 후 uid를 확인해서 넣으면 더 단단해짐
-       ==================================================== */
+    /* ============================================================
+       오너 판별값
+       - 비공개 문서를 읽고 쓸 수 있는 계정
+       - OWNER_UID를 알면 UID까지 넣는 것이 가장 안정적이다.
+       ============================================================ */
     const OWNER_EMAIL = "hinnahinna3939@gmail.com";
-    const OWNER_UID = "";
+    const OWNER_UID = "HW7XBUxK1dX7CpN7TOtjIus0B2F3";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const googleProvider = new GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
 
-    /* ====================================================
-       ② DOM 요소
-    ==================================================== */
-    const viewEl = document.getElementById("view");
-    const pageListEl = document.getElementById("page-list");
-    const sideSearchInput = document.getElementById("side-search-input");
-    const authBtn = document.getElementById("auth-btn");
-    const authStatus = document.getElementById("auth-status");
-    const chipWrap = document.getElementById("category-chips");
+    /* ============================================================
+       전역 상태
+       ============================================================ */
+    let currentUser = null;
+    let canEdit = false;
+    let allPages = [];
+    let visiblePages = [];
+    let currentPageId = null;
+    let currentPageData = null;
+    let unsubscribePages = null;
+    let hasAttemptedSeed = false;
 
-    /* ====================================================
-       ③ 상태
-    ==================================================== */
-    let pages = [];       // 문서 배열
-    let revisions = {};       // { pageId: [{ id, title, content, savedAt, savedBy, note }] }
-    let pagesReady = false;    // 로드 완료 여부
-    let currentFilter = "all";
-    let sideQuery = "";
-    let canEdit = false;    // true = 편집 가능 (= 로그인 상태)
+    /* ============================================================
+       DOM 참조
+       ============================================================ */
+    const authStatusEl = document.getElementById("auth-status");
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const newBtn = document.getElementById("new-btn");
+    const searchInput = document.getElementById("search-input");
+    const docList = document.getElementById("doc-list");
+    const breadcrumbs = document.getElementById("breadcrumbs");
+    const docTitle = document.getElementById("doc-title");
+    const docSub = document.getElementById("doc-sub");
+    const docBody = document.getElementById("doc-body");
+    const docHeadActions = document.getElementById("doc-head-actions");
+    const visibilityBadge = document.getElementById("visibility-badge");
+    const editBtn = document.getElementById("edit-btn");
+    const historyBtn = document.getElementById("history-btn");
+    const deleteBtn = document.getElementById("delete-btn");
 
-    /* Firebase 인증/실시간 구독 상태 */
-    let currentUser = null;       // 현재 로그인한 Firebase 사용자
-    let unsubscribePages = null;  // pages 컬렉션 실시간 구독 해제 함수
-    let hasAttemptedSeed = false;  // 최초 시드 문서 입력 시도 여부
+    const editorBackdrop = document.getElementById("editor-backdrop");
+    const editTitleInput = document.getElementById("edit-title");
+    const editSlugInput = document.getElementById("edit-slug");
+    const editVisibilitySelect = document.getElementById("edit-visibility");
+    const editBodyInput = document.getElementById("edit-body");
+    const cancelEditBtn = document.getElementById("cancel-edit-btn");
+    const saveEditBtn = document.getElementById("save-edit-btn");
 
-    /* ====================================================
-       ④ Firestore 구독 / 시드 / 인증
-    ==================================================== */
-    function ownerEmailNormalized() {
-      return String(OWNER_EMAIL || "").trim().toLowerCase();
+    const historyBackdrop = document.getElementById("history-backdrop");
+    const historyList = document.getElementById("history-list");
+    const closeHistoryBtn = document.getElementById("close-history-btn");
+
+    /* ============================================================
+       유틸 함수
+       ============================================================ */
+    function escapeHtml(str = "") {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function slugify(text = "") {
+      return String(text)
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-가-힣]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "") || `note-${Date.now()}`;
     }
 
     function isOwnerUser(user) {
       if (!user) return false;
-      const email = String(user.email || "").trim().toLowerCase();
-      if (OWNER_UID && user.uid === OWNER_UID) return true;
-      if (ownerEmailNormalized() && email === ownerEmailNormalized()) return true;
-      return false;
+      const emailMatch = OWNER_EMAIL && user.email === OWNER_EMAIL;
+      const uidMatch = OWNER_UID && user.uid === OWNER_UID;
+      return !!(emailMatch || uidMatch);
     }
 
-    function getActorLabel() {
-      return currentUser?.email || currentUser?.displayName || "owner";
+    function isPageVisibleToCurrentUser(page) {
+      const visibility = page?.visibility || "public";
+      if (visibility !== "private") return true;
+      return canEdit;
     }
 
-    function makeOwnerFields() {
-      return {
-        ownerUid: OWNER_UID || currentUser?.uid || null,
-        ownerEmail: ownerEmailNormalized() || currentUser?.email || null
-      };
-    }
-
-    function normalizePageDoc(id, data) {
-      return {
-        id,
-        title: data?.title || id,
-        content: data?.content || "",
-        createdAt: Number(data?.createdAt || Date.now()),
-        updatedAt: Number(data?.updatedAt || data?.createdAt || Date.now()),
-        updatedBy: data?.updatedBy || "",
-        aliases: Array.isArray(data?.aliases) ? data.aliases : []
-      };
-    }
-
-    function updateAuthUI() {
-      if (canEdit) {
-        authBtn.textContent = "로그아웃";
-        authStatus.textContent = currentUser?.email || "편집 모드";
-      } else {
-        authBtn.textContent = "로그인";
-        authStatus.textContent = "읽기 모드";
-      }
-      route();
-    }
-
-    async function login() {
+    function formatDate(value) {
+      if (!value) return "";
       try {
-        await signInWithPopup(auth, googleProvider);
-      } catch (error) {
-        console.error(error);
-        alert("구글 로그인에 실패했어. Firebase 설정과 승인된 도메인을 다시 확인해줘.");
+        const d = value?.toDate ? value.toDate() : new Date(value);
+        return new Intl.DateTimeFormat("ko-KR", {
+          dateStyle: "medium",
+          timeStyle: "short"
+        }).format(d);
+      } catch {
+        return "";
       }
     }
 
-    async function logout() {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        console.error(error);
-        alert("로그아웃에 실패했어.");
-      }
+    /*
+      아주 가벼운 Markdown 렌더러
+      - 초급자가 보기 쉽게, 외부 라이브러리 없이 기본 문법만 처리한다.
+      - 제목, 문단, 링크, 굵게, 기울임, 목록, 코드블록 정도만 반영한다.
+    */
+    function renderMarkdown(md = "") {
+      let text = escapeHtml(md);
+
+      // 코드 블록 ``` ```
+      text = text.replace(/```([\s\S]*?)```/g, (_, code) => {
+        return `<pre class="code-block"><code>${code}</code></pre>`;
+      });
+
+      // 헤딩
+      text = text.replace(/^###\s+(.*)$/gm, "<h3>$1</h3>");
+      text = text.replace(/^##\s+(.*)$/gm, "<h2>$1</h2>");
+      text = text.replace(/^#\s+(.*)$/gm, "<h1>$1</h1>");
+
+      // 굵게 / 기울임
+      text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+      // 링크 [text](url)
+      text = text.replace(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+      // blockquote
+      text = text.replace(/^>\s?(.*)$/gm, "<blockquote>$1</blockquote>");
+
+      // unordered list
+      text = text.replace(/(?:^|\n)(-\s.*(?:\n-\s.*)*)/g, (match) => {
+        const items = match.trim().split("\n").map(line => `<li>${line.replace(/^-\s/, "")}</li>`).join("");
+        return `\n<ul>${items}</ul>`;
+      });
+
+      // ordered list
+      text = text.replace(/(?:^|\n)(\d+\.\s.*(?:\n\d+\.\s.*)*)/g, (match) => {
+        const items = match.trim().split("\n").map(line => `<li>${line.replace(/^\d+\.\s/, "")}</li>`).join("");
+        return `\n<ol>${items}</ol>`;
+      });
+
+      // 줄바꿈 2개 이상은 문단으로 처리
+      text = text
+        .split(/\n{2,}/)
+        .map(block => {
+          const trimmed = block.trim();
+          if (!trimmed) return "";
+          if (/^<(h\d|ul|ol|li|blockquote|pre)/.test(trimmed)) return trimmed;
+          return `<p>${trimmed.replace(/\n/g, "<br>")}</p>`;
+        })
+        .join("\n");
+
+      return text;
     }
+
+    /* ============================================================
+       초기 시드 문서
+       - Firestore가 비어 있을 때 오너 로그인 상태에서만 한 번 넣는다.
+       - 새 문서는 private 기본값이지만, 이 예시 문서는 public으로 둔다.
+       ============================================================ */
+    const SEED_PAGES = [
+      {
+        id: "welcome",
+        title: "환영합니다",
+        slug: "welcome",
+        visibility: "public",
+        body: `# 환영합니다\n\n이곳은 **사적 글쓰기** 공간입니다.\n\n- 이 문서는 공개 예시입니다.\n- 새 문서는 기본적으로 비공개로 생성됩니다.\n- 비공개 문서는 오너 로그인 상태에서만 보입니다.`,
+      }
+    ];
 
     async function ensureSeedPages() {
       if (!canEdit || hasAttemptedSeed) return;
       hasAttemptedSeed = true;
 
-      try {
-        const snap = await getDocs(collection(db, "pages"));
-        if (!snap.empty) return;
+      const pagesSnap = await getDocs(collection(db, "pages"));
+      if (!pagesSnap.empty) return;
 
-        const seed = Array.isArray(window.SEED_PAGES) ? window.SEED_PAGES : [];
-        if (!seed.length) return;
-
-        const now = Date.now();
-        const batch = writeBatch(db);
-        seed.forEach((p) => {
-          const id = toDocId(p.title);
-          batch.set(doc(db, "pages", id), {
-            id,
-            title: p.title,
-            content: p.content || "",
-            createdAt: now,
-            updatedAt: now,
-            updatedBy: getActorLabel(),
-            aliases: [],
-            ...makeOwnerFields()
-          }, { merge: true });
+      const batch = writeBatch(db);
+      for (const page of SEED_PAGES) {
+        const pageRef = doc(db, "pages", page.id);
+        batch.set(pageRef, {
+          ...page,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          updatedBy: currentUser?.email || "owner"
         });
-        await batch.commit();
-      } catch (error) {
-        hasAttemptedSeed = false;
-        throw error;
+      }
+      await batch.commit();
+    }
+
+    /* ============================================================
+       UI 반영
+       ============================================================ */
+    function updateAuthUI() {
+      if (canEdit && currentUser) {
+        authStatusEl.textContent = `오너 로그인: ${currentUser.email || currentUser.uid}`;
+        authStatusEl.className = "chip";
+        loginBtn.hidden = true;
+        logoutBtn.hidden = false;
+        newBtn.hidden = false;
+      } else {
+        authStatusEl.textContent = "읽기 전용";
+        authStatusEl.className = "chip";
+        loginBtn.hidden = false;
+        logoutBtn.hidden = true;
+        newBtn.hidden = true;
+      }
+
+      editBtn.hidden = !canEdit || !currentPageData;
+      deleteBtn.hidden = !canEdit || !currentPageData;
+    }
+
+    function updateList() {
+      const q = searchInput.value.trim().toLowerCase();
+      visiblePages = allPages.filter(page => {
+        if (!isPageVisibleToCurrentUser(page)) return false;
+        if (!q) return true;
+        return (page.title || "").toLowerCase().includes(q)
+          || (page.slug || "").toLowerCase().includes(q)
+          || (page.body || "").toLowerCase().includes(q);
+      });
+
+      docList.innerHTML = "";
+
+      if (!visiblePages.length) {
+        docList.innerHTML = `<div class="item"><span class="meta">표시할 문서가 없습니다.</span></div>`;
+        return;
+      }
+
+      for (const page of visiblePages) {
+        const a = document.createElement("a");
+        a.href = `#${page.slug || page.id}`;
+        a.className = `item ${page.id === currentPageId ? "active" : ""}`;
+
+        const visibility = page.visibility || "public";
+        const rightMeta = visibility === "private" ? "비공개" : "공개";
+
+        a.innerHTML = `
+          <div>
+            <div>${escapeHtml(page.title || "제목 없음")}</div>
+            <div class="meta">${escapeHtml(page.slug || page.id)}</div>
+          </div>
+          <div class="meta">${rightMeta}</div>
+        `;
+
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          openPageById(page.id, true);
+        });
+
+        docList.appendChild(a);
       }
     }
 
+    function renderPage(page) {
+      currentPageData = page;
+      currentPageId = page?.id || null;
+
+      updateList();
+      updateAuthUI();
+
+      if (!page) {
+        breadcrumbs.innerHTML = "";
+        docTitle.textContent = "문서를 찾을 수 없습니다.";
+        docSub.textContent = "이 문서는 존재하지 않거나 비공개 상태입니다.";
+        docBody.innerHTML = "";
+        docHeadActions.hidden = true;
+        return;
+      }
+
+      if (!isPageVisibleToCurrentUser(page)) {
+        breadcrumbs.innerHTML = "";
+        docTitle.textContent = "비공개 문서입니다.";
+        docSub.textContent = "오너 로그인 상태에서만 볼 수 있습니다.";
+        docBody.innerHTML = "";
+        docHeadActions.hidden = true;
+        return;
+      }
+
+      breadcrumbs.innerHTML = `<a href="/note.html">문서</a><span>/</span><span>${escapeHtml(page.title || "")}</span>`;
+      docTitle.textContent = page.title || "제목 없음";
+      docSub.textContent = `마지막 수정: ${formatDate(page.updatedAt)}${page.updatedBy ? ` · ${page.updatedBy}` : ""}`;
+      docBody.innerHTML = renderMarkdown(page.body || "");
+      docHeadActions.hidden = false;
+
+      const visibility = page.visibility || "public";
+      visibilityBadge.textContent = visibility === "private" ? "비공개" : "공개";
+      visibilityBadge.className = `chip ${visibility}`;
+
+      editBtn.hidden = !canEdit;
+      deleteBtn.hidden = !canEdit;
+
+      if (page.slug) {
+        history.replaceState({}, "", `#${page.slug}`);
+      }
+    }
+
+    /* ============================================================
+       페이지 열기
+       ============================================================ */
+    function openPageById(pageId, pushHash = false) {
+      const page = allPages.find(p => p.id === pageId) || null;
+      renderPage(page);
+      if (pushHash && page?.slug) {
+        history.replaceState({}, "", `#${page.slug}`);
+      }
+    }
+
+    function openPageBySlug(slug) {
+      if (!slug) {
+        const firstVisible = allPages.find(isPageVisibleToCurrentUser) || null;
+        renderPage(firstVisible);
+        return;
+      }
+      const page = allPages.find(p => p.slug === slug) || null;
+      renderPage(page);
+    }
+
+    /* ============================================================
+       Firestore 실시간 구독
+       ============================================================ */
     function subscribePages() {
       if (unsubscribePages) unsubscribePages();
 
       const q = query(collection(db, "pages"), orderBy("updatedAt", "desc"));
-      unsubscribePages = onSnapshot(q, async (snapshot) => {
-        if (snapshot.empty && canEdit) {
-          await ensureSeedPages();
-          return;
-        }
+      unsubscribePages = onSnapshot(q, async (snap) => {
+        allPages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        updateList();
 
-        pages = snapshot.docs.map((d) => normalizePageDoc(d.id, d.data()));
-        pagesReady = true;
-        buildList();
-        route();
-      }, (error) => {
-        console.error(error);
-        pagesReady = true;
-        const msg = error?.code === "permission-denied"
-          ? "Firestore 권한이 막혀 있어. rules의 OWNER 이메일/UID를 실제 값으로 바꿨는지 확인해줘."
-          : "문서를 불러오는 데 실패했어. Firebase 설정과 규칙을 확인해줘.";
-        viewEl.innerHTML = `<p class="muted">${msg}</p>`;
+        const currentHash = location.hash.replace(/^#/, "");
+        if (currentHash) {
+          openPageBySlug(currentHash);
+        } else if (currentPageId) {
+          openPageById(currentPageId);
+        } else {
+          const firstVisible = allPages.find(isPageVisibleToCurrentUser) || null;
+          renderPage(firstVisible);
+        }
+      }, (err) => {
+        console.error(err);
       });
     }
 
-    function loadAll() {
+    async function loadAll() {
       subscribePages();
     }
 
-    function savePages() {
-      /* Firestore 사용 버전에서는 실질적으로 필요 없음 */
-    }
-
-    function saveRevisions() {
-      /* Firestore 사용 버전에서는 실질적으로 필요 없음 */
-    }
-
-    async function initFirebase() {
-      onAuthStateChanged(auth, async (user) => {
-        if (user && !isOwnerUser(user)) {
-          alert("이 구글 계정은 편집 권한이 없어. 오너 계정으로 다시 로그인해줘.");
-          await signOut(auth);
-          currentUser = null;
-          canEdit = false;
-          updateAuthUI();
-          return;
-        }
-
-        currentUser = user || null;
-        canEdit = !!currentUser && isOwnerUser(currentUser);
-        updateAuthUI();
-
-        if (canEdit) {
-          try {
-            await ensureSeedPages();
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      });
-
-      loadAll();
-    }
-
-    /* ====================================================
-       ⑥ 유틸 함수
-    ==================================================== */
-
-    /* 날짜 포맷 (밀리초 타임스탬프 → 문자열) */
-    function formatDate(ms) {
-      const d = new Date(ms || Date.now());
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      const hh = String(d.getHours()).padStart(2, "0");
-      const mm = String(d.getMinutes()).padStart(2, "0");
-      return `${y}-${m}-${day} ${hh}:${mm}`;
-    }
-
-    /* 제목 → 문서 ID (URL-safe slug) */
-    function toDocId(title) {
-      return encodeURIComponent((title || "").trim().replace(/\s+/g, "-"));
-    }
-
-    /* URL 패턴 체크 */
-    function isUrlLike(s) { return /^https?:\/\//i.test(s) }
-
-    /* HTML 이스케이프 */
-    function escapeHtml(s) {
-      return String(s)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
-    }
-
-    /* 스마트 따옴표 정규화 */
-    function normalizeSmartQuotes(s) {
-      return String(s || "").replace(/[\u2018\u2019]/g, "'");
-    }
-
-    /* ====================================================
-       ⑦ front matter 파싱
-    ==================================================== */
-    function parseFrontMatter(raw) {
-      const text = String(raw || "");
-      if (!text.startsWith("---\n")) return { meta: {}, body: text };
-      const end = text.indexOf("\n---\n", 4);
-      if (end === -1) return { meta: {}, body: text };
-      const header = text.slice(4, end).trim();
-      const body = text.slice(end + 5);
-      const meta = {};
-      header.split("\n").forEach(line => {
-        const idx = line.indexOf(":");
-        if (idx === -1) return;
-        const key = line.slice(0, idx).trim();
-        const val = line.slice(idx + 1).trim();
-        if (key) meta[key] = val;
-      });
-      return { meta, body };
-    }
-
-    /* ====================================================
-       ⑧ 리다이렉트 처리
-       — #REDIRECT [[대상]] 문법 지원 (미디어위키 호환)
-    ==================================================== */
-    function getRedirectTarget(content) {
-      const { body } = parseFrontMatter(String(content || ""));
-      const m = body.trim().match(/^#redirect\s*\[\[([^\]]+)\]\]/i);
-      if (!m) return null;
-      const inside = (m[1] || "").trim();
-      const targetTitle = inside.includes("|") ? inside.split("|")[0].trim() : inside;
-      return targetTitle ? { targetTitle, targetId: toDocId(targetTitle) } : null;
-    }
-
-    function isRedirectPage(page) {
-      return !!getRedirectTarget(page?.content || "");
-    }
-
-    /* ====================================================
-       ⑨ 카테고리
-    ==================================================== */
-    function getCategory(page) {
-      const { meta } = parseFrontMatter(page.content);
-      return (meta.category || meta.type || "").trim();
-    }
-
-    /* ====================================================
-       ⑩ 위키 렌더링 (note2.zip script.js 완전 이식)
-    ==================================================== */
-
-    /* 인라인 코드 보호 (`...`) */
-    function protectInlineCode(rawText) {
-      const codes = [];
-      const replaced = String(rawText || "").replace(/`([^`\n]+)`/g, (m, inner) => {
-        codes.push(inner);
-        return `{{CODE:${codes.length - 1}}}`;
-      });
-      return { text: replaced, codes };
-    }
-
-    /* 펜스 코드블록 추출 (``` / ~~~) */
-    function extractFencedCodeBlocks(lines) {
-      const blocks = [];
-      const outLines = [];
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const m = line.trim().match(/^(```|~~~)/);
-        if (!m) { outLines.push(line); continue; }
-        const fence = m[1];
-        const codeLines = [];
-        i++;
-        while (i < lines.length && !lines[i].trim().startsWith(fence)) {
-          codeLines.push(lines[i]);
-          i++;
-        }
-        blocks.push(codeLines.join("\n"));
-        outLines.push(`{{CODEBLOCK:${blocks.length - 1}}}`);
-      }
-      return { lines: outLines, blocks };
-    }
-
-    /* 인라인 코드 전체 텍스트 보호/복원 */
-    function protectInlineCodeAll(text) {
-      const codes = [];
-      const out = String(text || "").replace(/`([^`\n]+)`/g, (m, inner) => {
-        codes.push(inner);
-        return `{{INLINECODE:${codes.length - 1}}}`;
-      });
-      return { text: out, codes };
-    }
-    function restoreInlineCodeAll(text, codes) {
-      return String(text || "").replace(/\{\{INLINECODE:(\d+)\}\}/g, (m, n) => {
-        return "`" + (codes[Number(n)] ?? "") + "`";
+    /* ============================================================
+       저장 / 삭제 / 리비전
+       ============================================================ */
+    async function addRevision(pageId, pageData) {
+      const revRef = doc(collection(db, "pages", pageId, "revisions"));
+      await setDoc(revRef, {
+        title: pageData.title,
+        slug: pageData.slug,
+        body: pageData.body,
+        visibility: pageData.visibility || "public",
+        updatedAt: serverTimestamp(),
+        updatedBy: currentUser?.email || "owner"
       });
     }
 
-    /* 인라인 렌더 */
-    function renderInline(text) {
-      let raw = normalizeSmartQuotes(String(text || ""));
-      const { text: protected1, codes } = protectInlineCode(raw);
-      raw = protected1;
-
-      raw = raw.replace(/<!--[\s\S]*?-->/g, "");
-        let t = escapeHtml(raw);
-
-      /* 외부 링크: [https://url 레이블] */
-      t = t.replace(/\[(https?:\/\/[^\s\]]+)(?:\s+([^\]]+))?\]/g, (m, url, label) => {
-        const u = escapeHtml(url);
-        const l = escapeHtml((label || url).trim());
-        return `<a href="${u}" target="_blank" rel="noopener noreferrer">${l}</a>`;
-      });
-
-      /* 미디어위키 강조 */
-      t = t.replace(/'''''(.+?)'''''/g, "<strong><em>$1</em></strong>");
-      t = t.replace(/'''(.+?)'''/g, "<strong>$1</strong>");
-      t = t.replace(/''(.+?)''/g, "<em>$1</em>");
-
-      /* 마크다운 강조 */
-      t = t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-      t = t.replace(/\*(.+?)\*/g, "<em>$1</em>");
-
-      /* 마크다운 링크 [레이블](url) */
-      t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (m, label, url) => {
-        return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
-      });
-
-      /* 마크다운 이미지 ![alt](url) */
-      t = t.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, (m, alt, url) => {
-        const su = escapeHtml(url), sa = escapeHtml(alt || "");
-        return `
-          <figure class="wiki-figure">
-            <a class="wiki-img-link" href="${su}" target="_blank" rel="noopener noreferrer">
-              <img class="wiki-img" src="${su}" alt="${sa}" loading="lazy" />
-            </a>
-            ${sa ? `<figcaption class="wiki-caption">${sa}</figcaption>` : ""}
-          </figure>`;
-      });
-
-      /* 위키 이미지 [[Image:url|캡션]] */
-      t = t.replace(/\[\[(?:Image|File|파일|이미지):(https?:\/\/[^\]|]+)(?:\|([^\]]+))?\]\]/gi, (m, url, cap) => {
-        const su = escapeHtml(url.trim()), sc = escapeHtml((cap || "").trim());
-        return `
-          <figure class="wiki-figure">
-            <a class="wiki-img-link" href="${su}" target="_blank" rel="noopener noreferrer">
-              <img class="wiki-img" src="${su}" alt="${sc}" loading="lazy" />
-            </a>
-            ${sc ? `<figcaption class="wiki-caption">${sc}</figcaption>` : ""}
-          </figure>`;
-      });
-
-      /* 위키 링크 [[대상]] / [[대상|레이블]] */
-      t = t.replace(/\[\[([^\]]+)\]\]/g, (m, inner) => {
-        const raw2 = (inner || "").trim();
-        if (raw2.includes("|")) {
-          const [targetRaw, labelRaw] = raw2.split("|");
-          const target = (targetRaw || "").trim();
-          const label = (labelRaw || "").trim();
-          if (isUrlLike(target)) return `<a href="${escapeHtml(target)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label || target)}</a>`;
-          return `<a href="#/page/${toDocId(target)}">${escapeHtml(label || target)}</a>`;
-        }
-        if (isUrlLike(raw2)) return `<a href="${escapeHtml(raw2)}" target="_blank" rel="noopener noreferrer">${escapeHtml(raw2)}</a>`;
-        return `<a href="#/page/${toDocId(raw2)}">${escapeHtml(raw2)}</a>`;
-      });
-
-      /* 각주 플레이스홀더 {{REF:n}} */
-      t = t.replace(/\{\{REF:(\d+)\}\}/g, (m, n) => {
-        const num = Number(n);
-        return `<sup class="ref"><a href="#ref-${num}" id="refback-${num}">[${num}]</a></sup>`;
-      });
-
-      /* 베어 URL 자동 링크 */
-      t = t.replace(/(^|[\s>])(https?:\/\/[^\s<]+)/g,
-        (m, lead, url) => `${lead}<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
-      );
-
-      /* 인라인 코드 복원 */
-      t = t.replace(/\{\{CODE:(\d+)\}\}/g, (m, idxStr) => {
-        return `<code class="inline-code">${escapeHtml(codes[Number(idxStr)] ?? "")}</code>`;
-      });
-
-      return t;
-    }
-
-    /* 미디어위키 목록 (* / #) */
-    function consumeMwList(lines, startIndex) {
-      let i = startIndex;
-      const out = [];
-      const stack = [];
-      let openLiDepth = 0;
-
-      const typeOf = ch => ch === "*" ? "ul" : "ol";
-
-      function closeLiIfNeeded(targetDepth) {
-        if (openLiDepth > 0 && targetDepth <= openLiDepth) { out.push("</li>"); openLiDepth = 0; }
-      }
-      function closeListsTo(commonDepth) {
-        while (stack.length > commonDepth) {
-          if (openLiDepth === stack.length) { out.push("</li>"); openLiDepth = 0; }
-          out.push(`</${stack.pop()}>`);
-        }
-      }
-      function openListsFrom(commonDepth, targetTypes) {
-        for (let d = commonDepth; d < targetTypes.length; d++) {
-          out.push(`<${targetTypes[d]}>`); stack.push(targetTypes[d]);
-        }
-      }
-
-      while (i < lines.length) {
-        const line = lines[i];
-        const m = line.match(/^([*#]+)\s+(.*)$/);
-        if (!m) break;
-        const prefix = m[1], itemText = m[2];
-        const targetTypes = prefix.split("").map(typeOf);
-        let common = 0;
-        while (common < stack.length && common < targetTypes.length && stack[common] === targetTypes[common]) common++;
-        closeLiIfNeeded(targetTypes.length);
-        closeListsTo(common);
-        openListsFrom(common, targetTypes);
-        if (openLiDepth === targetTypes.length) { out.push("</li>"); openLiDepth = 0; }
-        out.push(`<li>${renderInline(itemText)}`);
-        openLiDepth = targetTypes.length;
-        i++;
-      }
-
-      if (openLiDepth > 0) out.push("</li>");
-      while (stack.length > 0) out.push(`</${stack.pop()}>`);
-      return { html: out.join(""), nextIndex: i };
-    }
-
-    /* 단락 내 줄바꿈: newline → <br> */
-    function renderParagraphBr(linesBuf) {
-      return linesBuf.map(l => renderInline(l)).join("<br>");
-    }
-
-    /* ★ 블록 렌더 — 핵심 함수 */
-    let __REFS = [];
-
-    function renderWiki(body) {
-      __REFS = [];
-
-      const originalLines = normalizeSmartQuotes(String(body || ""))
-        .replaceAll("\r\n", "\n").split("\n");
-
-      /* 1) 코드블록 보호 */
-      const { lines: extracted, blocks: codeBlocks } = extractFencedCodeBlocks(originalLines);
-
-      /* 2) 인라인 코드 보호 */
-      const { text: iProtected, codes: iCodes } = protectInlineCodeAll(extracted.join("\n"));
-      let text = iProtected;
-
-      /* 3) 주석 제거 */
-      text = text.replace(/<!--[\s\S]*?-->/g, "");
-
-      /* 4) 각주 추출 */
-      text = text.replace(/<ref>([\s\S]*?)<\/ref>/gi, (m, inner) => {
-        __REFS.push((inner || "").trim());
-        return `{{REF:${__REFS.length}}}`;
-      });
-
-      /* 5) 숨김 템플릿 토큰화 */
-      text = text.replace(
-        /\{\{\s*숨김\s*시작\s*\|\s*제목\s*=\s*([^}]+?)\s*\}\}/g,
-        (m, titleRaw) => `\n{{HIDE_START:${encodeURIComponent(String(titleRaw).trim())}}}\n`
-      );
-      text = text.replace(/\{\{\s*숨김\s*끝\s*\}\}/g, "\n{{HIDE_END}}\n");
-
-      /* 6) 인라인 코드 복원 */
-      text = restoreInlineCodeAll(text, iCodes);
-
-      const lines = text.split("\n");
-
-      /* 재귀 렌더 (숨김 블록 내부도 동일 규칙) */
-      function renderFromLines(localLines) {
-        const out = [];
-        let i = 0;
-
-        while (i < localLines.length) {
-          const line = localLines[i];
-          if (!line.trim()) { i++; continue; }
-
-          /* 코드블록 복원 */
-          const cbMatch = line.trim().match(/^\{\{CODEBLOCK:(\d+)\}\}$/);
-          if (cbMatch) {
-            const codeText = codeBlocks[Number(cbMatch[1])] ?? "";
-            out.push(`<pre class="code-block"><code>${escapeHtml(codeText)}</code></pre>`);
-            i++; continue;
-          }
-
-          /* 숨김 시작 */
-          const hs = line.trim().match(/^\{\{HIDE_START:(.+)\}\}$/);
-          if (hs) {
-            const title = decodeURIComponent(hs[1] || "");
-            i++;
-            const inner = [];
-            let depth = 1;
-            while (i < localLines.length) {
-              const l = localLines[i];
-              if (l.trim().match(/^\{\{HIDE_START:/)) { depth++; inner.push(l); i++; continue; }
-              if (l.trim() === "{{HIDE_END}}") {
-                depth--;
-                if (depth === 0) { i++; break; }
-                inner.push(l); i++; continue;
-              }
-              inner.push(l); i++;
-            }
-            out.push(`
-              <details class="mw-hide">
-                <summary>${escapeHtml(title)}</summary>
-                <div class="mw-hide-body">${renderFromLines(inner)}</div>
-              </details>`);
-            continue;
-          }
-
-          /* 숨김 끝(짝 안 맞는 경우) */
-          if (line.trim() === "{{HIDE_END}}") { i++; continue; }
-
-          /* <references/> */
-          if (/^<references\s*\/\s*>$/i.test(line.trim())) {
-            if (!__REFS.length) {
-              out.push(`<p class="muted">각주가 아직 없습니다.</p>`);
-            } else {
-              const items = __REFS.map((ref, idx) => {
-                const n = idx + 1;
-                return `<li id="ref-${n}">${renderInline(ref)} <a href="#refback-${n}">↩︎</a></li>`;
-              }).join("");
-              out.push(`<ol class="reflist">${items}</ol>`);
-            }
-            i++; continue;
-          }
-
-          /* 미디어위키 제목 == ... == */
-          const mwH = line.match(/^(={2,6})\s*(.+?)\s*\1\s*$/);
-          if (mwH) {
-            const level = Math.min(6, Math.max(2, mwH[1].length));
-            out.push(`<h${level}>${renderInline(mwH[2])}</h${level}>`);
-            i++; continue;
-          }
-
-          /* 마크다운 제목 # */
-          if (line.startsWith("### ")) { out.push(`<h4>${renderInline(line.slice(4))}</h4>`); i++; continue; }
-          if (line.startsWith("## ")) { out.push(`<h3>${renderInline(line.slice(3))}</h3>`); i++; continue; }
-          if (line.startsWith("# ")) { out.push(`<h2>${renderInline(line.slice(2))}</h2>`); i++; continue; }
-
-          /* 구분선 --- */
-          if (line.trim() === "---") { out.push("<hr />"); i++; continue; }
-
-          /* 목록 * / # */
-          if (/^[*#]+\s+/.test(line)) {
-            const { html, nextIndex } = consumeMwList(localLines, i);
-            out.push(html); i = nextIndex; continue;
-          }
-
-          /* 인용 > */
-          if (line.startsWith(">")) {
-            const buf = [];
-            while (i < localLines.length && localLines[i].startsWith(">")) {
-              buf.push(localLines[i].replace(/^>\s?/, "")); i++;
-            }
-            out.push(`<blockquote>${buf.map(l => `<p>${renderInline(l)}</p>`).join("")}</blockquote>`);
-            continue;
-          }
-
-          /* 단락 (빈 줄이 올 때까지) */
-          const buf = [];
-          while (i < localLines.length && localLines[i].trim()) { buf.push(localLines[i]); i++; }
-          out.push(`<p>${renderParagraphBr(buf)}</p>`);
-        }
-
-        return out.join("\n");
-      }
-
-      return renderFromLines(lines);
-    }
-
-    /* ====================================================
-       ⑪ 리비전(히스토리) 관리
-    ==================================================== */
-
-    async function fetchRevisions(pageId) {
-      const q = query(
-        collection(db, "pages", pageId, "revisions"),
-        orderBy("savedAt", "desc"),
-        limit(MAX_REVISIONS)
-      );
-      const snap = await getDocs(q);
-      const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      revisions[pageId] = rows;
-      return rows;
-    }
-
-    async function trimOldRevisions(pageId) {
-      const q = query(collection(db, "pages", pageId, "revisions"), orderBy("savedAt", "desc"));
-      const snap = await getDocs(q);
-      if (snap.size <= MAX_REVISIONS) return;
-
-      const batch = writeBatch(db);
-      snap.docs.slice(MAX_REVISIONS).forEach((docSnap) => batch.delete(docSnap.ref));
-      await batch.commit();
-    }
-
-    /* 리비전 추가 + 최대 개수 초과 시 오래된 것 삭제 */
-    async function addRevision(pageId, { title, content, savedBy, savedAt, note }) {
-      if (!canEdit) throw new Error("로그인해야 히스토리를 저장할 수 있어.");
-
-      const ref = doc(collection(db, "pages", pageId, "revisions"));
-      await setDoc(ref, {
-        id: ref.id,
-        title,
-        content,
-        savedBy: savedBy || getActorLabel(),
-        savedAt: Number(savedAt || Date.now()),
-        note: note || ""
-      });
-
-      await trimOldRevisions(pageId);
-      await fetchRevisions(pageId);
-    }
-
-    /* ====================================================
-       ⑫ 카테고리 칩 UI
-    ==================================================== */
-    function buildChips() {
-      chipWrap.innerHTML = "";
-
-      const makeChip = (label, filter) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = `chip ${currentFilter === filter ? "is-active" : ""}`;
-        btn.textContent = label;
-        btn.addEventListener("click", () => {
-          currentFilter = filter;
-          buildChips();
-          buildList();
-        });
-        chipWrap.appendChild(btn);
-      };
-
-      makeChip("전체", "all");
-      CATEGORY_OPTIONS.forEach(cat => makeChip(cat, cat));
-    }
-
-    /* ====================================================
-       ⑬ 사이드바 목록
-    ==================================================== */
-    function buildList() {
-      const q = sideQuery.trim().toLowerCase();
-      let list = [...pages].filter(p => !isRedirectPage(p));
-
-      if (currentFilter !== "all") list = list.filter(p => getCategory(p) === currentFilter);
-      if (q) list = list.filter(p => (p.title || "").toLowerCase().includes(q));
-      list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-
-      pageListEl.innerHTML = list.map(p => {
-        const cat = getCategory(p);
-        const hint = `${cat ? cat + " · " : ""}${formatDate(p.updatedAt || p.createdAt)}`;
-        return `
-          <li class="page-item" data-id="${escapeHtml(p.id)}">
-            <div class="t">${escapeHtml(p.title)}</div>
-            <div class="m">${escapeHtml(hint)}</div>
-          </li>`;
-      }).join("");
-
-      pageListEl.querySelectorAll(".page-item").forEach(li => {
-        li.addEventListener("click", () => {
-          location.hash = `#/page/${li.getAttribute("data-id")}`;
-        });
-      });
-    }
-
-    /* ====================================================
-       ⑭ 라우터
-    ==================================================== */
-    function route() {
-      if (!pagesReady) { viewEl.innerHTML = `<p class="muted">불러오는 중...</p>`; return; }
-
-      const hash = location.hash || "#/";
-      const [path, qs] = hash.replace("#", "").split("?");
-
-      if (path === "/") return renderGuideHome();
-      if (path === "/recent") return renderRecent();
-      if (path === "/search") return renderSearch((new URLSearchParams(qs || "")).get("q") || "");
-      if (path === "/new") return renderEditor({ mode: "new" });
-      if (path.startsWith("/page/")) return renderPage(path.replace("/page/", ""));
-      if (path.startsWith("/edit/")) return renderEditor({ mode: "edit", slug: path.replace("/edit/", "") });
-      if (path.startsWith("/history/")) return renderHistory(path.replace("/history/", ""));
-      if (path.startsWith("/revision/")) {
-        const [pageId, revId] = path.replace("/revision/", "").split("/");
-        return renderRevision(pageId, revId);
-      }
-
-      location.hash = "#/";
-    }
-
-    /* ====================================================
-       ⑮ 홈 — HOME_PAGE_TITLE 문서가 있으면 열고, 없으면 최근 목록
-    ==================================================== */
-    function renderGuideHome() {
-      const homeId = toDocId(HOME_PAGE_TITLE);
-      const exists = pages.some(p => p.id === homeId);
-      if (exists) return renderPage(homeId);
-      return renderRecent();
-    }
-
-    function renderRecent() {
-      const recent = [...pages]
-        .filter(p => !isRedirectPage(p))
-        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
-        .slice(0, 10);
-
-      viewEl.innerHTML = `
-        <h2 class="page-title">최근</h2>
-        <ul>
-          ${recent.map(p => `<li><a href="#/page/${escapeHtml(p.id)}">${escapeHtml(p.title)}</a></li>`).join("")}
-        </ul>`;
-    }
-
-    /* ====================================================
-       ⑯ 문서 보기 (리다이렉트 포함)
-    ==================================================== */
-    function renderPage(pageId) {
-      const page = pages.find(p => p.id === pageId);
-
-      if (!page) {
-        viewEl.innerHTML = `
-          <h2 class="page-title">없음</h2>
-          <p>문서를 찾지 못했어.</p>
-          <div class="tools-row">
-            <button class="tool-link" type="button" onclick="history.back()">뒤로</button>
-          </div>`;
-        return;
-      }
-
-      /* 리다이렉트 처리 */
-      const redirect = getRedirectTarget(page.content);
-      if (redirect) {
-        viewEl.innerHTML = `
-          <h2 class="page-title">${escapeHtml(page.title)}</h2>
-          <p class="muted">
-            이 문서는 <a href="#/page/${escapeHtml(redirect.targetId)}">${escapeHtml(redirect.targetTitle)}</a>로 이동했습니다. 이동 중…
-          </p>
-          <div class="tools-row">
-            <button class="tool-link" type="button" id="go-btn">이동</button>
-            <button class="tool-link" type="button" id="stay-btn">여기 머물기</button>
-            <button class="tool-link" type="button" id="history-direct-btn">히스토리</button>
-          </div>`;
-
-        const timer = setTimeout(() => { location.hash = `#/page/${redirect.targetId}`; }, 200);
-        document.getElementById("go-btn").addEventListener("click", () => { clearTimeout(timer); location.hash = `#/page/${redirect.targetId}`; });
-        document.getElementById("stay-btn").addEventListener("click", () => clearTimeout(timer));
-        document.getElementById("history-direct-btn").addEventListener("click", () => { clearTimeout(timer); location.hash = `#/history/${pageId}`; });
-        return;
-      }
-
-      const { meta, body } = parseFrontMatter(page.content);
-      const metaBits = [];
-      if (meta.category) metaBits.push(`category: ${meta.category}`);
-      if (meta.tags) metaBits.push(`tags: ${meta.tags}`);
-
-      viewEl.innerHTML = `
-        <h2 class="page-title">${escapeHtml(page.title)}</h2>
-
-        <div class="meta-row">
-          <span>최종 편집: ${escapeHtml(formatDate(page.updatedAt || page.createdAt))}</span>
-          ${page.updatedBy ? `<span>·</span><span>by ${escapeHtml(page.updatedBy)}</span>` : ""}
-          ${metaBits.length ? `<span>·</span><span>${escapeHtml(metaBits.join(" · "))}</span>` : ""}
-        </div>
-
-        <hr />
-
-        <div class="doc">${renderWiki(body)}</div>
-
-        <div class="tools-row">
-          <button class="tool-link" type="button" id="edit-btn">편집</button>
-          <button class="tool-link" type="button" id="history-btn">히스토리</button>
-          ${canEdit ? `<button class="tool-link" type="button" id="delete-btn">문서 삭제</button>` : ""}
-        </div>`;
-
-      document.getElementById("edit-btn").addEventListener("click", () => {
-        if (!canEdit) return alert("편집하려면 로그인해야 해.");
-        location.hash = `#/edit/${pageId}`;
-      });
-      document.getElementById("history-btn").addEventListener("click", () => {
-        location.hash = `#/history/${pageId}`;
-      });
-      document.getElementById("delete-btn")?.addEventListener("click", () => deletePageCompletely(pageId));
-    }
-
-    /* ====================================================
-       ⑰ 검색
-    ==================================================== */
-    function renderSearch(q) {
-      const query = (q || "").trim();
-      const results = query
-        ? pages.filter(p => !isRedirectPage(p) && (p.title + "\n" + p.content).toLowerCase().includes(query.toLowerCase()))
-        : [];
-
-      viewEl.innerHTML = `
-        <h2 class="page-title">검색</h2>
-        <div class="editor">
-          <label>검색어</label>
-          <input id="search-input" type="text" value="${escapeHtml(query)}" placeholder="검색어..." />
-        </div>
-        <hr />
-        ${query
-          ? (results.length
-            ? `<ul>${results.map(p => `<li><a href="#/page/${escapeHtml(p.id)}">${escapeHtml(p.title)}</a></li>`).join("")}</ul>`
-            : `<p>결과가 없어.</p>`)
-          : `<p>검색어를 입력해줘.</p>`}`;
-
-      const input = document.getElementById("search-input");
-      input.addEventListener("input", () => {
-        const val = input.value.trim();
-        location.hash = val ? `#/search?q=${encodeURIComponent(val)}` : "#/search";
-      });
-    }
-
-    /* ====================================================
-       ⑱ 히스토리 보기
-    ==================================================== */
-    async function renderHistory(pageId) {
-      const rows = await fetchRevisions(pageId);
-      const page = pages.find(p => p.id === pageId);
-
-      viewEl.innerHTML = `
-        <h2 class="page-title">히스토리</h2>
-        <p class="muted">최신 ${MAX_REVISIONS}개 보관 · ${escapeHtml(page?.title || pageId)}</p>
-
-        ${rows.length ? `
-          <ul>
-            ${rows.map(r => `
-              <li>
-                <a href="#/revision/${escapeHtml(pageId)}/${escapeHtml(r.id)}">
-                  ${escapeHtml(formatDate(r.savedAt))}
-                </a>
-                <span class="muted"> · ${escapeHtml(r.savedBy || "")}${r.note ? ` · ${escapeHtml(r.note)}` : ""}</span>
-              </li>`).join("")}
-          </ul>` : `<p>아직 기록이 없어.</p>`}
-
-        <div class="tools-row">
-          <button class="tool-link" type="button" onclick="location.hash='#/page/${escapeHtml(pageId)}'">문서로</button>
-        </div>`;
-    }
-
-    /* ====================================================
-       ⑲ 리비전 상세 + 되돌리기
-    ==================================================== */
-    async function renderRevision(pageId, revId) {
-      const pageRevs = revisions[pageId]?.length ? revisions[pageId] : await fetchRevisions(pageId);
-      const r = pageRevs.find(rv => rv.id === revId);
-
-      if (!r) {
-        viewEl.innerHTML = `<h2 class="page-title">리비전 없음</h2>`;
-        return;
-      }
-
-      viewEl.innerHTML = `
-        <h2 class="page-title">리비전</h2>
-        <div class="meta-row">
-          <span>${escapeHtml(formatDate(r.savedAt))}</span>
-          ${r.savedBy ? `<span>·</span><span>${escapeHtml(r.savedBy)}</span>` : ""}
-          ${r.note ? `<span>·</span><span>${escapeHtml(r.note)}</span>` : ""}
-        </div>
-
-        <div class="doc">${renderWiki(String(r.content || ""))}</div>
-
-        <div class="tools-row">
-          <button class="tool-link" type="button" onclick="location.hash='#/history/${escapeHtml(pageId)}'">히스토리로</button>
-          <button class="tool-link" type="button" onclick="location.hash='#/page/${escapeHtml(pageId)}'">문서로</button>
-          ${canEdit ? `<button class="tool-link" type="button" id="revert-btn">이 버전으로 되돌리기</button>` : ""}
-        </div>`;
-
-      if (canEdit) {
-        document.getElementById("revert-btn")?.addEventListener("click", async () => {
-          if (!confirm("현재 문서를 이 리비전으로 되돌릴까? (되돌리기도 히스토리에 기록됨)")) return;
-
-          const current = pages.find(p => p.id === pageId) || (await getDoc(doc(db, "pages", pageId))).data();
-          if (!current) return;
-
-          const now = Date.now();
-          await setDoc(doc(db, "pages", pageId), {
-            ...normalizePageDoc(pageId, current),
-            content: String(r.content || ""),
-            updatedAt: now,
-            updatedBy: getActorLabel(),
-            ...makeOwnerFields()
-          }, { merge: true });
-
-          await addRevision(pageId, {
-            title: current.title || pageId,
-            content: String(r.content || ""),
-            savedBy: getActorLabel(),
-            savedAt: now,
-            note: `revert:${revId}`
-          });
-
-          buildList();
-          location.hash = `#/page/${pageId}`;
-        });
-      }
-    }
-
-    /* ====================================================
-       ⑳ 문서 저장 (신규 / 편집 / 제목 변경 시 리다이렉트)
-    ==================================================== */
-    async function savePage({ mode, oldId, title, content }) {
-      if (!canEdit) throw new Error("로그인해야 저장할 수 있어.");
-
-      const now = Date.now();
-      const newId = toDocId(title);
-      const isEdit = mode === "edit" && !!oldId;
-      const prev = isEdit ? pages.find(p => p.id === oldId) : null;
-      const prevCreatedAt = Number(prev?.createdAt || now);
-      const prevAliases = Array.isArray(prev?.aliases) ? prev.aliases : [];
-      const dest = pages.find(p => p.id === newId);
-      const destExists = !!dest;
-      const actor = getActorLabel();
-
-      if (!isEdit && destExists) throw new Error("같은 제목(슬러그)의 문서가 이미 있어.");
-
-      const batch = writeBatch(db);
-      const queueUpsertPage = (id, data) => {
-        batch.set(doc(db, "pages", id), {
-          id,
-          ...data,
-          ...makeOwnerFields()
-        }, { merge: true });
-      };
-
-      /* ① 편집 & 슬러그 그대로 */
-      if (isEdit && newId === oldId) {
-        queueUpsertPage(oldId, {
-          title,
-          content,
-          updatedAt: now,
-          updatedBy: actor
-        });
-        await batch.commit();
-        await addRevision(oldId, { title, content, savedBy: actor, savedAt: now, note: "edit" });
-        return oldId;
-      }
-
-      /* ② 편집 & 슬러그 변경 & 목적지 문서 이미 존재 → 덮어쓰기 */
-      if (isEdit && oldId !== newId && destExists) {
-        const destAliases = Array.isArray(dest.aliases) ? dest.aliases : [];
-        await addRevision(newId, {
-          title: dest.title,
-          content: String(dest.content || ""),
-          savedBy: actor,
-          savedAt: now,
-          note: `backup-before-overwrite-from:${oldId}`
-        });
-
-        const mergedAliases = Array.from(new Set([...destAliases, ...prevAliases, oldId].filter(Boolean)));
-        queueUpsertPage(newId, {
-          title,
-          content,
-          createdAt: Math.min(Number(dest.createdAt || now), prevCreatedAt),
-          updatedAt: now,
-          updatedBy: actor,
-          aliases: mergedAliases
-        });
-
-        const rContent = `---
-redirect: true
----
-#REDIRECT [[${title}]]`;
-        queueUpsertPage(oldId, {
-          title: prev?.title || oldId,
-          content: rContent,
-          updatedAt: now,
-          updatedBy: actor,
-          aliases: prevAliases
-        });
-
-        await batch.commit();
-        await addRevision(newId, { title, content, savedBy: actor, savedAt: now, note: `overwrite-from:${oldId}` });
-        await addRevision(oldId, {
-          title: prev?.title || oldId,
-          content: rContent,
-          savedBy: actor,
-          savedAt: now,
-          note: `redirect-to:${newId}`
-        });
-        return newId;
-      }
-
-      /* ③ 신규 OR 정상 이동 */
-      const aliases = isEdit ? Array.from(new Set([...prevAliases, oldId].filter(Boolean))) : [];
-      queueUpsertPage(newId, {
-        title,
-        content,
-        createdAt: prevCreatedAt,
-        updatedAt: now,
-        updatedBy: actor,
-        aliases
-      });
-
-      if (isEdit && oldId && oldId !== newId) {
-        const rContent = `---
-redirect: true
----
-#REDIRECT [[${title}]]`;
-        queueUpsertPage(oldId, {
-          title: prev?.title || oldId,
-          content: rContent,
-          updatedAt: now,
-          updatedBy: actor,
-          aliases: prevAliases
-        });
-      }
-
-      await batch.commit();
-      await addRevision(newId, { title, content, savedBy: actor, savedAt: now, note: isEdit ? `rename-from:${oldId}` : "new" });
-
-      if (isEdit && oldId && oldId !== newId) {
-        const rContent = `---
-redirect: true
----
-#REDIRECT [[${title}]]`;
-        await addRevision(oldId, {
-          title: prev?.title || oldId,
-          content: rContent,
-          savedBy: actor,
-          savedAt: now,
-          note: `redirect-to:${newId}`
-        });
-      }
-
-      return newId;
-    }
-
-    /* ====================================================
-       ㉑ 문서 삭제 (리다이렉트 알리아스 포함)
-    ==================================================== */
-    async function deletePageCompletely(pageId) {
-      if (!canEdit) return alert("삭제하려면 로그인해야 해.");
-      const page = pages.find(p => p.id === pageId);
-      if (!confirm(`정말 삭제할까?
-
-- 문서: ${page?.title || pageId}
-- 히스토리(리비전)도 함께 삭제됨`)) return;
-
-      const aliasIds = Array.isArray(page?.aliases) ? page.aliases : [];
-      const toRemove = Array.from(new Set([pageId, ...aliasIds]));
-      const batch = writeBatch(db);
-
-      for (const id of toRemove) {
-        const revSnap = await getDocs(collection(db, "pages", id, "revisions"));
-        revSnap.forEach((docSnap) => batch.delete(docSnap.ref));
-        batch.delete(doc(db, "pages", id));
-        delete revisions[id];
-      }
-
-      await batch.commit();
-      buildList();
-      location.hash = "#/";
-    }
-
-    /* ====================================================
-       ㉒ 에디터
-    ==================================================== */
-    function renderEditor({ mode, slug }) {
+    async function savePage() {
       if (!canEdit) {
-        viewEl.innerHTML = `
-          <h2 class="page-title">편집하려면 로그인</h2>
-          <div class="tools-row">
-            <button class="tool-link" type="button" id="login-now">로그인</button>
-            <button class="tool-link" type="button" onclick="location.hash='#/'">닫기</button>
-          </div>`;
-        document.getElementById("login-now").addEventListener("click", async () => { await login(); route(); });
+        alert("오너만 저장할 수 있습니다.");
         return;
       }
 
-      const editing = mode === "edit" ? pages.find(p => p.id === slug) : null;
-      const titleValue = editing ? editing.title : "";
-      const contentValue = editing
-        ? editing.content
-        : `---\ncategory: ${CATEGORY_OPTIONS[0]}\ntags:\n---\n\n== 제목 ==\n내용...\n`;
+      const title = editTitleInput.value.trim();
+      const slug = slugify(editSlugInput.value || title);
+      const body = editBodyInput.value;
+      const visibility = editVisibilitySelect.value || "private";
 
-      viewEl.innerHTML = `
-        <h2 class="page-title">${mode === "edit" ? "편집" : "새 문서"}</h2>
-
-        <div class="editor">
-          <label>제목</label>
-          <input id="edit-title" type="text" value="${escapeHtml(titleValue)}" placeholder="문서 제목" />
-
-          <label>내용</label>
-          <textarea id="edit-content" spellcheck="false">${escapeHtml(contentValue)}</textarea>
-
-          <div class="editor-actions">
-            <button class="btn primary" type="button" id="save-btn">저장</button>
-            <button class="btn" type="button" id="cancel-btn">취소</button>
-          </div>
-        </div>`;
-
-      const titleInput = document.getElementById("edit-title");
-      const contentInput = document.getElementById("edit-content");
-
-      document.getElementById("save-btn").addEventListener("click", async () => {
-        const newTitle = titleInput.value.trim();
-        const newContent = contentInput.value;
-        if (!newTitle) return alert("제목을 입력해줘.");
-        try {
-          const newId = await savePage({ mode, oldId: editing?.id || null, title: newTitle, content: newContent });
-          buildList();
-          location.hash = `#/page/${newId}`;
-        } catch (e) {
-          alert(e?.message || "저장 실패.");
-        }
-      });
-
-      document.getElementById("cancel-btn").addEventListener("click", () => {
-        location.hash = (mode === "edit" && editing) ? `#/page/${editing.id}` : "#/";
-      });
-    }
-
-    /* ====================================================
-       ㉓ UI 이벤트 바인딩
-    ==================================================== */
-    function bindUI() {
-      document.querySelectorAll(".nav-btn[data-nav]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const nav = btn.getAttribute("data-nav");
-          if (nav === "recent") { location.hash = "#/recent"; return; }
-          if (nav === "search") { location.hash = "#/search"; return; }
-          if (nav === "new") {
-            if (!canEdit) return alert("새 문서는 로그인 후에 만들 수 있어.");
-            location.hash = "#/new";
-          }
-        });
-      });
-
-      authBtn.addEventListener("click", async () => {
-        if (canEdit) await logout();
-        else await login();
-      });
-
-      sideSearchInput.addEventListener("input", () => {
-        sideQuery = sideSearchInput.value;
-        buildList();
-      });
-
-      window.addEventListener("hashchange", route);
-    }
-
-    /* ====================================================
-       ㉔ 앱 시작
-    ==================================================== */
-    bindUI();
-    buildChips();
-    buildList();
-    route();
-    initFirebase();
-  </script>
-
-  <!-- 시드 데이터 (처음 실행 시 기본 문서 삽입) -->
-  <script>
-    /*
-      ★ 시드 문서 수정 방법
-      — 아래 SEED_PAGES 배열에 문서를 추가하면
-        처음 localStorage가 비어있을 때 자동으로 삽입됨
-      — 한 번이라도 저장된 뒤에는 아래 내용을 바꿔도 반영 안 됨
-        (기존 데이터를 지키기 위해)
-    */
-    window.SEED_PAGES = [
-      {
-        title: "처음",
-        content:
-          `> 사적 발행글
-
-
-`
+      if (!title) {
+        alert("제목을 입력해 주세요.");
+        return;
       }
-    ];
-  </script>
 
+      const existingId = currentPageId;
+      const pageId = existingId || slug;
+      const pageRef = doc(db, "pages", pageId);
+      const pageSnap = await getDoc(pageRef);
+
+      const pageData = {
+        title,
+        slug,
+        body,
+        visibility,
+        updatedAt: serverTimestamp(),
+        updatedBy: currentUser?.email || "owner"
+      };
+
+      if (!pageSnap.exists()) {
+        pageData.createdAt = serverTimestamp();
+      }
+
+      await setDoc(pageRef, pageData, { merge: true });
+      await addRevision(pageId, pageData);
+      closeEditor();
+      currentPageId = pageId;
+    }
+
+    async function deletePageCompletely(pageId) {
+      if (!canEdit || !pageId) return;
+      const ok = confirm("정말 이 문서를 삭제할까요? 이 작업은 되돌리기 어렵습니다.");
+      if (!ok) return;
+
+      const revs = await getDocs(collection(db, "pages", pageId, "revisions"));
+      const batch = writeBatch(db);
+      revs.forEach(r => batch.delete(r.ref));
+      batch.delete(doc(db, "pages", pageId));
+      await batch.commit();
+
+      currentPageId = null;
+      currentPageData = null;
+      history.replaceState({}, "", "/note.html");
+    }
+
+    /* ============================================================
+       편집 모달 제어
+       ============================================================ */
+    function openEditor(page = null) {
+      if (page) {
+        editTitleInput.value = page.title || "";
+        editSlugInput.value = page.slug || "";
+        editBodyInput.value = page.body || "";
+        editVisibilitySelect.value = page.visibility || "public";
+      } else {
+        editTitleInput.value = "";
+        editSlugInput.value = "";
+        editBodyInput.value = "";
+        editVisibilitySelect.value = "private";
+      }
+      editorBackdrop.classList.add("open");
+      editorBackdrop.setAttribute("aria-hidden", "false");
+    }
+
+    function closeEditor() {
+      editorBackdrop.classList.remove("open");
+      editorBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    /* ============================================================
+       히스토리 모달
+       ============================================================ */
+    async function openHistory() {
+      if (!currentPageId) return;
+      historyList.innerHTML = `<div class="item"><span class="meta">불러오는 중...</span></div>`;
+      historyBackdrop.classList.add("open");
+      historyBackdrop.setAttribute("aria-hidden", "false");
+
+      const snap = await getDocs(query(collection(db, "pages", currentPageId, "revisions"), orderBy("updatedAt", "desc")));
+      if (snap.empty) {
+        historyList.innerHTML = `<div class="item"><span class="meta">히스토리가 없습니다.</span></div>`;
+        return;
+      }
+
+      historyList.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <div>
+            <div>${escapeHtml(data.title || "제목 없음")}</div>
+            <div class="meta">${formatDate(data.updatedAt)} · ${escapeHtml(data.updatedBy || "")}</div>
+          </div>
+          <div class="meta">${(data.visibility || "public") === "private" ? "비공개" : "공개"}</div>
+        `;
+        historyList.appendChild(item);
+      });
+    }
+
+    function closeHistory() {
+      historyBackdrop.classList.remove("open");
+      historyBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    /* ============================================================
+       로그인 / 로그아웃
+       ============================================================ */
+    async function login() {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      if (!isOwnerUser(user)) {
+        alert("이 구글 계정은 편집 권한이 없어. 오너 계정으로 다시 로그인해줘.");
+        await signOut(auth);
+        return;
+      }
+    }
+
+    async function logout() {
+      await signOut(auth);
+    }
+
+    /* ============================================================
+       이벤트 바인딩
+       ============================================================ */
+    loginBtn.addEventListener("click", login);
+    logoutBtn.addEventListener("click", logout);
+    newBtn.addEventListener("click", () => openEditor(null));
+    editBtn.addEventListener("click", () => openEditor(currentPageData));
+    deleteBtn.addEventListener("click", () => deletePageCompletely(currentPageId));
+    historyBtn.addEventListener("click", openHistory);
+    closeHistoryBtn.addEventListener("click", closeHistory);
+    cancelEditBtn.addEventListener("click", closeEditor);
+    saveEditBtn.addEventListener("click", savePage);
+    searchInput.addEventListener("input", updateList);
+
+    editorBackdrop.addEventListener("click", (e) => {
+      if (e.target === editorBackdrop) closeEditor();
+    });
+    historyBackdrop.addEventListener("click", (e) => {
+      if (e.target === historyBackdrop) closeHistory();
+    });
+
+    window.addEventListener("hashchange", () => {
+      openPageBySlug(location.hash.replace(/^#/, ""));
+    });
+
+    /* ============================================================
+       인증 상태 감시
+       - 로그인 상태가 바뀔 때마다 canEdit, UI, 시드 문서 여부를 갱신한다.
+       ============================================================ */
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user || null;
+      canEdit = !!currentUser && isOwnerUser(currentUser);
+      updateAuthUI();
+      await ensureSeedPages();
+      await loadAll();
+    });
+
+    /*
+      디버깅용 전역 노출
+      - 브라우저 콘솔에서 UID 확인이 필요할 때 사용
+      - 예: firebaseAuth.currentUser?.uid
+    */
+    window.firebaseAuth = auth;
+  </script>
 </body>
 
 </html>
-
-<!--
-================================================================
-  나중에 Firebase 붙이는 법
-  ────────────────────────────────────────────────────────────
-  현재 이 파일은 localStorage만 씀.
-  Firebase 연동은 디자인 확정 후 아래 순서로 진행:
-
-  1. Firebase 콘솔 → 프로젝트 생성
-  2. Firestore DB + Google Auth 활성화
-  3. <script type="module"> 로 firebase SDK import 추가
-  4. loadAll()     → onSnapshot(pagesCol, ...)
-  5. savePage()    → setDoc(pageDoc(id), ...)
-  6. addRevision() → addDoc(revisionsCol(id), ...)
-  7. login()       → signInWithPopup(GoogleAuthProvider)
-  8. logout()      → signOut(auth)
-  9. Firestore 보안 규칙: 읽기 = 전체 공개 / 쓰기 = OWNER_UID 만
-================================================================
--->
