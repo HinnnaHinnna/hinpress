@@ -802,6 +802,16 @@
       return page?.visibility === "private" ? "private" : "public";
     }
 
+    function canReadPage(page) {
+      if (!page) return false;
+
+      /* 공개 문서는 누구나 읽기 가능 */
+      if (getVisibility(page) === "public") return true;
+
+      /* 비공개 문서는 로그인한 오너만 읽기 가능 */
+      return canEdit;
+    }
+
     /* ====================================================
        Firestore 문서 normalize
        - 이번에 visibility 추가
@@ -1397,7 +1407,7 @@
     ==================================================== */
     function buildList() {
       const q = sideQuery.trim().toLowerCase();
-      let list = [...pages].filter(p => !isRedirectPage(p));
+      let list = [...pages].filter(p => !isRedirectPage(p) && canReadPage(p));
 
       if (currentFilter !== "all") list = list.filter(p => getCategory(p) === currentFilter);
       if (q) list = list.filter(p => (p.title || "").toLowerCase().includes(q));
@@ -1454,7 +1464,7 @@
 
     function renderRecent() {
       const recent = [...pages]
-        .filter(p => !isRedirectPage(p))
+        .filter(p => !isRedirectPage(p) && canReadPage(p))
         .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
         .slice(0, 10);
 
@@ -1477,13 +1487,13 @@
     function renderPage(pageId) {
       const page = pages.find(p => p.id === pageId);
 
-      if (!page) {
+      if (!canReadPage(page)) {
         viewEl.innerHTML = `
-          <h2 class="page-title">없음</h2>
-          <p>문서를 찾지 못했어.</p>
-          <div class="tools-row">
-            <button class="tool-link" type="button" onclick="history.back()">뒤로</button>
-          </div>`;
+      <h2 class="page-title">비공개 문서</h2>
+      <p>이 문서는 아직 공개되지 않았어.</p>
+      <div class="tools-row">
+        <button class="tool-link" type="button" onclick="location.hash='#/'">홈으로</button>
+      </div>`;
         return;
       }
 
@@ -1551,7 +1561,11 @@
     function renderSearch(q) {
       const query = (q || "").trim();
       const results = query
-        ? pages.filter(p => !isRedirectPage(p) && (p.title + "\n" + p.content).toLowerCase().includes(query.toLowerCase()))
+        ? pages.filter(p =>
+          !isRedirectPage(p) &&
+          canReadPage(p) &&
+          (p.title + "\n" + p.content).toLowerCase().includes(query.toLowerCase())
+        )
         : [];
 
       viewEl.innerHTML = `
@@ -1583,9 +1597,17 @@
        히스토리 보기
     ==================================================== */
     async function renderHistory(pageId) {
-      const rows = await fetchRevisions(pageId);
       const page = pages.find(p => p.id === pageId);
-
+      if (!page || !canReadPage(page)) {
+        viewEl.innerHTML = `
+      <h2 class="page-title">히스토리</h2>
+      <p>이 문서의 히스토리를 볼 수 없어.</p>
+      <div class="tools-row">
+        <button class="tool-link" type="button" onclick="location.hash='#/'">홈으로</button>
+      </div>`;
+        return;
+      }
+      const rows = await fetchRevisions(pageId);
       viewEl.innerHTML = `
         <h2 class="page-title">히스토리</h2>
         <p class="muted">
@@ -1616,6 +1638,15 @@
        리비전 상세 + 되돌리기
     ==================================================== */
     async function renderRevision(pageId, revId) {
+      const page = pages.find(p => p.id === pageId);
+
+      if (!page || !canReadPage(page)) {
+        viewEl.innerHTML = `
+      <h2 class="page-title">리비전 없음</h2>
+      <p>이 문서의 리비전을 볼 수 없어.</p>`;
+        return;
+      }
+
       const pageRevs = revisions[pageId]?.length ? revisions[pageId] : await fetchRevisions(pageId);
       const r = pageRevs.find(rv => rv.id === revId);
 
