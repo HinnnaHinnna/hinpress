@@ -1110,7 +1110,7 @@
       });
       return { text: out, codes };
     }
-
+    /* */
     function restoreInlineCodeAll(text, codes) {
       return String(text || "").replace(/\{\{INLINECODE:(\d+)\}\}/g, (m, n) => {
         return "`" + (codes[Number(n)] ?? "") + "`";
