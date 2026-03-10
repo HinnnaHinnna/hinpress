@@ -714,6 +714,7 @@
       deleteDoc,
       onSnapshot,
       query,
+      where,
       orderBy,
       limit,
       writeBatch
@@ -895,7 +896,72 @@
     function subscribePages() {
       if (unsubscribePages) unsubscribePages();
 
-      const q = query(collection(db, "pages"), orderBy("updatedAt", "desc"));
+      /*
+        중요:
+        - 오너 로그인 상태면 모든 문서를 읽어도 됨
+        - 비로그인/비오너 상태면 public 문서만 쿼리해야 함
+        - Firestore는 "나중에 JS에서 필터링"을 허용하지 않음
+      */
+      const pagesRef = collection(db, "pages");
+
+      function subscribePages() {
+        if (unsubscribePages) unsubscribePages();
+
+        const pagesRef = collection(db, "pages");
+
+        const q = canEdit
+          ? query(pagesRef, orderBy("updatedAt", "desc"))
+          : query(
+            pagesRef,
+            where("visibility", "==", "public"),
+            orderBy("updatedAt", "desc")
+          );
+
+        unsubscribePages = onSnapshot(q, async (snapshot) => {
+          if (snapshot.empty && canEdit) {
+            await ensureSeedPages();
+            return;
+          }
+
+          pages = snapshot.docs.map((d) => normalizePageDoc(d.id, d.data()));
+          pagesReady = true;
+          buildList();
+          route();
+        }, (error) => {
+          console.error(error);
+          pagesReady = true;
+
+          const msg = error?.code === "permission-denied"
+            ? "Firestore 권한이 막혀 있어. rules 또는 visibility 쿼리를 확인해줘."
+            : "문서를 불러오는 데 실패했어. Firebase 설정과 규칙을 확인해줘.";
+
+          viewEl.innerHTML = `<p class="muted">${msg}</p>`;
+        });
+      }
+
+      async function backfillVisibilityToPublic() {
+        if (!canEdit) return;
+
+        const snap = await getDocs(collection(db, "pages"));
+        const batch = writeBatch(db);
+        let count = 0;
+
+        snap.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (!("visibility" in data)) {
+            batch.set(docSnap.ref, { visibility: "public" }, { merge: true });
+            count++;
+          }
+        });
+
+        if (count > 0) {
+          await batch.commit();
+          console.log(`visibility 없는 문서 ${count}개를 public으로 채웠어.`);
+        } else {
+          console.log("visibility 없는 문서가 없어서 아무것도 안 바꿨어.");
+        }
+      }
+
       unsubscribePages = onSnapshot(q, async (snapshot) => {
         if (snapshot.empty && canEdit) {
           await ensureSeedPages();
@@ -909,9 +975,11 @@
       }, (error) => {
         console.error(error);
         pagesReady = true;
+
         const msg = error?.code === "permission-denied"
-          ? "Firestore 권한이 막혀 있어. rules의 OWNER 이메일/UID를 실제 값으로 바꿨는지 확인해줘."
+          ? "Firestore 권한이 막혀 있어. rules 또는 visibility 쿼리를 확인해줘."
           : "문서를 불러오는 데 실패했어. Firebase 설정과 규칙을 확인해줘.";
+
         viewEl.innerHTML = `<p class="muted">${msg}</p>`;
       });
     }
@@ -946,6 +1014,7 @@
         if (canEdit) {
           try {
             await ensureSeedPages();
+            await backfillVisibilityToPublic();
           } catch (error) {
             console.error(error);
           }
@@ -1598,6 +1667,7 @@
     ==================================================== */
     async function renderHistory(pageId) {
       const page = pages.find(p => p.id === pageId);
+
       if (!page || !canReadPage(page)) {
         viewEl.innerHTML = `
       <h2 class="page-title">히스토리</h2>
@@ -1656,21 +1726,21 @@
       }
 
       viewEl.innerHTML = `
-        <h2 class="page-title">리비전</h2>
-        <div class="meta-row">
-          <span>${escapeHtml(formatDate(r.savedAt))}</span>
-          ${r.savedBy ? `<span>·</span><span>${escapeHtml(r.savedBy)}</span>` : ""}
-          ${r.note ? `<span>·</span><span>${escapeHtml(r.note)}</span>` : ""}
-          ${r.visibility ? `<span>·</span><span>${escapeHtml(r.visibility === "private" ? "비공개" : "공개")}</span>` : ""}
-        </div>
+    <h2 class="page-title">리비전</h2>
+    <div class="meta-row">
+      <span>${escapeHtml(formatDate(r.savedAt))}</span>
+      ${r.savedBy ? `<span>·</span><span>${escapeHtml(r.savedBy)}</span>` : ""}
+      ${r.note ? `<span>·</span><span>${escapeHtml(r.note)}</span>` : ""}
+      ${r.visibility ? `<span>·</span><span>${escapeHtml(r.visibility === "private" ? "비공개" : "공개")}</span>` : ""}
+    </div>
 
-        <div class="doc">${renderWiki(String(r.content || ""))}</div>
+    <div class="doc">${renderWiki(String(r.content || ""))}</div>
 
-        <div class="tools-row">
-          <button class="tool-link" type="button" onclick="location.hash='#/history/${escapeHtml(pageId)}'">히스토리로</button>
-          <button class="tool-link" type="button" onclick="location.hash='#/page/${escapeHtml(pageId)}'">문서로</button>
-          ${canEdit ? `<button class="tool-link" type="button" id="revert-btn">이 버전으로 되돌리기</button>` : ""}
-        </div>`;
+    <div class="tools-row">
+      <button class="tool-link" type="button" onclick="location.hash='#/history/${escapeHtml(pageId)}'">히스토리로</button>
+      <button class="tool-link" type="button" onclick="location.hash='#/page/${escapeHtml(pageId)}'">문서로</button>
+      ${canEdit ? `<button class="tool-link" type="button" id="revert-btn">이 버전으로 되돌리기</button>` : ""}
+    </div>`;
 
       if (canEdit) {
         document.getElementById("revert-btn")?.addEventListener("click", async () => {
