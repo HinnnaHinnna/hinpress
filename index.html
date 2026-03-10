@@ -9,6 +9,68 @@
   <!-- 외부 CSS -->
   <link rel="preload" href="./AutoGroteskTRIAL-BExtrabold.otf" as="font" type="font/otf" crossorigin>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* 
+      ============================
+      note.html 바로가기 버튼용 최소 스타일
+      ============================
+
+      왜 inline style로 넣었는가?
+      - 지금은 빠르게 테스트하는 단계라서
+      - 기존 style.css를 크게 건드리지 않고
+      - index.html 하나만 바꿔도 바로 확인할 수 있게 하려는 목적이다.
+    */
+    .note-shortcut {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 9999;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      padding: 10px 14px;
+      border: 1px solid #000;
+      border-radius: 999px;
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .note-shortcut:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+    }
+
+    .note-shortcut:focus-visible {
+      outline: 2px solid #000;
+      outline-offset: 3px;
+    }
+
+    .note-shortcut-label {
+      white-space: nowrap;
+    }
+
+    /*
+      모바일에서는 버튼이 너무 크지 않도록 약간 조정
+    */
+    @media (max-width: 768px) {
+      .note-shortcut {
+        right: 14px;
+        bottom: 14px;
+        padding: 9px 12px;
+        font-size: 13px;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -110,8 +172,8 @@
   </div>
 
   <!-- ============================
-     상세 페이지
-     ============================ -->
+       상세 페이지
+       ============================ -->
   <div id="detail-page" class="page">
     <div class="detail-nav">
       <span id="detail-prev" class="detail-nav-arrow detail-nav-arrow--mirrored" aria-label="이전">➔</span>
@@ -143,7 +205,6 @@
           </div>
         </div>
 
-
         <p id="detail-description"></p>
         <div id="detail-links" class="detail-links"></div>
       </div>
@@ -164,6 +225,21 @@
       </button>
     </div>
   </div>
+
+  <!--
+    ============================
+    개인 note 페이지로 가는 고정 링크
+    ============================
+
+    왜 a 태그를 썼는가?
+    - 단순 페이지 이동은 링크가 가장 안정적이다.
+    - 외부 script.js와 충돌할 가능성이 적다.
+    - 브라우저 기본 동작이라 디버깅이 쉽다.
+  -->
+  <a class="note-shortcut" href="/note.html" aria-label="개인 노트 페이지로 이동">
+    <span aria-hidden="true">↗</span>
+    <span class="note-shortcut-label">Private Note</span>
+  </a>
 
   <script src="projects-data.js"></script>
   <script src="script.js"></script>
