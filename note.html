@@ -8,16 +8,12 @@
 
   <title>사적 글쓰기 — hinPress</title>
   <style>
-    /* ============================================================
-       note2.zip / style.css — 원본 그대로
-    ============================================================ */
     :root {
       --bg: #fff;
       --text: #0b0b0b;
       --muted: #6b6b6b;
       --line: #e9e9e9;
       --link: #0008ff;
-      /* note2 핑크 링크 색상 */
       --links: #252cfb;
       --chip-bg: #f3f3f3;
       --chip-active: #a3a3a3;
@@ -42,12 +38,10 @@
       overflow-x: hidden;
     }
 
-    /* Grid/Flex 아이템이 내용 때문에 폭을 못 줄이는 문제 해결 */
     .layout>* {
       min-width: 0
     }
 
-    /* 긴 URL/단어가 화면을 늘리지 않도록 */
     .doc,
     .doc * {
       overflow-wrap: anywhere;
@@ -59,7 +53,6 @@
       word-break: break-word
     }
 
-    /* 코드블록은 박스 안에서만 스크롤 */
     pre.code-block {
       max-width: 100%;
       overflow: auto
@@ -69,7 +62,6 @@
       color: var(--muted)
     }
 
-    /* ===================== 상단 복귀 바 ===================== */
     .back-bar {
       background: #f5f5f5;
       border-bottom: 1px solid var(--line);
@@ -91,7 +83,6 @@
       opacity: 0.6
     }
 
-    /* ===================== 헤더 ===================== */
     .top {
       position: sticky;
       top: 0;
@@ -142,7 +133,6 @@
       text-underline-offset: 3px;
     }
 
-    /* 로그인 상태 알약 표시 */
     .auth-pill {
       border: 1px solid var(--line);
       background: #fff;
@@ -156,14 +146,12 @@
       text-overflow: ellipsis;
     }
 
-    /* ===================== 레이아웃 ===================== */
     .layout {
       display: grid;
       grid-template-columns: var(--side-w) 1fr;
       min-height: calc(100vh - 80px);
     }
 
-    /* ===================== 사이드바 ===================== */
     .side {
       border-right: 1px solid var(--line);
       padding: 14px
@@ -222,7 +210,6 @@
       font-size: 13px;
     }
 
-    /* 페이지 목록 */
     .page-list {
       position: relative;
       margin: 12px 0 0 0;
@@ -267,7 +254,6 @@
       letter-spacing: 0.01em
     }
 
-    /* ===================== 콘텐츠 영역 ===================== */
     .content {
       padding: 18px 16px
     }
@@ -350,7 +336,6 @@
       margin: 0 0 14px 18px
     }
 
-    /* 각주 */
     sup.ref {
       font-size: 12px;
       vertical-align: super
@@ -364,7 +349,6 @@
       margin-bottom: 6px
     }
 
-    /* 코드 */
     code.inline-code {
       background: #f7f7f7;
       border: 1px solid var(--line);
@@ -389,7 +373,6 @@
       white-space: pre;
     }
 
-    /* 에디터 */
     .editor {
       display: grid;
       gap: 10px
@@ -443,11 +426,11 @@
       background: #f2f2ff
     }
 
-    /* ============================================================
-       공개 / 비공개 토글
-       - 이번 수정의 핵심
-       - 편집창 하단 저장/취소 버튼 줄 오른쪽 끝에만 붙음
-    ============================================================ */
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     .visibility-toggle-wrap {
       margin-left: auto;
       display: flex;
@@ -512,7 +495,6 @@
       outline-offset: 2px;
     }
 
-    /* 이미지 */
     figure.wiki-figure {
       margin: 0 0 14px 0
     }
@@ -535,7 +517,6 @@
       font-size: 12px
     }
 
-    /* ===================== 숨김(접기) ===================== */
     details.mw-hide {
       margin: 0;
       padding: 0;
@@ -589,7 +570,112 @@
       margin-top: 0
     }
 
-    /* ===================== 반응형 ===================== */
+    /* ============================================================
+       OCR UI
+       - 편집 모드에서만 나타나는 이미지 → 텍스트 추출 영역
+       - 본문 textarea를 바로 덮어쓰지 않고,
+         먼저 결과를 보여준 뒤 사용자가 삽입/추가를 선택하게 함
+    ============================================================ */
+    .ocr-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fcfcfc;
+      display: grid;
+      gap: 10px;
+    }
+
+    .ocr-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .ocr-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .ocr-help {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .ocr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .ocr-file-input {
+      width: 100%;
+      max-width: 360px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .ocr-status {
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 1.4em;
+    }
+
+    .ocr-progress {
+      width: 100%;
+      height: 8px;
+      background: #efefef;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .ocr-progress-bar {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: var(--links);
+      transition: width 0.15s ease;
+    }
+
+    .ocr-preview {
+      display: block;
+      max-width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 6px;
+    }
+
+    .ocr-result-wrap {
+      display: grid;
+      gap: 6px;
+    }
+
+    .ocr-result-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .ocr-result {
+      width: 100%;
+      min-height: 180px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      outline: none;
+      background: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
     @media (max-width: 960px) {
       .site-title {
         font-size: 16px;
@@ -625,6 +711,15 @@
         margin-left: 0;
         margin-top: 4px;
       }
+
+      .ocr-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .ocr-file-input {
+        max-width: none;
+      }
     }
 
     @media (min-width: 961px) {
@@ -640,16 +735,10 @@
 
 <body>
 
-  <!-- =====================================================
-    ① 힌프레스 복귀 바
-  ===================================================== -->
   <div class="back-bar">
     <a href="index.html">← hinPress</a>
   </div>
 
-  <!-- =====================================================
-    ② 헤더
-  ===================================================== -->
   <header class="top">
     <div class="top-inner">
       <h1 class="site-title">
@@ -687,15 +776,14 @@
     </section>
   </main>
 
-  <script type="module">
-    /* ============================================================
-       Firebase + 위키 코드
-       이번 수정 포인트:
-       1) 문서 데이터에 visibility 필드 추가
-       2) 편집창 하단 저장/취소 버튼 줄에 토글 추가
-       3) 기존 문서에 visibility가 없으면 public으로 처리
-    ============================================================ */
+  <!-- ============================================================
+       OCR 라이브러리
+       - 전역 window.Tesseract 로 접근
+       - 이후 module script 안에서 createWorker를 사용
+  ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
     import {
       getAuth,
@@ -770,6 +858,14 @@
     let hasAttemptedSeed = false;
 
     /* ====================================================
+       OCR 상태
+       - worker를 한 번 만들어두고 재사용
+       - 같은 편집 세션에서 여러 장 OCR해도 매번 새로 만들지 않음
+    ==================================================== */
+    let ocrWorker = null;
+    let ocrLoggerProxy = null;
+
+    /* ====================================================
        인증 / 오너 판별
     ==================================================== */
     function ownerEmailNormalized() {
@@ -797,7 +893,6 @@
 
     /* ====================================================
        공개 / 비공개 헬퍼
-       - 기존 문서에 visibility 필드가 없으면 public으로 간주
     ==================================================== */
     function getVisibility(page) {
       return page?.visibility === "private" ? "private" : "public";
@@ -805,17 +900,12 @@
 
     function canReadPage(page) {
       if (!page) return false;
-
-      /* 공개 문서는 누구나 읽기 가능 */
       if (getVisibility(page) === "public") return true;
-
-      /* 비공개 문서는 로그인한 오너만 읽기 가능 */
       return canEdit;
     }
 
     /* ====================================================
        Firestore 문서 normalize
-       - 이번에 visibility 추가
     ==================================================== */
     function normalizePageDoc(id, data) {
       return {
@@ -954,7 +1044,6 @@
       }
     }
 
-
     function loadAll() {
       subscribePages();
     }
@@ -966,6 +1055,7 @@
     function saveRevisions() {
       /* Firestore 사용 버전에서는 필요 없음 */
     }
+
     async function initFirebase() {
       onAuthStateChanged(auth, async (user) => {
         if (user && !isOwnerUser(user)) {
@@ -974,8 +1064,6 @@
           currentUser = null;
           canEdit = false;
           updateAuthUI();
-
-          /* 비오너로 정리된 뒤 public 쿼리로 다시 구독 */
           loadAll();
           return;
         }
@@ -1014,7 +1102,9 @@
       return encodeURIComponent((title || "").trim().replace(/\s+/g, "-"));
     }
 
-    function isUrlLike(s) { return /^https?:\/\//i.test(s) }
+    function isUrlLike(s) {
+      return /^https?:\/\//i.test(s)
+    }
 
     function escapeHtml(s) {
       return String(s)
@@ -1027,6 +1117,103 @@
     function normalizeSmartQuotes(s) {
       return String(s || "").replace(/[\u2018\u2019]/g, "'");
     }
+
+    function cleanupOcrText(text) {
+      return String(text || "")
+        .replace(/\r\n/g, "\n")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function appendBlockText(original, extra) {
+      const source = String(original || "");
+      const add = cleanupOcrText(extra);
+      if (!add) return source;
+      if (!source.trim()) return add;
+      return source.replace(/\s*$/, "") + "\n\n" + add;
+    }
+
+    function insertTextAtCursor(textarea, text) {
+      if (!textarea) return;
+      const insertText = String(text || "");
+      const start = Number(textarea.selectionStart ?? textarea.value.length);
+      const end = Number(textarea.selectionEnd ?? textarea.value.length);
+
+      const before = textarea.value.slice(0, start);
+      const after = textarea.value.slice(end);
+
+      textarea.value = before + insertText + after;
+
+      const nextPos = before.length + insertText.length;
+      textarea.selectionStart = nextPos;
+      textarea.selectionEnd = nextPos;
+      textarea.focus();
+    }
+
+    /* ====================================================
+       OCR 헬퍼
+       - 브라우저에서 worker를 1개 생성해서 재사용
+       - kor + eng 언어를 함께 로드
+       - 공백 보존 / DPI 기본값을 조금 보정
+    ==================================================== */
+    async function getOrCreateOcrWorker(loggerCallback) {
+      if (!window.Tesseract || typeof window.Tesseract.createWorker !== "function") {
+        throw new Error("OCR 라이브러리를 불러오지 못했어. 네트워크 상태를 확인해줘.");
+      }
+
+      ocrLoggerProxy = typeof loggerCallback === "function" ? loggerCallback : null;
+
+      if (ocrWorker) {
+        return ocrWorker;
+      }
+
+      try {
+        const { createWorker } = window.Tesseract;
+
+        ocrWorker = await createWorker(["kor", "eng"], 1, {
+          logger: (message) => {
+            if (typeof ocrLoggerProxy === "function") {
+              ocrLoggerProxy(message);
+            }
+          }
+        });
+
+        try {
+          await ocrWorker.setParameters({
+            preserve_interword_spaces: "1",
+            user_defined_dpi: "300"
+          });
+        } catch (paramError) {
+          console.warn("OCR 파라미터 설정 중 경고:", paramError);
+        }
+
+        return ocrWorker;
+      } catch (error) {
+        ocrWorker = null;
+        throw error;
+      }
+    }
+
+    async function runOcrFromFile(file, onProgress) {
+      if (!file) {
+        throw new Error("OCR할 이미지 파일을 먼저 골라줘.");
+      }
+
+      const worker = await getOrCreateOcrWorker(onProgress);
+      const result = await worker.recognize(file);
+      return result?.data?.text || "";
+    }
+
+    window.addEventListener("beforeunload", () => {
+      if (ocrWorker) {
+        try {
+          ocrWorker.terminate();
+        } catch (error) {
+          console.warn("OCR worker 종료 중 경고:", error);
+        }
+      }
+    });
 
     /* ====================================================
        front matter
@@ -1091,7 +1278,10 @@
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const m = line.trim().match(/^(```|~~~)/);
-        if (!m) { outLines.push(line); continue; }
+        if (!m) {
+          outLines.push(line);
+          continue;
+        }
         const fence = m[1];
         const codeLines = [];
         i++;
@@ -1113,7 +1303,7 @@
       });
       return { text: out, codes };
     }
-    /* */
+
     function restoreInlineCodeAll(text, codes) {
       return String(text || "").replace(/\{\{INLINECODE:(\d+)\}\}/g, (m, n) => {
         return "`" + (codes[Number(n)] ?? "") + "`";
@@ -1205,12 +1395,18 @@
       const typeOf = ch => ch === "*" ? "ul" : "ol";
 
       function closeLiIfNeeded(targetDepth) {
-        if (openLiDepth > 0 && targetDepth <= openLiDepth) { out.push("</li>"); openLiDepth = 0; }
+        if (openLiDepth > 0 && targetDepth <= openLiDepth) {
+          out.push("</li>");
+          openLiDepth = 0;
+        }
       }
 
       function closeListsTo(commonDepth) {
         while (stack.length > commonDepth) {
-          if (openLiDepth === stack.length) { out.push("</li>"); openLiDepth = 0; }
+          if (openLiDepth === stack.length) {
+            out.push("</li>");
+            openLiDepth = 0;
+          }
           out.push(`</${stack.pop()}>`);
         }
       }
@@ -1233,7 +1429,10 @@
         closeLiIfNeeded(targetTypes.length);
         closeListsTo(common);
         openListsFrom(common, targetTypes);
-        if (openLiDepth === targetTypes.length) { out.push("</li>"); openLiDepth = 0; }
+        if (openLiDepth === targetTypes.length) {
+          out.push("</li>");
+          openLiDepth = 0;
+        }
         out.push(`<li>${renderInline(itemText)}`);
         openLiDepth = targetTypes.length;
         i++;
@@ -1283,7 +1482,10 @@
 
         while (i < localLines.length) {
           const line = localLines[i];
-          if (!line.trim()) { i++; continue; }
+          if (!line.trim()) {
+            i++;
+            continue;
+          }
 
           const cbMatch = line.trim().match(/^\{\{CODEBLOCK:(\d+)\}\}$/);
           if (cbMatch) {
@@ -1301,13 +1503,24 @@
             let depth = 1;
             while (i < localLines.length) {
               const l = localLines[i];
-              if (l.trim().match(/^\{\{HIDE_START:/)) { depth++; inner.push(l); i++; continue; }
+              if (l.trim().match(/^\{\{HIDE_START:/)) {
+                depth++;
+                inner.push(l);
+                i++;
+                continue;
+              }
               if (l.trim() === "{{HIDE_END}}") {
                 depth--;
-                if (depth === 0) { i++; break; }
-                inner.push(l); i++; continue;
+                if (depth === 0) {
+                  i++;
+                  break;
+                }
+                inner.push(l);
+                i++;
+                continue;
               }
-              inner.push(l); i++;
+              inner.push(l);
+              i++;
             }
             out.push(`
               <details class="mw-hide">
@@ -1317,7 +1530,10 @@
             continue;
           }
 
-          if (line.trim() === "{{HIDE_END}}") { i++; continue; }
+          if (line.trim() === "{{HIDE_END}}") {
+            i++;
+            continue;
+          }
 
           if (/^<references\s*\/\s*>$/i.test(line.trim())) {
             if (!__REFS.length) {
@@ -1341,11 +1557,27 @@
             continue;
           }
 
-          if (line.startsWith("### ")) { out.push(`<h4>${renderInline(line.slice(4))}</h4>`); i++; continue; }
-          if (line.startsWith("## ")) { out.push(`<h3>${renderInline(line.slice(3))}</h3>`); i++; continue; }
-          if (line.startsWith("# ")) { out.push(`<h2>${renderInline(line.slice(2))}</h2>`); i++; continue; }
+          if (line.startsWith("### ")) {
+            out.push(`<h4>${renderInline(line.slice(4))}</h4>`);
+            i++;
+            continue;
+          }
+          if (line.startsWith("## ")) {
+            out.push(`<h3>${renderInline(line.slice(3))}</h3>`);
+            i++;
+            continue;
+          }
+          if (line.startsWith("# ")) {
+            out.push(`<h2>${renderInline(line.slice(2))}</h2>`);
+            i++;
+            continue;
+          }
 
-          if (line.trim() === "---") { out.push("<hr />"); i++; continue; }
+          if (line.trim() === "---") {
+            out.push("<hr />");
+            i++;
+            continue;
+          }
 
           if (/^[*#]+\s+/.test(line)) {
             const { html, nextIndex } = consumeMwList(localLines, i);
@@ -1365,7 +1597,10 @@
           }
 
           const buf = [];
-          while (i < localLines.length && localLines[i].trim()) { buf.push(localLines[i]); i++; }
+          while (i < localLines.length && localLines[i].trim()) {
+            buf.push(localLines[i]);
+            i++;
+          }
           out.push(`<p>${renderParagraphBr(buf)}</p>`);
         }
 
@@ -1443,9 +1678,6 @@
 
     /* ====================================================
        사이드바 목록
-       - 이번 단계에서는 디자인 유지가 우선이라
-         visibility로 숨기지는 않음
-       - 그냥 값만 저장하는 단계
     ==================================================== */
     function buildList() {
       const q = sideQuery.trim().toLowerCase();
@@ -1477,7 +1709,10 @@
        라우터
     ==================================================== */
     function route() {
-      if (!pagesReady) { viewEl.innerHTML = `<p class="muted">불러오는 중...</p>`; return; }
+      if (!pagesReady) {
+        viewEl.innerHTML = `<p class="muted">불러오는 중...</p>`;
+        return;
+      }
 
       const hash = location.hash || "#/";
       const [path, qs] = hash.replace("#", "").split("?");
@@ -1524,18 +1759,17 @@
 
     /* ====================================================
        문서 보기
-       - 여기서는 현재 visibility 값을 정보로만 표시
     ==================================================== */
     function renderPage(pageId) {
       const page = pages.find(p => p.id === pageId);
 
       if (!canReadPage(page)) {
         viewEl.innerHTML = `
-      <h2 class="page-title">비공개 문서</h2>
-      <p>이 문서는 아직 공개되지 않았어.</p>
-      <div class="tools-row">
-        <button class="tool-link" type="button" onclick="location.hash='#/'">홈으로</button>
-      </div>`;
+          <h2 class="page-title">비공개 문서</h2>
+          <p>이 문서는 아직 공개되지 않았어.</p>
+          <div class="tools-row">
+            <button class="tool-link" type="button" onclick="location.hash='#/'">홈으로</button>
+          </div>`;
         return;
       }
 
@@ -1555,10 +1789,19 @@
             <button class="tool-link" type="button" id="history-direct-btn">히스토리</button>
           </div>`;
 
-        const timer = setTimeout(() => { location.hash = `#/page/${redirect.targetId}`; }, 200);
-        document.getElementById("go-btn").addEventListener("click", () => { clearTimeout(timer); location.hash = `#/page/${redirect.targetId}`; });
+        const timer = setTimeout(() => {
+          location.hash = `#/page/${redirect.targetId}`;
+        }, 200);
+
+        document.getElementById("go-btn").addEventListener("click", () => {
+          clearTimeout(timer);
+          location.hash = `#/page/${redirect.targetId}`;
+        });
         document.getElementById("stay-btn").addEventListener("click", () => clearTimeout(timer));
-        document.getElementById("history-direct-btn").addEventListener("click", () => { clearTimeout(timer); location.hash = `#/history/${pageId}`; });
+        document.getElementById("history-direct-btn").addEventListener("click", () => {
+          clearTimeout(timer);
+          location.hash = `#/history/${pageId}`;
+        });
         return;
       }
 
@@ -1601,12 +1844,12 @@
        검색
     ==================================================== */
     function renderSearch(q) {
-      const query = (q || "").trim();
-      const results = query
+      const queryText = (q || "").trim();
+      const results = queryText
         ? pages.filter(p =>
           !isRedirectPage(p) &&
           canReadPage(p) &&
-          (p.title + "\n" + p.content).toLowerCase().includes(query.toLowerCase())
+          (p.title + "\n" + p.content).toLowerCase().includes(queryText.toLowerCase())
         )
         : [];
 
@@ -1614,17 +1857,17 @@
         <h2 class="page-title">검색</h2>
         <div class="editor">
           <label>검색어</label>
-          <input id="search-input" type="text" value="${escapeHtml(query)}" placeholder="검색어..." />
+          <input id="search-input" type="text" value="${escapeHtml(queryText)}" placeholder="검색어..." />
         </div>
         <hr />
-        ${query
+        ${queryText
           ? (results.length
             ? `<ul>${results.map(p => `
-                <li>
-                  <a href="#/page/${escapeHtml(p.id)}">${escapeHtml(p.title)}</a>
-                  <span class="muted"> · ${escapeHtml(getVisibility(p) === "private" ? "비공개" : "공개")}</span>
-                </li>
-              `).join("")}</ul>`
+                  <li>
+                    <a href="#/page/${escapeHtml(p.id)}">${escapeHtml(p.title)}</a>
+                    <span class="muted"> · ${escapeHtml(getVisibility(p) === "private" ? "비공개" : "공개")}</span>
+                  </li>
+                `).join("")}</ul>`
             : `<p>결과가 없어.</p>`)
           : `<p>검색어를 입력해줘.</p>`}`;
 
@@ -1643,13 +1886,14 @@
 
       if (!page || !canReadPage(page)) {
         viewEl.innerHTML = `
-      <h2 class="page-title">히스토리</h2>
-      <p>이 문서의 히스토리를 볼 수 없어.</p>
-      <div class="tools-row">
-        <button class="tool-link" type="button" onclick="location.hash='#/'">홈으로</button>
-      </div>`;
+          <h2 class="page-title">히스토리</h2>
+          <p>이 문서의 히스토리를 볼 수 없어.</p>
+          <div class="tools-row">
+            <button class="tool-link" type="button" onclick="location.hash='#/'">홈으로</button>
+          </div>`;
         return;
       }
+
       const rows = await fetchRevisions(pageId);
       viewEl.innerHTML = `
         <h2 class="page-title">히스토리</h2>
@@ -1685,8 +1929,8 @@
 
       if (!page || !canReadPage(page)) {
         viewEl.innerHTML = `
-      <h2 class="page-title">리비전 없음</h2>
-      <p>이 문서의 리비전을 볼 수 없어.</p>`;
+          <h2 class="page-title">리비전 없음</h2>
+          <p>이 문서의 리비전을 볼 수 없어.</p>`;
         return;
       }
 
@@ -1699,21 +1943,21 @@
       }
 
       viewEl.innerHTML = `
-    <h2 class="page-title">리비전</h2>
-    <div class="meta-row">
-      <span>${escapeHtml(formatDate(r.savedAt))}</span>
-      ${r.savedBy ? `<span>·</span><span>${escapeHtml(r.savedBy)}</span>` : ""}
-      ${r.note ? `<span>·</span><span>${escapeHtml(r.note)}</span>` : ""}
-      ${r.visibility ? `<span>·</span><span>${escapeHtml(r.visibility === "private" ? "비공개" : "공개")}</span>` : ""}
-    </div>
+        <h2 class="page-title">리비전</h2>
+        <div class="meta-row">
+          <span>${escapeHtml(formatDate(r.savedAt))}</span>
+          ${r.savedBy ? `<span>·</span><span>${escapeHtml(r.savedBy)}</span>` : ""}
+          ${r.note ? `<span>·</span><span>${escapeHtml(r.note)}</span>` : ""}
+          ${r.visibility ? `<span>·</span><span>${escapeHtml(r.visibility === "private" ? "비공개" : "공개")}</span>` : ""}
+        </div>
 
-    <div class="doc">${renderWiki(String(r.content || ""))}</div>
+        <div class="doc">${renderWiki(String(r.content || ""))}</div>
 
-    <div class="tools-row">
-      <button class="tool-link" type="button" onclick="location.hash='#/history/${escapeHtml(pageId)}'">히스토리로</button>
-      <button class="tool-link" type="button" onclick="location.hash='#/page/${escapeHtml(pageId)}'">문서로</button>
-      ${canEdit ? `<button class="tool-link" type="button" id="revert-btn">이 버전으로 되돌리기</button>` : ""}
-    </div>`;
+        <div class="tools-row">
+          <button class="tool-link" type="button" onclick="location.hash='#/history/${escapeHtml(pageId)}'">히스토리로</button>
+          <button class="tool-link" type="button" onclick="location.hash='#/page/${escapeHtml(pageId)}'">문서로</button>
+          ${canEdit ? `<button class="tool-link" type="button" id="revert-btn">이 버전으로 되돌리기</button>` : ""}
+        </div>`;
 
       if (canEdit) {
         document.getElementById("revert-btn")?.addEventListener("click", async () => {
@@ -1748,7 +1992,6 @@
 
     /* ====================================================
        문서 저장
-       - 이번 수정에서 visibility 저장 추가
     ==================================================== */
     async function savePage({ mode, oldId, title, content, visibility }) {
       if (!canEdit) throw new Error("로그인해야 저장할 수 있어.");
@@ -1763,7 +2006,6 @@
       const destExists = !!dest;
       const actor = getActorLabel();
 
-      /* 공개/비공개 값 정규화 */
       const finalVisibility = visibility === "private" ? "private" : "public";
 
       if (!isEdit && destExists) throw new Error("같은 제목(슬러그)의 문서가 이미 있어.");
@@ -1777,7 +2019,6 @@
         }, { merge: true });
       };
 
-      /* ① 편집 & 슬러그 그대로 */
       if (isEdit && newId === oldId) {
         queueUpsertPage(oldId, {
           title,
@@ -1791,7 +2032,6 @@
         return oldId;
       }
 
-      /* ② 편집 & 슬러그 변경 & 목적지 문서 이미 존재 → 덮어쓰기 */
       if (isEdit && oldId !== newId && destExists) {
         const destAliases = Array.isArray(dest.aliases) ? dest.aliases : [];
         await addRevision(newId, {
@@ -1838,7 +2078,6 @@ redirect: true
         return newId;
       }
 
-      /* ③ 신규 OR 정상 이동 */
       const aliases = isEdit ? Array.from(new Set([...prevAliases, oldId].filter(Boolean))) : [];
       queueUpsertPage(newId, {
         title,
@@ -1914,8 +2153,10 @@ redirect: true
 
     /* ====================================================
        에디터
-       - 이번 수정의 핵심
-       - 저장/취소 버튼 줄 오른쪽 끝에 토글 추가
+       - OCR 영역 추가
+       - 이미지 파일을 고른 뒤 OCR 실행
+       - 결과를 먼저 별도 textarea에 보여준 다음
+         커서 위치 삽입 / 본문 끝 추가를 선택
     ==================================================== */
     function renderEditor({ mode, slug }) {
       if (!canEdit) {
@@ -1925,7 +2166,10 @@ redirect: true
             <button class="tool-link" type="button" id="login-now">로그인</button>
             <button class="tool-link" type="button" onclick="location.hash='#/'">닫기</button>
           </div>`;
-        document.getElementById("login-now").addEventListener("click", async () => { await login(); route(); });
+        document.getElementById("login-now").addEventListener("click", async () => {
+          await login();
+          route();
+        });
         return;
       }
 
@@ -1935,7 +2179,6 @@ redirect: true
         ? editing.content
         : `---\ncategory: ${CATEGORY_OPTIONS[0]}\ntags:\n---\n\n== 제목 ==\n내용...\n`;
 
-      /* 기존 문서는 visibility가 없을 수 있으므로 public 기본 처리 */
       const visibilityValue = editing ? getVisibility(editing) : "private";
 
       viewEl.innerHTML = `
@@ -1948,15 +2191,56 @@ redirect: true
           <label>내용</label>
           <textarea id="edit-content" spellcheck="false">${escapeHtml(contentValue)}</textarea>
 
+          <!-- ====================================================
+               OCR 영역
+               1) 이미지 선택
+               2) OCR 실행
+               3) 결과 검토
+               4) 본문에 삽입 / 본문 끝에 추가
+          ==================================================== -->
+          <div class="ocr-panel">
+            <div class="ocr-head">
+              <div class="ocr-title">OCR</div>
+              <div class="ocr-help">이미지 속 글자를 추출해서 문서 본문으로 가져오기</div>
+            </div>
+
+            <div class="ocr-actions">
+              <input
+                id="ocr-file"
+                class="ocr-file-input"
+                type="file"
+                accept="image/*"
+              />
+              <button class="btn" type="button" id="ocr-run-btn">이미지에서 텍스트 추출</button>
+              <button class="btn" type="button" id="ocr-insert-btn" disabled>커서 위치에 삽입</button>
+              <button class="btn" type="button" id="ocr-append-btn" disabled>본문 끝에 추가</button>
+            </div>
+
+            <div class="ocr-status" id="ocr-status">
+              이미지를 선택한 뒤 “이미지에서 텍스트 추출”을 눌러줘.
+            </div>
+
+            <div class="ocr-progress" aria-hidden="true">
+              <span class="ocr-progress-bar" id="ocr-progress-bar"></span>
+            </div>
+
+            <img id="ocr-preview" class="ocr-preview" alt="OCR 미리보기" hidden />
+
+            <div class="ocr-result-wrap">
+              <div class="ocr-result-label">추출 결과 (필요하면 여기서 직접 정리한 뒤 본문에 넣어도 됨)</div>
+              <textarea
+                id="ocr-result"
+                class="ocr-result"
+                spellcheck="false"
+                placeholder="OCR 결과가 여기 표시돼."
+              ></textarea>
+            </div>
+          </div>
+
           <div class="editor-actions">
             <button class="btn primary" type="button" id="save-btn">저장</button>
             <button class="btn" type="button" id="cancel-btn">취소</button>
 
-            <!-- ====================================================
-                 공개 / 비공개 토글
-                 - 네가 요청한 바로 그 위치
-                 - 저장/취소 버튼 줄 오른쪽 끝
-            ==================================================== -->
             <div class="visibility-toggle-wrap">
               <span class="visibility-toggle-label" id="visibility-label">
                 ${visibilityValue === "public" ? "공개" : "비공개"}
@@ -1979,19 +2263,158 @@ redirect: true
       const visibilityToggle = document.getElementById("visibility-toggle");
       const visibilityLabel = document.getElementById("visibility-label");
 
-      /* 토글 상태가 바뀌면 라벨도 같이 바뀌게 함 */
+      /* ====================================================
+         OCR DOM
+      ==================================================== */
+      const ocrFileInput = document.getElementById("ocr-file");
+      const ocrRunBtn = document.getElementById("ocr-run-btn");
+      const ocrInsertBtn = document.getElementById("ocr-insert-btn");
+      const ocrAppendBtn = document.getElementById("ocr-append-btn");
+      const ocrStatus = document.getElementById("ocr-status");
+      const ocrProgressBar = document.getElementById("ocr-progress-bar");
+      const ocrPreview = document.getElementById("ocr-preview");
+      const ocrResult = document.getElementById("ocr-result");
+
+      let previewUrl = "";
+
       function syncVisibilityLabel() {
         visibilityLabel.textContent = visibilityToggle.checked ? "공개" : "비공개";
+      }
+
+      function setOcrStatus(message) {
+        ocrStatus.textContent = message;
+      }
+
+      function setOcrProgress(percent) {
+        const value = Math.max(0, Math.min(100, Number(percent || 0)));
+        ocrProgressBar.style.width = `${value}%`;
+      }
+
+      function resetOcrResultState() {
+        ocrResult.value = "";
+        ocrInsertBtn.disabled = true;
+        ocrAppendBtn.disabled = true;
+        setOcrProgress(0);
       }
 
       syncVisibilityLabel();
       visibilityToggle.addEventListener("change", syncVisibilityLabel);
 
+      /* ====================================================
+         이미지가 선택되면
+         - 미리보기 표시
+         - 이전 OCR 결과는 비움
+      ==================================================== */
+      ocrFileInput.addEventListener("change", () => {
+        const file = ocrFileInput.files?.[0];
+        resetOcrResultState();
+
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrl = "";
+        }
+
+        if (!file) {
+          ocrPreview.hidden = true;
+          ocrPreview.removeAttribute("src");
+          setOcrStatus("이미지를 선택한 뒤 “이미지에서 텍스트 추출”을 눌러줘.");
+          return;
+        }
+
+        previewUrl = URL.createObjectURL(file);
+        ocrPreview.src = previewUrl;
+        ocrPreview.hidden = false;
+
+        setOcrStatus(`선택된 파일: ${file.name}`);
+      });
+
+      /* ====================================================
+         OCR 실행 버튼
+         - 진행률 logger를 받아 상태 문구와 바를 갱신
+         - 결과는 먼저 별도 textarea에 보여줌
+      ==================================================== */
+      ocrRunBtn.addEventListener("click", async () => {
+        const file = ocrFileInput.files?.[0];
+        if (!file) {
+          alert("OCR할 이미지 파일을 먼저 선택해줘.");
+          return;
+        }
+
+        ocrRunBtn.disabled = true;
+        ocrInsertBtn.disabled = true;
+        ocrAppendBtn.disabled = true;
+        setOcrProgress(0);
+        setOcrStatus("OCR 준비 중이야... 처음 한 번은 조금 걸릴 수 있어.");
+
+        try {
+          const text = await runOcrFromFile(file, (message) => {
+            const status = String(message?.status || "");
+            const progress = typeof message?.progress === "number"
+              ? Math.round(message.progress * 100)
+              : 0;
+
+            setOcrProgress(progress);
+
+            if (status) {
+              setOcrStatus(`OCR 진행 중: ${status.replaceAll("_", " ")} ${progress ? `(${progress}%)` : ""}`);
+            }
+          });
+
+          const cleanedText = cleanupOcrText(text);
+          ocrResult.value = cleanedText;
+
+          if (cleanedText) {
+            ocrInsertBtn.disabled = false;
+            ocrAppendBtn.disabled = false;
+            setOcrProgress(100);
+            setOcrStatus("OCR이 끝났어. 결과를 확인한 뒤 본문에 넣어줘.");
+          } else {
+            setOcrStatus("문자를 거의 찾지 못했어. 해상도가 더 높은 이미지를 써보거나 대비가 큰 이미지를 써봐.");
+          }
+        } catch (error) {
+          console.error(error);
+          setOcrStatus("OCR 중 오류가 났어. 이미지 파일 형식이나 네트워크 상태를 확인해줘.");
+          alert(error?.message || "OCR 실행 중 오류가 났어.");
+        } finally {
+          ocrRunBtn.disabled = false;
+        }
+      });
+
+      /* ====================================================
+         OCR 결과를 현재 커서 위치에 삽입
+         - 사용자가 본문 중간에 원하는 위치를 선택한 뒤 넣을 수 있음
+      ==================================================== */
+      ocrInsertBtn.addEventListener("click", () => {
+        const text = cleanupOcrText(ocrResult.value);
+        if (!text) {
+          alert("삽입할 OCR 결과가 없어.");
+          return;
+        }
+
+        insertTextAtCursor(contentInput, text);
+        setOcrStatus("추출한 텍스트를 현재 커서 위치에 삽입했어.");
+      });
+
+      /* ====================================================
+         OCR 결과를 본문 끝에 추가
+         - 기존 글 뒤에 두 줄 띄우고 블록으로 덧붙임
+      ==================================================== */
+      ocrAppendBtn.addEventListener("click", () => {
+        const text = cleanupOcrText(ocrResult.value);
+        if (!text) {
+          alert("추가할 OCR 결과가 없어.");
+          return;
+        }
+
+        contentInput.value = appendBlockText(contentInput.value, text);
+        contentInput.focus();
+        contentInput.selectionStart = contentInput.selectionEnd = contentInput.value.length;
+        setOcrStatus("추출한 텍스트를 본문 끝에 추가했어.");
+      });
+
       document.getElementById("save-btn").addEventListener("click", async () => {
         const newTitle = titleInput.value.trim();
         const newContent = contentInput.value;
-
-        /* 체크되면 공개, 아니면 비공개 */
         const newVisibility = visibilityToggle.checked ? "public" : "private";
 
         if (!newTitle) return alert("제목을 입력해줘.");
@@ -2012,6 +2435,10 @@ redirect: true
       });
 
       document.getElementById("cancel-btn").addEventListener("click", () => {
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrl = "";
+        }
         location.hash = (mode === "edit" && editing) ? `#/page/${editing.id}` : "#/";
       });
     }
@@ -2023,8 +2450,14 @@ redirect: true
       document.querySelectorAll(".nav-btn[data-nav]").forEach(btn => {
         btn.addEventListener("click", () => {
           const nav = btn.getAttribute("data-nav");
-          if (nav === "recent") { location.hash = "#/recent"; return; }
-          if (nav === "search") { location.hash = "#/search"; return; }
+          if (nav === "recent") {
+            location.hash = "#/recent";
+            return;
+          }
+          if (nav === "search") {
+            location.hash = "#/search";
+            return;
+          }
           if (nav === "new") {
             if (!canEdit) return alert("새 문서는 로그인 후에 만들 수 있어.");
             location.hash = "#/new";
@@ -2055,7 +2488,6 @@ redirect: true
     initFirebase();
   </script>
 
-  <!-- 시드 데이터 -->
   <script>
     window.SEED_PAGES = [
       {
