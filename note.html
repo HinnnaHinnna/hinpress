@@ -920,9 +920,12 @@
         console.error(error);
         pagesReady = true;
 
-        const msg = error?.code === "permission-denied"
-          ? "Firestore 권한이 막혀 있어. rules 또는 visibility 쿼리를 확인해줘."
-          : "문서를 불러오는 데 실패했어. Firebase 설정과 규칙을 확인해줘.";
+        const msg =
+          error?.code === "permission-denied"
+            ? "읽기 권한이 없어. Firestore Rules를 확인해줘."
+            : error?.code === "failed-precondition"
+              ? "공개 문서 쿼리에 필요한 Firestore 인덱스가 아직 없거나 빌드 중이야."
+              : `문서를 불러오는 중 오류가 났어: ${error?.message || error?.code || "unknown error"}`;
 
         viewEl.innerHTML = `<p class="muted">${msg}</p>`;
       });
