@@ -1,10 +1,3 @@
-// =====================================================
-// script.js
-// =====================================================
-
-// =====================================================
-// 0) 공통 요소 선택
-// =====================================================
 const mainPage = document.getElementById('main-page');
 const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
@@ -44,9 +37,8 @@ const detailStripRight = document.getElementById('detail-strip-right');
 
 let currentProjectIndex = -1;
 
-// =====================================================
-// ✅ 유틸
-// =====================================================
+
+
 function getImageSrc(item) {
   if (!item) return '';
   if (typeof item === 'string') return item;
@@ -93,15 +85,10 @@ function setImageSrcWithFallback(imgEl, src) {
 
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-// =====================================================
-// 1) 페이지 전환
-// =====================================================
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   page.classList.add('active');
 
-  // ✅ [변경] 포트폴리오 페이지 진입 시 "랜덤 셔플"하지 않고,
-  // projects-data.js에 정의된 원래 순서대로 렌더링
   if (page === portfolioPage) createThumbnails({ shuffle: false });
 
   if (page === mainPage) topBar?.classList.add('hidden');
@@ -116,9 +103,6 @@ cvBtn?.addEventListener('click', () => showPage(cvPage));
 contactBtn?.addEventListener('click', () => window.open('note.html', '_blank'));
 
 
-// =====================================================
-// 2) 상세 prev/next
-// =====================================================
 function updateDetailNavButtons() {
   if (!detailPrev || !detailNext || !Array.isArray(projects)) return;
   if (currentProjectIndex <= 0) detailPrev.classList.add('disabled');
@@ -141,9 +125,7 @@ detailNext?.addEventListener('click', () => {
   if (next) showProjectDetail(next.id);
 });
 
-// =====================================================
-// 3) 캔버스 + 마퀴바(패들)
-// =====================================================
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas?.getContext('2d');
 const marqueeBar = document.getElementById('marquee-bar');
@@ -157,9 +139,7 @@ let paddleTop = 0;
 let paddleBottom = 0;
 let paddleVX = 0;
 
-// -----------------------------------------------------
-// ✅ 텍스트 잉크 박스
-// -----------------------------------------------------
+
 function getTextInkRect(el) {
   if (!el) return null;
   const range = document.createRange();
@@ -169,16 +149,14 @@ function getTextInkRect(el) {
   return rect;
 }
 
-// -----------------------------------------------------
-// ✅ 모바일 기준값을 화면폭 비율로 스케일링
-// -----------------------------------------------------
+
 function getMarqueeTuningByViewport() {
   const BASE_W = 390;
 
   const isMobile = window.innerWidth <= 768;
 
-  const BASE_GAP = isMobile ? -24 : -15;        // ✅ 모바일만 더 붙이기
-  const BASE_LEFT_NUDGE = isMobile ? 2.8 : 2.8; // 필요하면 같이
+  const BASE_GAP = isMobile ? -24 : -15;
+  const BASE_LEFT_NUDGE = isMobile ? 2.8 : 2.8;
 
   const scale = clamp(window.innerWidth / BASE_W, 0.7, 3.2);
 
@@ -189,9 +167,7 @@ function getMarqueeTuningByViewport() {
   };
 }
 
-// -----------------------------------------------------
-// ✅ 타이틀 아래 마퀴바 정렬
-// -----------------------------------------------------
+
 function alignMarqueeToTitleUnderline() {
   if (!mainTitle || !marqueeBar) return;
 
@@ -287,9 +263,7 @@ if (mainTitle && 'ResizeObserver' in window) {
   ro.observe(mainTitle);
 }
 
-// -----------------------------------------------------
-// ✅ 패들 드래그(좌우만)
-// -----------------------------------------------------
+
 let isDraggingPaddle = false;
 let lastPointerX = 0;
 let lastPointerTime = 0;
@@ -355,9 +329,7 @@ const endTouch = () => { isDraggingPaddle = false; paddleVX = 0; };
 window.addEventListener('touchend', endTouch);
 window.addEventListener('touchcancel', endTouch);
 
-// =====================================================
-// 4) 스마일 볼
-// =====================================================
+
 class Ball {
   constructor(x, y, radius, color) {
     this.x = x; this.y = y;
@@ -403,7 +375,6 @@ class Ball {
     if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx = -Math.abs(this.vx); }
     else if (this.x - this.radius < 0) { this.x = this.radius; this.vx = Math.abs(this.vx); }
 
-    // 패들 충돌
     if (paddleHeight > 0) {
       const withinPaddleX =
         this.x >= (paddleX - this.radius) &&
@@ -458,18 +429,16 @@ const ballColor = '#0008ff';
 const MAX_BALLS = 10;
 let lastSpawnTime = 0;
 
-// ✅ 디버그 출력(콘솔 + 화면)
+
 const debugBallEl = document.getElementById('debug-balls');
 let lastDebugLog = 0;
 function debugBallCount() {
   const now = performance.now();
 
-  // 화면 표시(매 프레임 업데이트)
   if (debugBallEl) {
     debugBallEl.textContent = `balls: ${balls.length} / ${MAX_BALLS}`;
   }
 
-  // 콘솔은 1초에 1번만(너무 많이 찍히면 보기 힘들어서)
   if (now - lastDebugLog > 1000) {
     console.log(`[hinPress] balls: ${balls.length} / ${MAX_BALLS}`);
     lastDebugLog = now;
@@ -536,23 +505,20 @@ function checkCollision(ball1, ball2) {
   ball2.vy += impulseY * invMass2;
 
   const now = performance.now();
-  // ✅ 여기서만 새 볼이 늘어남. balls.length < MAX_BALLS이면 절대 MAX 초과 못 함.
   if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
     balls.push(new Ball((ball1.x + ball2.x) / 2, (ball1.y + ball2.y) / 2, ball1.radius, ballColor));
     lastSpawnTime = now;
   }
 }
 
-// ✅ 중복 실행 방지: 이전 RAF가 있으면 끊고 새로 시작
 if (window.__hinpressBallRAF) {
   cancelAnimationFrame(window.__hinpressBallRAF);
   window.__hinpressBallRAF = null;
 }
 
 if (canvas && ctx) {
-  // ✅ 시작 볼 5개 생성 (지름 = radius * 2)
   for (let i = 0; i < numBalls; i++) {
-    const radius = 30; // ✅ 지름을 바꾸려면 여기 값만 바꾸면 됨 (예: 20 → 지름 40)
+    const radius = 30;
     const x = radius + Math.random() * (canvas.width - radius * 2);
     const y = radius + Math.random() * (canvas.height - radius * 2);
     balls.push(new Ball(x, y, radius, ballColor));
@@ -568,22 +534,14 @@ if (canvas && ctx) {
       for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
     }
 
-    // ✅ 디버그(콘솔 + 화면)
     debugBallCount();
 
     window.__hinpressBallRAF = requestAnimationFrame(animate);
   }
 
-  // ✅ 여기! 호출은 그냥 이렇게 깔끔하게
   animate();
 }
 
-
-// =====================================================
-// 5) 썸네일/상세
-// =====================================================
-
-// (유지) 셔플 함수는 나중에 "정렬 토글" 만들 때 다시 쓰려고 남겨둠
 function shuffleArray(inputArray) {
   const arr = inputArray.slice();
   for (let i = arr.length - 1; i > 0; i--) {
@@ -597,9 +555,6 @@ function createThumbnails(options = {}) {
   if (!thumbnailsContainer || !Array.isArray(projects)) return;
   thumbnailsContainer.innerHTML = '';
 
-  // ✅ [변경] 기본값을 "셔플 안 함(false)"으로 변경
-  // - 이전: (options.shuffle ?? true)  → 기본이 true라서 항상 랜덤
-  // - 변경: (options.shuffle ?? false) → 기본이 false라서 원래 순서
   const list = (options.shuffle ?? false) ? shuffleArray(projects) : projects;
 
   list.forEach(project => {
@@ -617,7 +572,6 @@ function createThumbnails(options = {}) {
   });
 }
 
-// ✅ [변경] 최초 렌더도 셔플 없이
 createThumbnails({ shuffle: false });
 
 function normalizeMainImageSize(value) {
@@ -632,7 +586,6 @@ function normalizeText(value) {
   return '';
 }
 
-// ✅ 스트립 클릭 가드(드래그 중 클릭 방지)
 let stripIsPointerDown = false;
 let stripMoved = false;
 let stripStartX = 0;
@@ -806,9 +759,6 @@ function showProjectDetail(projectId) {
   updateDetailNavButtons();
 }
 
-// =====================================================
-// 6) 모바일: 상세 스와이프(prev/next)
-// =====================================================
 if (detailPage) {
   let touchStartX = 0;
   let touchStartY = 0;

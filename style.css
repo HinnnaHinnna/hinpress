@@ -39,95 +39,25 @@
   --marquee-loop-duration: 30s;
 }
 
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* =====================================================
-   ✅ (추가) 로컬 폰트: AutoGrotesk TRIAL
-   - 폰트 파일이 index.html/style.css/script.js와 같은 폴더에 있으니
-     url('./파일명') 또는 url('파일명') 둘 다 OK
-   - format은 otf이므로 'opentype'
-   ===================================================== */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
 @font-face {
   font-family: 'AutoGroteskTRIAL';
   src: url('./AutoGroteskTRIAL-BExtrabold.otf') format('opentype');
   font-weight: 800;
-  /* ExtraBold에 해당하는 일반적인 값 */
   font-style: normal;
   font-display: optional;
 }
 
-/* =====================================================
-   Pretendard (기존)
-   ===================================================== */
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');
-  font-weight: 100;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');
-  font-weight: 200;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2') format('woff2');
-  font-weight: 800;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');
-  font-weight: 900;
-  font-display: swap;
-}
-
 body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, "Pretendard", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 300;
   background: var(--color-bg-main);
   color: var(--color-text-main);
@@ -136,7 +66,6 @@ body {
   height: 100vh;
 }
 
-/* =============================== 상단 바 =============================== */
 .top-bar {
   position: fixed;
   top: 0;
@@ -204,7 +133,6 @@ body {
   cursor: pointer;
 }
 
-/* =============================== 페이지 공통 =============================== */
 .page {
   position: absolute;
   width: 100%;
@@ -219,7 +147,6 @@ body {
   visibility: visible;
 }
 
-/* =============================== 메인 페이지 =============================== */
 #main-page {
   background: var(--color-bg-main);
 }
@@ -238,13 +165,8 @@ body {
 #main-title {
   white-space: nowrap;
   font-size: min(20vw, 20vh);
-
-  /* ✅ (변경) Inter → 로컬 AutoGrotesk */
   font-family: 'AutoGroteskTRIAL', Helvetica, Arial, sans-serif;
-
-  /* ✅ (권장) 폰트가 ExtraBold 1종만 있으니 weight도 맞춰주는 게 안전 */
   font-weight: 800;
-
   letter-spacing: -0.022em;
   color: rgb(0, 0, 0);
   cursor: pointer;
@@ -281,7 +203,6 @@ body {
   pointer-events: none;
 }
 
-/* =============================== 마퀴바 =============================== */
 .marquee-bar {
   position: fixed;
   left: 0;
@@ -355,7 +276,6 @@ body {
   display: block;
 }
 
-/* =============================== 포트폴리오 페이지 =============================== */
 #portfolio-page {
   background: var(--color-portfolio-bg);
   overflow-y: auto;
@@ -387,7 +307,6 @@ body {
   display: block;
 }
 
-/* =============================== 상세 페이지 =============================== */
 #detail-page {
   background: var(#ffffff);
   overflow-y: auto;
@@ -588,7 +507,6 @@ body {
   }
 }
 
-/* =============================== 상세페이지 하단 스트립 =============================== */
 .detail-bottom-strip {
   background: transparent;
   margin-top: 3rem;
@@ -689,7 +607,6 @@ body {
   transform-origin: center;
 }
 
-/* =============================== Scrollbar =============================== */
 #portfolio-page,
 #detail-page,
 .detail-strip-track {
@@ -728,7 +645,6 @@ body {
   background: transparent;
 }
 
-/* =============================== CV 페이지 =============================== */
 #cv-page {
   background: var(--color-main-gray);
   color: var(--color-text-main);
@@ -793,7 +709,6 @@ body {
   top: 0;
 }
 
-/* =============================== 모바일 =============================== */
 @media (max-width: 768px) {
   :root {
     --bar-height: 2rem;

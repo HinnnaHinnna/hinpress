@@ -571,12 +571,6 @@
       margin-top: 0
     }
 
-    /* ============================================================
-       OCR UI
-       - 편집 모드에서만 나타나는 이미지 → 텍스트 추출 영역
-       - 본문 textarea를 바로 덮어쓰지 않고,
-         먼저 결과를 보여준 뒤 사용자가 삽입/추가를 선택하게 함
-    ============================================================ */
     .ocr-panel {
       border: 1px solid var(--line);
       border-radius: 16px;
@@ -781,11 +775,6 @@
     </section>
   </main>
 
-  <!-- ============================================================
-       OCR 라이브러리
-       - 전역 window.Tesseract 로 접근
-       - 이후 module script 안에서 createWorker를 사용
-  ============================================================ -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <script type="module">
@@ -813,9 +802,6 @@
       writeBatch
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    /* ====================================================
-       기본 설정
-    ==================================================== */
     const CATEGORY_OPTIONS = ["힌프레스", "책", "노트"];
     const HOME_PAGE_TITLE = "사적글쓰기는";
     const MAX_REVISIONS = 10;
@@ -838,9 +824,7 @@
     const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();
 
-    /* ====================================================
-       DOM
-    ==================================================== */
+
     const viewEl = document.getElementById("view");
     const pageListEl = document.getElementById("page-list");
     const sideSearchInput = document.getElementById("side-search-input");
@@ -848,9 +832,6 @@
     const authStatus = document.getElementById("auth-status");
     const chipWrap = document.getElementById("category-chips");
 
-    /* ====================================================
-       상태
-    ==================================================== */
     let pages = [];
     let revisions = {};
     let pagesReady = false;
@@ -862,17 +843,10 @@
     let unsubscribePages = null;
     let hasAttemptedSeed = false;
 
-    /* ====================================================
-       OCR 상태
-       - worker를 한 번 만들어두고 재사용
-       - 같은 편집 세션에서 여러 장 OCR해도 매번 새로 만들지 않음
-    ==================================================== */
+
     let ocrWorker = null;
     let ocrLoggerProxy = null;
 
-    /* ====================================================
-       인증 / 오너 판별
-    ==================================================== */
     function ownerEmailNormalized() {
       return String(OWNER_EMAIL || "").trim().toLowerCase();
     }
@@ -896,9 +870,6 @@
       };
     }
 
-    /* ====================================================
-       공개 / 비공개 헬퍼
-    ==================================================== */
     function getVisibility(page) {
       return page?.visibility === "private" ? "private" : "public";
     }
@@ -909,9 +880,6 @@
       return canEdit;
     }
 
-    /* ====================================================
-       Firestore 문서 normalize
-    ==================================================== */
     function normalizePageDoc(id, data) {
       return {
         id,
@@ -1054,11 +1022,9 @@
     }
 
     function savePages() {
-      /* Firestore 사용 버전에서는 필요 없음 */
     }
 
     function saveRevisions() {
-      /* Firestore 사용 버전에서는 필요 없음 */
     }
 
     async function initFirebase() {
@@ -1090,9 +1056,6 @@
       });
     }
 
-    /* ====================================================
-       유틸
-    ==================================================== */
     function formatDate(ms) {
       const d = new Date(ms || Date.now());
       const y = d.getFullYear();
@@ -1156,12 +1119,6 @@
       textarea.focus();
     }
 
-    /* ====================================================
-       OCR 헬퍼
-       - 브라우저에서 worker를 1개 생성해서 재사용
-       - kor + eng 언어를 함께 로드
-       - 공백 보존 / DPI 기본값을 조금 보정
-    ==================================================== */
     async function getOrCreateOcrWorker(loggerCallback) {
       if (!window.Tesseract || typeof window.Tesseract.createWorker !== "function") {
         throw new Error("OCR 라이브러리를 불러오지 못했어. 네트워크 상태를 확인해줘.");
@@ -1220,9 +1177,7 @@
       }
     });
 
-    /* ====================================================
-       front matter
-    ==================================================== */
+
     function parseFrontMatter(raw) {
       const text = String(raw || "");
       if (!text.startsWith("---\n")) return { meta: {}, body: text };
@@ -1241,9 +1196,7 @@
       return { meta, body };
     }
 
-    /* ====================================================
-       리다이렉트 처리
-    ==================================================== */
+
     function getRedirectTarget(content) {
       const { body } = parseFrontMatter(String(content || ""));
       const m = body.trim().match(/^#redirect\s*\[\[([^\]]+)\]\]/i);
@@ -1257,17 +1210,13 @@
       return !!getRedirectTarget(page?.content || "");
     }
 
-    /* ====================================================
-       카테고리
-    ==================================================== */
+
     function getCategory(page) {
       const { meta } = parseFrontMatter(page.content);
       return (meta.category || meta.type || "").trim();
     }
 
-    /* ====================================================
-       위키 렌더러
-    ==================================================== */
+
     function protectInlineCode(rawText) {
       const codes = [];
       const replaced = String(rawText || "").replace(/`([^`\n]+)`/g, (m, inner) => {
@@ -1615,9 +1564,7 @@
       return renderFromLines(lines);
     }
 
-    /* ====================================================
-       리비전
-    ==================================================== */
+
     async function fetchRevisions(pageId) {
       const q = query(
         collection(db, "pages", pageId, "revisions"),
@@ -1658,9 +1605,7 @@
       await fetchRevisions(pageId);
     }
 
-    /* ====================================================
-       카테고리 칩 UI
-    ==================================================== */
+
     function buildChips() {
       chipWrap.innerHTML = "";
 
@@ -1681,9 +1626,7 @@
       CATEGORY_OPTIONS.forEach(cat => makeChip(cat, cat));
     }
 
-    /* ====================================================
-       사이드바 목록
-    ==================================================== */
+
     function buildList() {
       const q = sideQuery.trim().toLowerCase();
       let list = [...pages].filter(p => !isRedirectPage(p) && canReadPage(p));
@@ -1710,9 +1653,7 @@
       });
     }
 
-    /* ====================================================
-       라우터
-    ==================================================== */
+
     function route() {
       if (!pagesReady) {
         viewEl.innerHTML = `<p class="muted">불러오는 중...</p>`;
@@ -1762,9 +1703,7 @@
         </ul>`;
     }
 
-    /* ====================================================
-       문서 보기
-    ==================================================== */
+
     function renderPage(pageId) {
       const page = pages.find(p => p.id === pageId);
 
@@ -1845,9 +1784,7 @@
       document.getElementById("delete-btn")?.addEventListener("click", () => deletePageCompletely(pageId));
     }
 
-    /* ====================================================
-       검색
-    ==================================================== */
+
     function renderSearch(q) {
       const queryText = (q || "").trim();
       const results = queryText
@@ -1883,9 +1820,7 @@
       });
     }
 
-    /* ====================================================
-       히스토리 보기
-    ==================================================== */
+
     async function renderHistory(pageId) {
       const page = pages.find(p => p.id === pageId);
 
@@ -1926,9 +1861,7 @@
         </div>`;
     }
 
-    /* ====================================================
-       리비전 상세 + 되돌리기
-    ==================================================== */
+
     async function renderRevision(pageId, revId) {
       const page = pages.find(p => p.id === pageId);
 
@@ -1995,9 +1928,7 @@
       }
     }
 
-    /* ====================================================
-       문서 저장
-    ==================================================== */
+
     async function savePage({ mode, oldId, title, content, visibility }) {
       if (!canEdit) throw new Error("로그인해야 저장할 수 있어.");
 
@@ -2129,9 +2060,7 @@ redirect: true
       return newId;
     }
 
-    /* ====================================================
-       문서 삭제
-    ==================================================== */
+
     async function deletePageCompletely(pageId) {
       if (!canEdit) return alert("삭제하려면 로그인해야 해.");
       const page = pages.find(p => p.id === pageId);
@@ -2156,13 +2085,7 @@ redirect: true
       location.hash = "#/";
     }
 
-    /* ====================================================
-       에디터
-       - OCR 영역 추가
-       - 이미지 파일을 고른 뒤 OCR 실행
-       - 결과를 먼저 별도 textarea에 보여준 다음
-         커서 위치 삽입 / 본문 끝 추가를 선택
-    ==================================================== */
+
     function renderEditor({ mode, slug }) {
       if (!canEdit) {
         viewEl.innerHTML = `
@@ -2268,9 +2191,7 @@ redirect: true
       const visibilityToggle = document.getElementById("visibility-toggle");
       const visibilityLabel = document.getElementById("visibility-label");
 
-      /* ====================================================
-         OCR DOM
-      ==================================================== */
+
       const ocrFileInput = document.getElementById("ocr-file");
       const ocrRunBtn = document.getElementById("ocr-run-btn");
       const ocrInsertBtn = document.getElementById("ocr-insert-btn");
@@ -2305,11 +2226,6 @@ redirect: true
       syncVisibilityLabel();
       visibilityToggle.addEventListener("change", syncVisibilityLabel);
 
-      /* ====================================================
-         이미지가 선택되면
-         - 미리보기 표시
-         - 이전 OCR 결과는 비움
-      ==================================================== */
       ocrFileInput.addEventListener("change", () => {
         const file = ocrFileInput.files?.[0];
         resetOcrResultState();
@@ -2333,11 +2249,6 @@ redirect: true
         setOcrStatus(`선택된 파일: ${file.name}`);
       });
 
-      /* ====================================================
-         OCR 실행 버튼
-         - 진행률 logger를 받아 상태 문구와 바를 갱신
-         - 결과는 먼저 별도 textarea에 보여줌
-      ==================================================== */
       ocrRunBtn.addEventListener("click", async () => {
         const file = ocrFileInput.files?.[0];
         if (!file) {
@@ -2385,10 +2296,7 @@ redirect: true
         }
       });
 
-      /* ====================================================
-         OCR 결과를 현재 커서 위치에 삽입
-         - 사용자가 본문 중간에 원하는 위치를 선택한 뒤 넣을 수 있음
-      ==================================================== */
+
       ocrInsertBtn.addEventListener("click", () => {
         const text = cleanupOcrText(ocrResult.value);
         if (!text) {
@@ -2400,10 +2308,7 @@ redirect: true
         setOcrStatus("추출한 텍스트를 현재 커서 위치에 삽입했어.");
       });
 
-      /* ====================================================
-         OCR 결과를 본문 끝에 추가
-         - 기존 글 뒤에 두 줄 띄우고 블록으로 덧붙임
-      ==================================================== */
+
       ocrAppendBtn.addEventListener("click", () => {
         const text = cleanupOcrText(ocrResult.value);
         if (!text) {
@@ -2448,9 +2353,6 @@ redirect: true
       });
     }
 
-    /* ====================================================
-       UI 이벤트 바인딩
-    ==================================================== */
     function bindUI() {
       document.querySelectorAll(".nav-btn[data-nav]").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -2483,9 +2385,6 @@ redirect: true
       window.addEventListener("hashchange", route);
     }
 
-    /* ====================================================
-       앱 시작
-    ==================================================== */
     bindUI();
     buildChips();
     buildList();
