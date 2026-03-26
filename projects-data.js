@@ -1,13 +1,3 @@
-// ============================================
-// projects-data.js
-// ✅ 대표이미지(첫 번째 이미지) 크기 고정:
-//    각 프로젝트에 mainImageSize: 's' | 'm' | 'l' 를 넣으면
-//    상세 페이지 첫 이미지가 그 크기로 표시된다.
-// ============================================
-
-/**
- * 폴더 + 베이스 파일명 + 개수만으로 이미지 경로 배열 자동 생성
- */
 function generateImageArray(folder, baseName, count, padLength = 2, ext = 'jpg') {
   const result = [];
   for (let i = 0; i < count; i++) {
@@ -23,11 +13,6 @@ function generateImageArray(folder, baseName, count, padLength = 2, ext = 'jpg')
 }
 
 
-// ============================================
-// 원본 프로젝트 데이터
-// - mainImageSize: 's' | 'm' | 'l'
-//   (여기서만 조절!)
-// ============================================
 const rawProjects = [
   {
     id: 1,
@@ -42,7 +27,7 @@ const rawProjects = [
     client: ['충무로영화제-감독주간, box8'],
     imageFolder: '2024/parkchanwuk',
     imageBaseName: 'parkchanwuk',
-    span2Indexes: [15], // parkchanwuk_15.jpg만 2칸(span:2)
+    span2Indexes: [15],
     imageCount: 18,
     imageExt: 'jpg',
     padLength: 2,
@@ -140,7 +125,6 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    // 포스터류는 대표이미지를 작게 두고 싶으면 's'
     mainImageSize: 'l'
   },
   {
@@ -264,7 +248,6 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
 
-    // ✅ 예시: 한글박물관 프로젝트는 대표이미지 크게
     mainImageSize: 'l'
   },
   {
@@ -351,17 +334,12 @@ const rawProjects = [
 ];
 
 
-// ============================================
-// 최종 projects 배열 생성 (✅ span2Indexes 지원)
-// ============================================
 const projects = rawProjects.map((p) => {
   let images = [];
 
-  // 1) 수동 images가 있으면 우선
   if (Array.isArray(p.images) && p.images.length > 0) {
     images = p.images;
   }
-  // 2) 자동 생성
   else if (p.imageFolder && p.imageBaseName && typeof p.imageCount === 'number') {
     images = generateImageArray(
       p.imageFolder,
@@ -372,10 +350,8 @@ const projects = rawProjects.map((p) => {
     );
   }
 
-  // ✅ span2Indexes가 있으면 해당 인덱스만 { src, span:2 }로 변환
   if (Array.isArray(p.span2Indexes) && p.span2Indexes.length > 0) {
     images = images.map((item, idx) => {
-      // item이 이미 객체면 그대로 둠(수동 images에서 객체를 넣었을 수도 있으니까)
       if (item && typeof item === 'object') return item;
 
       const isSpan2 = p.span2Indexes.includes(idx);
@@ -386,7 +362,6 @@ const projects = rawProjects.map((p) => {
   return { ...p, images };
 });
 
-// 디버그
 console.log('최종 projects:', projects);
 
 window.projects = projects;
