@@ -151,22 +151,24 @@ function getTextInkRect(el) {
 
 
 function getMarqueeTuningByViewport() {
-  const BASE_W = 390;
-
+  const BASE_H = 900;
   const isMobile = window.innerWidth <= 768;
 
-  const BASE_GAP = isMobile ? -24 : -15;
-  const BASE_LEFT_NUDGE = isMobile ? 2.8 : 2.8;
+  const BASE_GAP = isMobile ? -30 : -45;
 
-  const scale = clamp(window.innerWidth / BASE_W, 0.7, 3.2);
+  const BASE_LEFT_NUDGE = 2.8;
+
+  const widthScale = clamp(window.innerWidth / 390, 0.85, 1.35);
+
+  const heightShortRatio = clamp((BASE_H - window.innerHeight) / 300, 0, 1);
+  const extraGap = isMobile ? 8 * heightShortRatio : 5 * heightShortRatio;
 
   return {
-    GAP: BASE_GAP * scale,
-    LEFT_NUDGE: BASE_LEFT_NUDGE * scale,
+    GAP: BASE_GAP + extraGap,
+    LEFT_NUDGE: BASE_LEFT_NUDGE * widthScale,
     RIGHT_NUDGE: 0
   };
 }
-
 
 function alignMarqueeToTitleUnderline() {
   if (!mainTitle || !marqueeBar) return;

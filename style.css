@@ -13,7 +13,7 @@
 
   --bar-height: 24px;
 
-  --bar-font-size: 0.7rem;
+  --bar-font-size: 0.8rem;
 
   --page-side-padding: 1rem;
   --detail-page-side-padding: 10vw;
@@ -657,6 +657,7 @@ body {
   padding: 5rem 1.5rem 3rem;
   font-family: "Pretendard", sans-serif;
   font-size: 12px;
+  font-weight: 400;
 }
 
 .cv-section {
