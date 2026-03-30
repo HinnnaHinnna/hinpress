@@ -149,23 +149,20 @@ function getTextInkRect(el) {
   return rect;
 }
 
-
 function getMarqueeTuningByViewport() {
-  const BASE_H = 900;
+  // 간격이 화면 폭에 따라 흔들리지 않게 고정값으로 둔다.
+  // 현재는 좁아질수록 GAP, LEFT_NUDGE가 같이 변해서 어색했음.
+
   const isMobile = window.innerWidth <= 768;
 
-  const BASE_GAP = isMobile ? -30 : -45;
-
-  const BASE_LEFT_NUDGE = 2.8;
-
-  const widthScale = clamp(window.innerWidth / 390, 0.85, 1.35);
-
-  const heightShortRatio = clamp((BASE_H - window.innerHeight) / 300, 0, 1);
-  const extraGap = isMobile ? 8 * heightShortRatio : 5 * heightShortRatio;
-
   return {
-    GAP: BASE_GAP + extraGap,
-    LEFT_NUDGE: BASE_LEFT_NUDGE * widthScale,
+    // 마퀴를 더 위로 올리고 싶으면 더 작은 음수로:
+    // -28 -> -30
+    GAP: isMobile ? -28 : -45,
+
+    // 예전처럼 자연스럽게 고정
+    LEFT_NUDGE: 2.8,
+
     RIGHT_NUDGE: 0
   };
 }
@@ -176,7 +173,7 @@ function alignMarqueeToTitleUnderline() {
   const rect = getTextInkRect(mainTitle);
   if (!rect || !rect.width) return;
 
-  const { GAP, LEFT_NUDGE, RIGHT_NUDGE } = getMarqueeTuningByViewport();
+  const { GAP, LEFT_NUDGE, RIGHT_NUDGE } = getMarqueeTuningByViewport(rect);
 
   const left = rect.left + LEFT_NUDGE;
   const width = Math.max(0, rect.width - LEFT_NUDGE - RIGHT_NUDGE);

@@ -1285,19 +1285,19 @@
       t = t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
       t = t.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
-      t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (m, label, url) => {
-        return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
-      });
-
       t = t.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, (m, alt, url) => {
         const su = escapeHtml(url), sa = escapeHtml(alt || "");
         return `
-          <figure class="wiki-figure">
-            <a class="wiki-img-link" href="${su}" target="_blank" rel="noopener noreferrer">
-              <img class="wiki-img" src="${su}" alt="${sa}" loading="lazy" />
-            </a>
-            ${sa ? `<figcaption class="wiki-caption">${sa}</figcaption>` : ""}
-          </figure>`;
+    <figure class="wiki-figure">
+      <a class="wiki-img-link" href="${su}" target="_blank" rel="noopener noreferrer">
+        <img class="wiki-img" src="${su}" alt="${sa}" loading="lazy" />
+      </a>
+      ${sa ? `<figcaption class="wiki-caption">${sa}</figcaption>` : ""}
+    </figure>`;
+      });
+
+      t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (m, label, url) => {
+        return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
       });
 
       t = t.replace(/\[\[(?:Image|File|파일|이미지):(https?:\/\/[^\]|]+)(?:\|([^\]]+))?\]\]/gi, (m, url, cap) => {
@@ -2119,13 +2119,6 @@ redirect: true
           <label>내용</label>
           <textarea id="edit-content" spellcheck="false">${escapeHtml(contentValue)}</textarea>
 
-          <!-- ====================================================
-               OCR 영역
-               1) 이미지 선택
-               2) OCR 실행
-               3) 결과 검토
-               4) 본문에 삽입 / 본문 끝에 추가
-          ==================================================== -->
           <div class="ocr-panel">
             <div class="ocr-head">
               <div class="ocr-title">OCR</div>
