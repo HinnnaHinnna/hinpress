@@ -149,19 +149,15 @@ function getTextInkRect(el) {
   return rect;
 }
 
-function getMarqueeTuningByViewport() {
-  // 간격이 화면 폭에 따라 흔들리지 않게 고정값으로 둔다.
-  // 현재는 좁아질수록 GAP, LEFT_NUDGE가 같이 변해서 어색했음.
 
+function getMarqueeTuningByViewport(titleRect) {
+  const GAP_RATIO = -0.20;
   const isMobile = window.innerWidth <= 768;
 
   return {
-    // 마퀴를 더 위로 올리고 싶으면 더 작은 음수로:
-    // -28 -> -30
-    GAP: isMobile ? -28 : -45,
+    GAP: titleRect.height * GAP_RATIO,
 
-    // 예전처럼 자연스럽게 고정
-    LEFT_NUDGE: 2.8,
+    LEFT_NUDGE: isMobile ? 2.8 : 4.5,
 
     RIGHT_NUDGE: 0
   };
