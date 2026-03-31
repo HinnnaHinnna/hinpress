@@ -571,6 +571,20 @@
       margin-top: 0
     }
 
+
+    .wiki-embed {
+      margin: 0 0 14px 0;
+    }
+
+    .wiki-embed-frame {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
     .ocr-panel {
       border: 1px solid var(--line);
       border-radius: 16px;
@@ -1264,6 +1278,57 @@
       });
     }
 
+
+    function sanitizeEmbedSize(value, fallback) {
+      const raw = String(value || "").trim();
+      if (!raw) return fallback;
+
+      if (/^\d+$/.test(raw)) return `${raw}px`;
+      if (/^\d+(?:\.\d+)?(px|%|vw|vh)$/.test(raw)) return raw;
+
+      return fallback;
+    }
+
+    function parseIframeEmbed(line) {
+      const trimmed = String(line || "").trim();
+      const match = trimmed.match(/^\(iframe:\s*(https:\/\/[^\s)]+)([\s\S]*?)\)$/i);
+      if (!match) return null;
+
+      const url = match[1].trim();
+      const options = match[2] || "";
+
+      const widthMatch = options.match(/(?:^|\s)width:\s*([^\s)]+)/i);
+      const heightMatch = options.match(/(?:^|\s)height:\s*([^\s)]+)/i);
+
+      return {
+        url,
+        width: sanitizeEmbedSize(widthMatch?.[1], "100%"),
+        height: sanitizeEmbedSize(heightMatch?.[1], "560px")
+      };
+    }
+
+    function renderIframeEmbed(embed) {
+      if (!embed?.url) return "";
+
+      const safeUrl = escapeHtml(embed.url);
+      const safeWidth = escapeHtml(embed.width || "100%");
+      const safeHeight = escapeHtml(embed.height || "560px");
+
+      return `
+        <div class="wiki-embed">
+          <iframe
+            class="wiki-embed-frame"
+            src="${safeUrl}"
+            title="Embedded content"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            allowfullscreen
+            style="width:${safeWidth}; height:${safeHeight};"
+          ></iframe>
+        </div>`;
+    }
+
     function renderInline(text) {
       let raw = normalizeSmartQuotes(String(text || ""));
       const { text: protected1, codes } = protectInlineCode(raw);
@@ -1499,6 +1564,13 @@
               }).join("");
               out.push(`<ol class="reflist">${items}</ol>`);
             }
+            i++;
+            continue;
+          }
+
+          const iframeEmbed = parseIframeEmbed(line);
+          if (iframeEmbed) {
+            out.push(renderIframeEmbed(iframeEmbed));
             i++;
             continue;
           }
