@@ -1828,9 +1828,18 @@
 
     function renderGuideHome() {
       const homeId = toDocId(HOME_PAGE_TITLE);
-      const exists = pages.some(p => p.id === homeId);
-      if (exists) return renderPage(homeId);
-      return renderRecent();
+      const homePage = pages.find(p => p.id === homeId);
+
+      if (!homePage || !canReadPage(homePage)) {
+        return renderRecent();
+      }
+
+      const redirect = getRedirectTarget(homePage.content);
+      if (redirect) {
+        return renderPage(redirect.targetId);
+      }
+
+      return renderPage(homeId);
     }
 
     function renderRecent() {
