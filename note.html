@@ -350,6 +350,44 @@
       margin-bottom: 6px
     }
 
+
+    .footnote-link {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      color: var(--link);
+      font: inherit;
+      line-height: inherit;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .footnote-link:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--link);
+      text-underline-offset: 3px;
+    }
+
+    .footnote-link:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    sup.ref .footnote-link {
+      font-size: 12px;
+      vertical-align: super;
+    }
+
+    .footnote-target-flash {
+      background: rgba(37, 44, 251, 0.10);
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
     code.inline-code {
       background: #f7f7f7;
       border: 1px solid var(--line);
@@ -1329,6 +1367,27 @@
         </div>`;
     }
 
+    function scrollToFootnoteTarget(targetId) {
+      const id = String(targetId || "").trim();
+      if (!id) return;
+
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+      target.classList.remove("footnote-target-flash");
+      void target.offsetWidth;
+      target.classList.add("footnote-target-flash");
+
+      window.setTimeout(() => {
+        target.classList.remove("footnote-target-flash");
+      }, 1400);
+    }
+
     function renderInline(text) {
       let raw = normalizeSmartQuotes(String(text || ""));
       const { text: protected1, codes } = protectInlineCode(raw);
@@ -1391,7 +1450,15 @@
 
       t = t.replace(/\{\{REF:(\d+)\}\}/g, (m, n) => {
         const num = Number(n);
-        return `<sup class="ref"><a href="#ref-${num}" id="refback-${num}">[${num}]</a></sup>`;
+        return `
+          <sup class="ref" id="refback-${num}">
+            <button
+              type="button"
+              class="footnote-link"
+              data-footnote-target="ref-${num}"
+              aria-label="각주 ${num}번으로 이동"
+            >[${num}]</button>
+          </sup>`;
       });
 
       t = t.replace(/(^|[\s>])(https?:\/\/[^\s<]+)/g,
@@ -1560,7 +1627,16 @@
             } else {
               const items = __REFS.map((ref, idx) => {
                 const n = idx + 1;
-                return `<li id="ref-${n}">${renderInline(ref)} <a href="#refback-${n}">↩︎</a></li>`;
+                return `
+                  <li id="ref-${n}">
+                    ${renderInline(ref)}
+                    <button
+                      type="button"
+                      class="footnote-link"
+                      data-footnote-target="refback-${n}"
+                      aria-label="본문의 각주 ${n}번 위치로 돌아가기"
+                    >↩︎</button>
+                  </li>`;
               }).join("");
               out.push(`<ol class="reflist">${items}</ol>`);
             }
@@ -2445,6 +2521,14 @@ redirect: true
       sideSearchInput.addEventListener("input", () => {
         sideQuery = sideSearchInput.value;
         buildList();
+      });
+
+      viewEl.addEventListener("click", (event) => {
+        const trigger = event.target.closest("[data-footnote-target]");
+        if (!trigger) return;
+
+        event.preventDefault();
+        scrollToFootnoteTarget(trigger.getAttribute("data-footnote-target"));
       });
 
       window.addEventListener("hashchange", route);
