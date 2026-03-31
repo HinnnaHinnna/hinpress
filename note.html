@@ -33,7 +33,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
-      line-height: 1.6;
+      line-height: 1.8;
       max-width: 100%;
       overflow-x: hidden;
     }
@@ -338,8 +338,11 @@
     }
 
     sup.ref {
-      font-size: 12px;
-      vertical-align: super
+      font-size: 0.72em;
+      line-height: 1;
+      vertical-align: baseline;
+      position: relative;
+      top: -0.45em;
     }
 
     ol.reflist {
@@ -378,8 +381,9 @@
     }
 
     sup.ref .footnote-link {
-      font-size: 12px;
-      vertical-align: super;
+      font-size: 1em;
+      line-height: 1;
+      vertical-align: baseline;
     }
 
     .footnote-target-flash {
