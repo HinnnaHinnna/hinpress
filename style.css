@@ -206,7 +206,7 @@ body {
 .marquee-bar {
   position: fixed;
   left: 0;
-  top: 8px;
+  top: -8px;
   bottom: auto;
 
   height: var(--bar-height);
@@ -712,7 +712,7 @@ body {
 
 @media (max-width: 768px) {
   :root {
-    --bar-height: 2rem;
+    --bar-height: 2.5rem;
     --detail-page-side-padding: 0px;
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
