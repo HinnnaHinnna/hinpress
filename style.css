@@ -154,7 +154,7 @@ body {
 .title-container {
   position: absolute;
   top: 25vh;
-  left: var(--page-side-padding);
+  left: 0;
   transform: none;
   z-index: 10;
   padding: 0;
@@ -200,8 +200,9 @@ body {
 .marquee-bar {
   position: fixed;
   left: 0;
-  top: 50vh;
+  top: 25vh;
   bottom: auto;
+  width: 100vw;
   height: var(--bar-height);
   overflow: hidden;
   z-index: 100;
