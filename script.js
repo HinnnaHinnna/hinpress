@@ -787,3 +787,29 @@ if (detailPage) {
     }
   }, { passive: true });
 }
+
+function syncMainTitleSvgWidth() {
+  const svgTitle = document.getElementById("main-title-svg");
+  const measure = document.getElementById("main-title-measure");
+
+  if (!svgTitle || !measure) return;
+
+  const measuredWidth = Math.ceil(measure.getBoundingClientRect().width);
+
+  if (measuredWidth > 0) {
+    svgTitle.style.width = `${measuredWidth}px`;
+  }
+}
+
+
+window.addEventListener("load", syncMainTitleSvgWidth);
+
+
+window.addEventListener("resize", syncMainTitleSvgWidth);
+
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    syncMainTitleSvgWidth();
+  });
+}
