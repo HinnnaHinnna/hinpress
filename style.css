@@ -162,30 +162,14 @@ body {
   text-align: center;
 }
 
-.title-container {
-  position: absolute;
-  top: 20vh;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  padding: 0 1rem;
-  width: 100%;
-  text-align: center;
-}
-
-/* 
-  SVG 타이틀을 감싸는 박스
-  inline-block으로 두면 내용물 폭만큼만 차지해서 다루기 편함
-*/
 .main-title-visual {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: calc(var(--bar-height) / 2);
 }
 
-/*
-  실제로 보이는 SVG 타이틀
-  width는 JS가 계산해서 넣어줌
-*/
 #main-title-svg {
   display: block;
   width: auto;
@@ -199,25 +183,33 @@ body {
   opacity: 0.8;
 }
 
-/*
-  숨겨진 측정용 텍스트
-  화면에는 안 보이지만 실제 렌더링 폭은 계산 가능해야 하므로
-  display: none; 을 쓰면 안 됨
-*/
 #main-title-measure {
   position: absolute;
   top: 0;
   left: 0;
-
   visibility: hidden;
   pointer-events: none;
   white-space: nowrap;
-
   font-family: 'Susa60', Helvetica, Arial, sans-serif;
   font-size: min(20vw, 20vh);
   font-weight: 600;
   letter-spacing: -0.022em;
   line-height: 1;
+}
+
+.marquee-bar {
+  position: relative;
+  left: auto;
+  top: auto;
+  bottom: auto;
+  width: 100%;
+  height: var(--bar-height);
+  overflow: hidden;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  padding-top: 0;
 }
 
 @keyframes mobileTitleBlink {
@@ -243,22 +235,6 @@ body {
   padding: 6px 8px;
   border-radius: 8px;
   pointer-events: none;
-}
-
-.marquee-bar {
-  position: fixed;
-  left: 0;
-  top: 20px;
-  bottom: auto;
-
-  height: var(--bar-height);
-  overflow: hidden;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  background-color: transparent;
-
-  padding-top: 1px;
 }
 
 .marquee-inner {

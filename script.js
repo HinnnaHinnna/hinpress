@@ -3,7 +3,8 @@ const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
 const cvPage = document.getElementById('cv-page');
 
-const mainTitle = document.getElementById('main-title');
+const mainTitle = document.getElementById('main-title-svg');
+const mainTitleVisual = document.getElementById('main-title-visual');
 
 const topBar = document.getElementById('top-bar');
 const topLogo = document.getElementById('top-logo');
@@ -164,22 +165,6 @@ function getMarqueeTuningByViewport(titleRect) {
 }
 
 function alignMarqueeToTitleUnderline() {
-  if (!mainTitle || !marqueeBar) return;
-
-  const rect = getTextInkRect(mainTitle);
-  if (!rect || !rect.width) return;
-
-  const { GAP, LEFT_NUDGE, RIGHT_NUDGE } = getMarqueeTuningByViewport(rect);
-
-  const left = rect.left + LEFT_NUDGE;
-  const width = Math.max(0, rect.width - LEFT_NUDGE - RIGHT_NUDGE);
-  const top = rect.bottom + GAP;
-
-  marqueeBar.style.left = `${left.toFixed(2)}px`;
-  marqueeBar.style.width = `${width.toFixed(2)}px`;
-  marqueeBar.style.top = `${top.toFixed(2)}px`;
-  marqueeBar.style.bottom = 'auto';
-
   syncPaddleFromDom();
 }
 
