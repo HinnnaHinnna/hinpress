@@ -204,7 +204,7 @@ body {
   top: 25vh;
   bottom: auto;
   width: 100vw;
-  transform: translateY(-50%);
+  transform: translateY(100%);
   overflow: hidden;
   z-index: 100;
   display: flex;
