@@ -165,6 +165,22 @@ function getMarqueeTuningByViewport(titleRect) {
 }
 
 function alignMarqueeToTitleUnderline() {
+  if (!mainTitle || !marqueeBar) return;
+
+  const rect = mainTitle.getBoundingClientRect();
+  const barHeight =
+    marqueeBar.getBoundingClientRect().height ||
+    parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar-height')) ||
+    0;
+
+  const gap = barHeight / 2;
+
+  marqueeBar.style.position = 'fixed';
+  marqueeBar.style.left = `${rect.left}px`;
+  marqueeBar.style.top = `${rect.bottom + gap}px`;
+  marqueeBar.style.width = `${rect.width}px`;
+  marqueeBar.style.bottom = 'auto';
+
   syncPaddleFromDom();
 }
 
