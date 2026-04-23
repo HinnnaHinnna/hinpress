@@ -49,9 +49,9 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 @font-face {
-  font-family: 'AutoGroteskTRIAL';
-  src: url('./AutoGroteskTRIAL-BExtrabold.otf') format('opentype');
-  font-weight: 800;
+  font-family: 'Susa60';
+  src: url('./Susa60-Bold.otf') format('opentype');
+  font-weight: 700;
   font-style: normal;
   font-display: optional;
 }
@@ -165,8 +165,8 @@ body {
 #main-title {
   white-space: nowrap;
   font-size: min(20vw, 20vh);
-  font-family: 'AutoGroteskTRIAL', Helvetica, Arial, sans-serif;
-  font-weight: 800;
+  font-family: 'Susa60', Helvetica, Arial, sans-serif;
+  font-weight: 600;
   letter-spacing: -0.022em;
   color: rgb(0, 0, 0);
   cursor: pointer;
@@ -206,7 +206,7 @@ body {
 .marquee-bar {
   position: fixed;
   left: 0;
-  top: 0;
+  top: 8;
   bottom: auto;
 
   height: var(--bar-height);
@@ -216,7 +216,7 @@ body {
   align-items: center;
   background-color: transparent;
 
-  padding-top: 3px;
+  padding-top: 1px;
 }
 
 .marquee-inner {
