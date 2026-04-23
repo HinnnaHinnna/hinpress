@@ -153,7 +153,7 @@ body {
 
 .title-container {
   position: absolute;
-  top: 25vh;
+  top: 27vh;
   left: 0;
   transform: none;
   z-index: 10;
@@ -201,10 +201,10 @@ body {
 .marquee-bar {
   position: fixed;
   left: 0;
-  top: 25vh;
+  top: 45vh;
   bottom: auto;
   width: 100vw;
-  transform: translateY(100%);
+  height: var(--bar-height);
   overflow: hidden;
   z-index: 100;
   display: flex;
