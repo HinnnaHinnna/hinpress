@@ -157,9 +157,15 @@ body {
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  padding: 0 1rem;
+
   width: 100%;
+  padding: 0 1rem;
   text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--bar-height) / 2);
 }
 
 #main-title {
@@ -204,19 +210,21 @@ body {
 }
 
 .marquee-bar {
-  position: fixed;
-  left: 0;
-  top: 8px;
+  position: relative;
+  left: auto;
+  top: auto;
   bottom: auto;
 
+  width: 100%;
   height: var(--bar-height);
   overflow: hidden;
   z-index: 100;
   display: flex;
   align-items: center;
+  justify-content: center;
   background-color: transparent;
 
-  padding-top: 1px;
+  padding-top: 0;
 }
 
 .marquee-inner {
