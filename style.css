@@ -11,7 +11,7 @@
   --color-arrow: #0008ff;
   --color-maque: #daffa2;
 
-  --bar-height: 30px;
+  --bar-height: 50px;
 
   --bar-font-size: 0.8rem;
 
@@ -177,6 +177,7 @@ body {
   max-width: 100%;
   cursor: pointer;
   transition: opacity 0.2s ease;
+  margin-left: 1rem;
 }
 
 #main-title-svg:hover {
