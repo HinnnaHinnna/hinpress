@@ -167,18 +167,18 @@ function getMarqueeTuningByViewport(titleRect) {
 function alignMarqueeToTitleUnderline() {
   if (!mainTitle || !marqueeBar) return;
 
-  const rect = mainTitle.getBoundingClientRect();
-  const barHeight =
-    marqueeBar.getBoundingClientRect().height ||
-    parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar-height')) ||
-    0;
+  const rect = getTextInkRect(mainTitle);
+  if (!rect || !rect.width) return;
 
-  const gap = barHeight / 2;
+  const { GAP, LEFT_NUDGE, RIGHT_NUDGE } = getMarqueeTuningByViewport(rect);
 
-  marqueeBar.style.position = 'fixed';
-  marqueeBar.style.left = `${rect.left}px`;
-  marqueeBar.style.top = `${rect.bottom + gap}px`;
-  marqueeBar.style.width = `${rect.width}px`;
+  const left = rect.left + LEFT_NUDGE;
+  const width = Math.max(0, rect.width - LEFT_NUDGE - RIGHT_NUDGE);
+  const top = rect.bottom + GAP;
+
+  marqueeBar.style.left = `${left.toFixed(2)}px`;
+  marqueeBar.style.width = `${width.toFixed(2)}px`;
+  marqueeBar.style.top = `${top.toFixed(2)}px`;
   marqueeBar.style.bottom = 'auto';
 
   syncPaddleFromDom();

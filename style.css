@@ -48,13 +48,13 @@
 
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
-@font-face {
+/* @font-face {
   font-family: 'Susa60';
   src: url('./Susa60-Bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: optional;
-}
+} */
 
 body {
   font-family: "Pretendard Variable", "Pretendard", 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -154,12 +154,12 @@ body {
 .title-container {
   position: absolute;
   top: 25vh;
-  left: 50%;
-  transform: translateX(-50%);
+  left: var(--page-side-padding);
+  transform: none;
   z-index: 10;
-  padding: 0 1rem;
-  width: 100%;
-  text-align: center;
+  padding: 0;
+  width: calc(100% - (var(--page-side-padding) * 2));
+  text-align: left;
 }
 
 .main-title-visual {
@@ -200,7 +200,7 @@ body {
 .marquee-bar {
   position: fixed;
   left: 0;
-  top: 0;
+  top: 50vh;
   bottom: auto;
   height: var(--bar-height);
   overflow: hidden;
