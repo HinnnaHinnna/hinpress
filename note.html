@@ -631,123 +631,32 @@
       background: #fff;
     }
 
-    .ocr-panel {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      background: #fcfcfc;
-      display: grid;
-      gap: 10px;
-    }
-
-    .ocr-head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .ocr-title {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .ocr-help {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .ocr-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .ocr-file-input {
-      width: 100%;
-      max-width: 360px;
-      border: 1px solid var(--line);
-      background: #fff;
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-    }
-
-    .ocr-status {
-      font-size: 12px;
-      color: var(--muted);
-      min-height: 1.4em;
-    }
-
-    .ocr-progress {
-      width: 100%;
-      height: 8px;
-      background: #efefef;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .ocr-progress-bar {
-      display: block;
-      width: 0%;
-      height: 100%;
-      background: var(--links);
-      transition: width 0.15s ease;
-    }
-
-    .ocr-preview {
-      display: block;
-      max-width: 100%;
-      max-height: 300px;
-      object-fit: contain;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-      padding: 6px;
-    }
-
-    .ocr-preview[hidden] {
-      display: none !important;
-    }
-
-    .ocr-result-wrap {
-      display: grid;
-      gap: 6px;
-    }
-
-    .ocr-result-label {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .ocr-result {
-      width: 100%;
-      min-height: 180px;
-      resize: vertical;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.6;
-      outline: none;
-      background: #fff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-
     @media (max-width: 960px) {
       .site-title {
         font-size: 16px;
         line-height: 20px
       }
 
+      /*
+        모바일/태블릿에서는 HTML 구조상 .side가 먼저 있어도
+        화면에서는 본문(.content)을 먼저 보여주고,
+        문서 목록(.side)은 그 아래에 오도록 순서를 바꾼다.
+      */
       .layout {
-        grid-template-columns: 1fr
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+      }
+
+      .content {
+        order: 1;
       }
 
       .side {
+        order: 2;
         border-right: none;
-        border-bottom: 1px solid var(--line)
+        border-top: 1px solid var(--line);
+        border-bottom: none;
       }
 
       .auth-pill {
@@ -769,15 +678,6 @@
         justify-content: flex-end;
         margin-left: 0;
         margin-top: 4px;
-      }
-
-      .ocr-actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .ocr-file-input {
-        max-width: none;
       }
     }
 
@@ -834,8 +734,6 @@
       <div id="view"></div>
     </section>
   </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
@@ -903,9 +801,6 @@
     let unsubscribePages = null;
     let hasAttemptedSeed = false;
 
-
-    let ocrWorker = null;
-    let ocrLoggerProxy = null;
 
     function ownerEmailNormalized() {
       return String(OWNER_EMAIL || "").trim().toLowerCase();
@@ -1145,98 +1040,6 @@
     function normalizeSmartQuotes(s) {
       return String(s || "").replace(/[\u2018\u2019]/g, "'");
     }
-
-    function cleanupOcrText(text) {
-      return String(text || "")
-        .replace(/\r\n/g, "\n")
-        .replace(/[ \t]+\n/g, "\n")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim();
-    }
-
-    function appendBlockText(original, extra) {
-      const source = String(original || "");
-      const add = cleanupOcrText(extra);
-      if (!add) return source;
-      if (!source.trim()) return add;
-      return source.replace(/\s*$/, "") + "\n\n" + add;
-    }
-
-    function insertTextAtCursor(textarea, text) {
-      if (!textarea) return;
-      const insertText = String(text || "");
-      const start = Number(textarea.selectionStart ?? textarea.value.length);
-      const end = Number(textarea.selectionEnd ?? textarea.value.length);
-
-      const before = textarea.value.slice(0, start);
-      const after = textarea.value.slice(end);
-
-      textarea.value = before + insertText + after;
-
-      const nextPos = before.length + insertText.length;
-      textarea.selectionStart = nextPos;
-      textarea.selectionEnd = nextPos;
-      textarea.focus();
-    }
-
-    async function getOrCreateOcrWorker(loggerCallback) {
-      if (!window.Tesseract || typeof window.Tesseract.createWorker !== "function") {
-        throw new Error("OCR 라이브러리를 불러오지 못했어. 네트워크 상태를 확인해줘.");
-      }
-
-      ocrLoggerProxy = typeof loggerCallback === "function" ? loggerCallback : null;
-
-      if (ocrWorker) {
-        return ocrWorker;
-      }
-
-      try {
-        const { createWorker } = window.Tesseract;
-
-        ocrWorker = await createWorker(["kor", "eng"], 1, {
-          logger: (message) => {
-            if (typeof ocrLoggerProxy === "function") {
-              ocrLoggerProxy(message);
-            }
-          }
-        });
-
-        try {
-          await ocrWorker.setParameters({
-            preserve_interword_spaces: "1",
-            user_defined_dpi: "300"
-          });
-        } catch (paramError) {
-          console.warn("OCR 파라미터 설정 중 경고:", paramError);
-        }
-
-        return ocrWorker;
-      } catch (error) {
-        ocrWorker = null;
-        throw error;
-      }
-    }
-
-    async function runOcrFromFile(file, onProgress) {
-      if (!file) {
-        throw new Error("OCR할 이미지 파일을 먼저 골라줘.");
-      }
-
-      const worker = await getOrCreateOcrWorker(onProgress);
-      const result = await worker.recognize(file);
-      return result?.data?.text || "";
-    }
-
-    window.addEventListener("beforeunload", () => {
-      if (ocrWorker) {
-        try {
-          ocrWorker.terminate();
-        } catch (error) {
-          console.warn("OCR worker 종료 중 경고:", error);
-        }
-      }
-    });
-
 
     function parseFrontMatter(raw) {
       const text = String(raw || "");
@@ -2284,45 +2087,6 @@ redirect: true
           <label>내용</label>
           <textarea id="edit-content" spellcheck="false">${escapeHtml(contentValue)}</textarea>
 
-          <div class="ocr-panel">
-            <div class="ocr-head">
-              <div class="ocr-title">OCR</div>
-              <div class="ocr-help">이미지 속 글자를 추출해서 문서 본문으로 가져오기</div>
-            </div>
-
-            <div class="ocr-actions">
-              <input
-                id="ocr-file"
-                class="ocr-file-input"
-                type="file"
-                accept="image/*"
-              />
-              <button class="btn" type="button" id="ocr-run-btn">이미지에서 텍스트 추출</button>
-              <button class="btn" type="button" id="ocr-insert-btn" disabled>커서 위치에 삽입</button>
-              <button class="btn" type="button" id="ocr-append-btn" disabled>본문 끝에 추가</button>
-            </div>
-
-            <div class="ocr-status" id="ocr-status">
-              이미지를 선택한 뒤 “이미지에서 텍스트 추출”을 눌러줘.
-            </div>
-
-            <div class="ocr-progress" aria-hidden="true">
-              <span class="ocr-progress-bar" id="ocr-progress-bar"></span>
-            </div>
-
-            <img id="ocr-preview" class="ocr-preview" alt="OCR 미리보기" hidden />
-
-            <div class="ocr-result-wrap">
-              <div class="ocr-result-label">추출 결과 (필요하면 여기서 직접 정리한 뒤 본문에 넣어도 됨)</div>
-              <textarea
-                id="ocr-result"
-                class="ocr-result"
-                spellcheck="false"
-                placeholder="OCR 결과가 여기 표시돼."
-              ></textarea>
-            </div>
-          </div>
-
           <div class="editor-actions">
             <button class="btn primary" type="button" id="save-btn">저장</button>
             <button class="btn" type="button" id="cancel-btn">취소</button>
@@ -2350,135 +2114,12 @@ redirect: true
       const visibilityLabel = document.getElementById("visibility-label");
 
 
-      const ocrFileInput = document.getElementById("ocr-file");
-      const ocrRunBtn = document.getElementById("ocr-run-btn");
-      const ocrInsertBtn = document.getElementById("ocr-insert-btn");
-      const ocrAppendBtn = document.getElementById("ocr-append-btn");
-      const ocrStatus = document.getElementById("ocr-status");
-      const ocrProgressBar = document.getElementById("ocr-progress-bar");
-      const ocrPreview = document.getElementById("ocr-preview");
-      const ocrResult = document.getElementById("ocr-result");
-
-      let previewUrl = "";
-
       function syncVisibilityLabel() {
         visibilityLabel.textContent = visibilityToggle.checked ? "공개" : "비공개";
       }
 
-      function setOcrStatus(message) {
-        ocrStatus.textContent = message;
-      }
-
-      function setOcrProgress(percent) {
-        const value = Math.max(0, Math.min(100, Number(percent || 0)));
-        ocrProgressBar.style.width = `${value}%`;
-      }
-
-      function resetOcrResultState() {
-        ocrResult.value = "";
-        ocrInsertBtn.disabled = true;
-        ocrAppendBtn.disabled = true;
-        setOcrProgress(0);
-      }
-
       syncVisibilityLabel();
       visibilityToggle.addEventListener("change", syncVisibilityLabel);
-
-      ocrFileInput.addEventListener("change", () => {
-        const file = ocrFileInput.files?.[0];
-        resetOcrResultState();
-
-        if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
-          previewUrl = "";
-        }
-
-        if (!file) {
-          ocrPreview.hidden = true;
-          ocrPreview.removeAttribute("src");
-          setOcrStatus("이미지를 선택한 뒤 “이미지에서 텍스트 추출”을 눌러줘.");
-          return;
-        }
-
-        previewUrl = URL.createObjectURL(file);
-        ocrPreview.src = previewUrl;
-        ocrPreview.hidden = false;
-
-        setOcrStatus(`선택된 파일: ${file.name}`);
-      });
-
-      ocrRunBtn.addEventListener("click", async () => {
-        const file = ocrFileInput.files?.[0];
-        if (!file) {
-          alert("OCR할 이미지 파일을 먼저 선택해줘.");
-          return;
-        }
-
-        ocrRunBtn.disabled = true;
-        ocrInsertBtn.disabled = true;
-        ocrAppendBtn.disabled = true;
-        setOcrProgress(0);
-        setOcrStatus("OCR 준비 중이야... 처음 한 번은 조금 걸릴 수 있어.");
-
-        try {
-          const text = await runOcrFromFile(file, (message) => {
-            const status = String(message?.status || "");
-            const progress = typeof message?.progress === "number"
-              ? Math.round(message.progress * 100)
-              : 0;
-
-            setOcrProgress(progress);
-
-            if (status) {
-              setOcrStatus(`OCR 진행 중: ${status.replaceAll("_", " ")} ${progress ? `(${progress}%)` : ""}`);
-            }
-          });
-
-          const cleanedText = cleanupOcrText(text);
-          ocrResult.value = cleanedText;
-
-          if (cleanedText) {
-            ocrInsertBtn.disabled = false;
-            ocrAppendBtn.disabled = false;
-            setOcrProgress(100);
-            setOcrStatus("OCR이 끝났어. 결과를 확인한 뒤 본문에 넣어줘.");
-          } else {
-            setOcrStatus("문자를 거의 찾지 못했어. 해상도가 더 높은 이미지를 써보거나 대비가 큰 이미지를 써봐.");
-          }
-        } catch (error) {
-          console.error(error);
-          setOcrStatus("OCR 중 오류가 났어. 이미지 파일 형식이나 네트워크 상태를 확인해줘.");
-          alert(error?.message || "OCR 실행 중 오류가 났어.");
-        } finally {
-          ocrRunBtn.disabled = false;
-        }
-      });
-
-
-      ocrInsertBtn.addEventListener("click", () => {
-        const text = cleanupOcrText(ocrResult.value);
-        if (!text) {
-          alert("삽입할 OCR 결과가 없어.");
-          return;
-        }
-
-        insertTextAtCursor(contentInput, text);
-        setOcrStatus("추출한 텍스트를 현재 커서 위치에 삽입했어.");
-      });
-
-
-      ocrAppendBtn.addEventListener("click", () => {
-        const text = cleanupOcrText(ocrResult.value);
-        if (!text) {
-          alert("추가할 OCR 결과가 없어.");
-          return;
-        }
-
-        contentInput.value = appendBlockText(contentInput.value, text);
-        contentInput.focus();
-        contentInput.selectionStart = contentInput.selectionEnd = contentInput.value.length;
-        setOcrStatus("추출한 텍스트를 본문 끝에 추가했어.");
-      });
 
       document.getElementById("save-btn").addEventListener("click", async () => {
         const newTitle = titleInput.value.trim();
@@ -2503,10 +2144,6 @@ redirect: true
       });
 
       document.getElementById("cancel-btn").addEventListener("click", () => {
-        if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
-          previewUrl = "";
-        }
         location.hash = (mode === "edit" && editing) ? `#/page/${editing.id}` : "#/";
       });
     }
