@@ -744,9 +744,9 @@ body {
   }
 
   #main-title-svg {
-    width: 100vw;
+    width: 94vw;
     max-width: 100vw;
-    margin-left: 0;
+    margin-left: 10;
     animation: mobileTitleBlink 1.2s ease-in-out infinite;
   }
 
