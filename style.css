@@ -172,7 +172,7 @@ body {
 
 #main-title-svg {
   display: block;
-  width: auto;
+  width: min(72vw, 20rem);
   height: auto;
   max-width: 100%;
   cursor: pointer;
