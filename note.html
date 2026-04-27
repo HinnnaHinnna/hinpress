@@ -420,6 +420,39 @@
       white-space: pre;
     }
 
+    /*
+      마크다운 표 스타일
+      - JavaScript 렌더러가 | 표 문법을 만나면 아래 구조로 변환한다.
+      - .wiki-table-wrap: 모바일에서 표가 화면 밖으로 넘치면 가로 스크롤 가능하게 함
+      - table.wiki-table: 표의 기본 테두리, 셀 간격, 헤더 스타일을 정리함
+    */
+    .wiki-table-wrap {
+      max-width: 100%;
+      overflow-x: auto;
+      margin: 0 0 14px 0;
+    }
+
+    table.wiki-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    table.wiki-table th,
+    table.wiki-table td {
+      border: 1px solid var(--line);
+      padding: 7px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    table.wiki-table th {
+      background: #f7f7f7;
+      font-weight: 700;
+    }
+
     .editor {
       display: grid;
       gap: 10px
@@ -1340,6 +1373,173 @@
       return { html: out.join(""), nextIndex: i };
     }
 
+    /*
+      마크다운 표 문법을 처리하기 위한 보조 함수들
+      사용 예:
+      | 이름 | 설명 |
+      | --- | --- |
+      | A | 첫 번째 데이터 |
+      | B | 두 번째 데이터 |
+
+      규칙:
+      - | 문자로 열을 나눈다.
+      - 첫 줄은 헤더 행이다.
+      - 두 번째 줄은 구분 행이며, 각 칸은 최소 3개 이상의 하이픈(---)을 포함해야 한다.
+      - 구분 행에는 선택적으로 정렬 문법도 사용할 수 있다.
+        :---  왼쪽 정렬
+        :---: 가운데 정렬
+        ---:  오른쪽 정렬
+    */
+    function splitMarkdownTableRow(line) {
+      let raw = String(line || "").trim();
+
+      // 표의 맨 앞/맨 뒤에 붙는 | 는 장식에 가까우므로 제거한다.
+      // 예: | 이름 | 설명 | → 이름 | 설명
+      if (raw.startsWith("|")) raw = raw.slice(1);
+      if (raw.endsWith("|")) raw = raw.slice(0, -1);
+
+      const cells = [];
+      let current = "";
+      let isEscaped = false;
+
+      for (const ch of raw) {
+        // \|처럼 백슬래시로 이스케이프한 파이프는 열 구분자로 보지 않는다.
+        if (isEscaped) {
+          current += ch;
+          isEscaped = false;
+          continue;
+        }
+
+        if (ch === "\\") {
+          isEscaped = true;
+          continue;
+        }
+
+        if (ch === "|") {
+          cells.push(current.trim());
+          current = "";
+          continue;
+        }
+
+        current += ch;
+      }
+
+      cells.push(current.trim());
+      return cells;
+    }
+
+    function isMarkdownTableSeparator(line) {
+      if (!String(line || "").includes("|")) return false;
+
+      const cells = splitMarkdownTableRow(line);
+      if (!cells.length) return false;
+
+      return cells.every(cell => {
+        const trimmed = cell.trim();
+        // --- / :--- / ---: / :---: 형태를 허용한다.
+        return /^:?-{3,}:?$/.test(trimmed);
+      });
+    }
+
+    function isMarkdownTableStart(localLines, index) {
+      const headerLine = localLines[index] || "";
+      const separatorLine = localLines[index + 1] || "";
+
+      if (!headerLine.includes("|")) return false;
+      if (!isMarkdownTableSeparator(separatorLine)) return false;
+
+      const headerCells = splitMarkdownTableRow(headerLine);
+      const separatorCells = splitMarkdownTableRow(separatorLine);
+
+      // 표는 최소 두 개 이상의 열이 있을 때만 표로 처리한다.
+      // 한 줄 안에 우연히 | 문자가 들어간 문장을 표로 오해하지 않게 하기 위함이다.
+      if (headerCells.length < 2) return false;
+
+      // 헤더 칸 수와 구분 칸 수가 크게 어긋나면 표가 아닌 일반 문장으로 둔다.
+      if (separatorCells.length < headerCells.length) return false;
+
+      return true;
+    }
+
+    function getMarkdownTableAlign(separatorCell) {
+      const cell = String(separatorCell || "").trim();
+
+      if (/^:-{3,}:$/.test(cell)) return "center";
+      if (/^-{3,}:$/.test(cell)) return "right";
+      if (/^:-{3,}$/.test(cell)) return "left";
+
+      return "";
+    }
+
+    function renderMarkdownTable(localLines, startIndex) {
+      const headerCells = splitMarkdownTableRow(localLines[startIndex]);
+      const separatorCells = splitMarkdownTableRow(localLines[startIndex + 1]);
+      const aligns = separatorCells.map(getMarkdownTableAlign);
+
+      const rows = [];
+      let i = startIndex + 2;
+
+      while (i < localLines.length) {
+        const line = localLines[i];
+
+        // 빈 줄을 만나면 표가 끝난 것으로 본다.
+        if (!line.trim()) break;
+
+        // | 가 없는 줄을 만나면 표가 끝난 것으로 본다.
+        if (!line.includes("|")) break;
+
+        // 다른 표의 구분 행만 단독으로 다시 나오면 표가 끝난 것으로 본다.
+        if (isMarkdownTableSeparator(line)) break;
+
+        rows.push(splitMarkdownTableRow(line));
+        i++;
+      }
+
+      const columnCount = Math.max(
+        headerCells.length,
+        separatorCells.length,
+        ...rows.map(row => row.length)
+      );
+
+      function renderCell(tagName, cellText, columnIndex) {
+        const align = aligns[columnIndex] || "";
+        const alignAttr = align ? ` style="text-align:${align};"` : "";
+        return `<${tagName}${alignAttr}>${renderInline(cellText || "")}</${tagName}>`;
+      }
+
+      const thead = `
+        <thead>
+          <tr>
+            ${Array.from({ length: columnCount }, (_, idx) => {
+        return renderCell("th", headerCells[idx] || "", idx);
+      }).join("")}
+          </tr>
+        </thead>`;
+
+      const tbody = rows.length
+        ? `
+        <tbody>
+          ${rows.map(row => `
+            <tr>
+              ${Array.from({ length: columnCount }, (_, idx) => {
+          return renderCell("td", row[idx] || "", idx);
+        }).join("")}
+            </tr>`).join("")}
+        </tbody>`
+        : "";
+
+      return {
+        html: `
+          <div class="wiki-table-wrap">
+            <table class="wiki-table">
+              ${thead}
+              ${tbody}
+            </table>
+          </div>`,
+        nextIndex: i
+      };
+    }
+
     function renderParagraphBr(linesBuf) {
       return linesBuf.map(l => renderInline(l)).join("<br>");
     }
@@ -1483,6 +1683,13 @@
           if (line.startsWith("# ")) {
             out.push(`<h2>${renderInline(line.slice(2))}</h2>`);
             i++;
+            continue;
+          }
+
+          if (isMarkdownTableStart(localLines, i)) {
+            const { html, nextIndex } = renderMarkdownTable(localLines, i);
+            out.push(html);
+            i = nextIndex;
             continue;
           }
 
