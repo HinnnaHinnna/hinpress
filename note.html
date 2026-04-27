@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
   <title>사적 글쓰기 — hinPress</title>
   <style>
@@ -1074,6 +1073,12 @@
       return String(s || "").replace(/[\u2018\u2019]/g, "'");
     }
 
+    function stripHtmlComments(value) {
+      const open = "<" + "!--";
+      const close = "--" + ">";
+      return String(value || "").replace(new RegExp(open + "[\\s\\S]*?" + close, "g"), "");
+    }
+
     function parseFrontMatter(raw) {
       const text = String(raw || "");
       if (!text.startsWith("---\n")) return { meta: {}, body: text };
@@ -1237,8 +1242,8 @@
       const { text: protected1, codes } = protectInlineCode(raw);
       raw = protected1;
 
-      raw = raw.replace(/<!--[\s\S]*?-->/g, "");
-        let t = escapeHtml(raw);
+      raw = stripHtmlComments(raw);
+      let t = escapeHtml(raw);
 
       t = t.replace(/\[(https?:\/\/[^\s\]]+)(?:\s+([^\]]+))?\]/g, (m, url, label) => {
         const u = escapeHtml(url);
@@ -1556,7 +1561,7 @@
       const { text: iProtected, codes: iCodes } = protectInlineCodeAll(extracted.join("\n"));
       let text = iProtected;
 
-      text = text.replace(/<!--[\s\S]*?-->/g, "");
+      text = stripHtmlComments(text);
 
       text = text.replace(/<ref>([\s\S]*?)<\/ref>/gi, (m, inner) => {
         __REFS.push((inner || "").trim());
@@ -1718,6 +1723,17 @@
 
           const buf = [];
           while (i < localLines.length && localLines[i].trim()) {
+            /*
+              문단을 모으는 중간에 표 시작 행을 만나면 문단을 끊는다.
+              이렇게 해야 아래처럼 빈 줄 없이 이어 써도 표가 적용된다.
+
+              설명 문장
+              | 이름 | 설명 |
+              | --- | --- |
+              | A | B |
+            */
+            if (buf.length > 0 && isMarkdownTableStart(localLines, i)) break;
+
             buf.push(localLines[i]);
             i++;
           }
