@@ -1719,14 +1719,14 @@
 
     function renderParagraphBr(linesBuf) {
       /*
-        기존에는 같은 문단 안의 줄들을 <br>로 연결했기 때문에
-        편집창에서 줄을 바꿀 때마다 실제 화면에서도 강제 줄바꿈이 생겼다.
+        편집모드에서 엔터로 줄을 바꾼 부분을 실제 화면에서도 보이게 한다.
+        HTML 안의 일반 줄바꿈(\n)은 브라우저에서 공백처럼 처리되므로,
+        화면에 줄바꿈을 보여주려면 <br> 태그로 변환해야 한다.
 
-        여기서는 <br>을 만들지 않고 줄바꿈 문자(\n)로만 연결한다.
-        HTML 안의 일반 줄바꿈은 브라우저에서 보통 공백처럼 처리되므로,
-        이미지 다음 줄에 텍스트를 써도 불필요한 <br> 간격이 생기지 않는다.
+        이미지와 텍스트 사이의 간격은 여기서 없애지 않고,
+        figure.wiki-figure / .doc p 같은 CSS margin 값으로 조절한다.
       */
-      return linesBuf.map(l => renderInline(l)).join("\n");
+      return linesBuf.map(l => renderInline(l)).join("<br>");
     }
 
     let __REFS = [];
