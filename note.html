@@ -1061,6 +1061,51 @@
       return /^https?:\/\//i.test(s)
     }
 
+
+    function getGoogleDriveFileId(url) {
+      const raw = String(url || "").trim();
+      if (!raw) return "";
+
+      const filePathMatch = raw.match(/drive\.google\.com\/file\/d\/([^/]+)/i);
+      if (filePathMatch) return decodeURIComponent(filePathMatch[1]);
+
+      const queryIdMatch = raw.match(/[?&]id=([^&]+)/i);
+      if (queryIdMatch) return decodeURIComponent(queryIdMatch[1]);
+
+      return "";
+    }
+
+    function normalizeImageSrc(rawUrl) {
+      const url = String(rawUrl || "").trim();
+      if (!url) return "";
+
+      /*
+        Google Drive의 공유 링크는 그 자체가 이미지 파일 주소가 아니라
+        "미리보기 페이지 주소"인 경우가 많다.
+        그래서 이미지 태그의 src에 들어갈 수 있도록 thumbnail 주소로 바꾼다.
+
+        예:
+        https://drive.google.com/file/d/파일ID/view?usp=drive_link
+        → https://drive.google.com/thumbnail?id=파일ID&sz=w1600
+      */
+      if (/^https?:\/\/drive\.google\.com\//i.test(url)) {
+        const fileId = getGoogleDriveFileId(url);
+        if (fileId) return `https://drive.google.com/thumbnail?id=${encodeURIComponent(fileId)}&sz=w1600`;
+      }
+
+      return url;
+    }
+
+    function isAllowedImageUrl(rawUrl) {
+      const url = String(rawUrl || "").trim();
+      if (!url) return false;
+
+      if (/^https?:\/\//i.test(url)) return true;
+      if (/^(\/|\.\/|\.\.\/)/.test(url)) return true;
+
+      return /^[^<>"']+\.(png|jpe?g|gif|webp|svg|avif)(\?[^<>"']*)?(#[^<>"']*)?$/i.test(url);
+    }
+
     function escapeHtml(s) {
       return String(s)
         .replaceAll("&", "&amp;")
@@ -1258,11 +1303,56 @@
       t = t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
       t = t.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
-      t = t.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, (m, alt, url) => {
-        const su = escapeHtml(url), sa = escapeHtml(alt || "");
+      /*
+        링크 이미지 문법을 먼저 처리한다.
+
+        사용 예:
+        [![2권 중](삼백초2권원문_2.png)](https://drive.google.com/file/d/문서ID/view)
+
+        중요한 점:
+        - 이 문법은 이미지 문법과 링크 문법이 겹쳐 있다.
+        - 그래서 일반 이미지 ![...](...)보다 먼저 처리해야 한다.
+        - 이미지 주소는 https:// 주소뿐 아니라 같은 폴더의 png, jpg, gif, webp, svg 파일명도 허용한다.
+      */
+      t = t.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\((https?:\/\/[^)]+)\)/g, (m, alt, imgUrl, linkUrl) => {
+        const rawImgUrl = String(imgUrl || "").trim();
+        const rawLinkUrl = String(linkUrl || "").trim();
+
+        if (!isAllowedImageUrl(rawImgUrl)) return m;
+
+        const imageSrc = normalizeImageSrc(rawImgUrl);
+        const su = escapeHtml(imageSrc);
+        const href = escapeHtml(rawLinkUrl);
+        const sa = escapeHtml(alt || "");
+
+        return `
+          <figure class="wiki-figure">
+            <a class="wiki-img-link" href="${href}" target="_blank" rel="noopener noreferrer">
+              <img class="wiki-img" src="${su}" alt="${sa}" loading="lazy" />
+            </a>
+            ${sa ? `<figcaption class="wiki-caption">${sa}</figcaption>` : ""}
+          </figure>`;
+      });
+
+      /*
+        일반 이미지 문법
+        사용 예:
+        ![이미지 설명](image.png)
+        ![이미지 설명](https://example.com/image.png)
+      */
+      t = t.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, url) => {
+        const rawUrl = String(url || "").trim();
+
+        if (!isAllowedImageUrl(rawUrl)) return m;
+
+        const imageSrc = normalizeImageSrc(rawUrl);
+        const su = escapeHtml(imageSrc);
+        const href = escapeHtml(rawUrl);
+        const sa = escapeHtml(alt || "");
+
         return `
     <figure class="wiki-figure">
-      <a class="wiki-img-link" href="${su}" target="_blank" rel="noopener noreferrer">
+      <a class="wiki-img-link" href="${href}" target="_blank" rel="noopener noreferrer">
         <img class="wiki-img" src="${su}" alt="${sa}" loading="lazy" />
       </a>
       ${sa ? `<figcaption class="wiki-caption">${sa}</figcaption>` : ""}
@@ -1273,11 +1363,18 @@
         return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
       });
 
-      t = t.replace(/\[\[(?:Image|File|파일|이미지):(https?:\/\/[^\]|]+)(?:\|([^\]]+))?\]\]/gi, (m, url, cap) => {
-        const su = escapeHtml(url.trim()), sc = escapeHtml((cap || "").trim());
+      t = t.replace(/\[\[(?:Image|File|파일|이미지):(https?:\/\/[^\]|]+|[^\]|]+\.(?:png|jpe?g|gif|webp|svg|avif))(?:\|([^\]]+))?\]\]/gi, (m, url, cap) => {
+        const rawUrl = String(url || "").trim();
+        if (!isAllowedImageUrl(rawUrl)) return m;
+
+        const imageSrc = normalizeImageSrc(rawUrl);
+        const su = escapeHtml(imageSrc);
+        const href = escapeHtml(rawUrl);
+        const sc = escapeHtml((cap || "").trim());
+
         return `
           <figure class="wiki-figure">
-            <a class="wiki-img-link" href="${su}" target="_blank" rel="noopener noreferrer">
+            <a class="wiki-img-link" href="${href}" target="_blank" rel="noopener noreferrer">
               <img class="wiki-img" src="${su}" alt="${sc}" loading="lazy" />
             </a>
             ${sc ? `<figcaption class="wiki-caption">${sc}</figcaption>` : ""}
