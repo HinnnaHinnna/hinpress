@@ -1718,85 +1718,112 @@
     }
 
     function renderParagraphBr(linesBuf) {
+      /*
+        기존에는 같은 문단 안의 줄들을 <br>로 연결했기 때문에
+        편집창에서 줄을 바꿀 때마다 실제 화면에서도 강제 줄바꿈이 생겼다.
+
+        여기서는 <br>을 만들지 않고 줄바꿈 문자(\n)로만 연결한다.
+        HTML 안의 일반 줄바꿈은 브라우저에서 보통 공백처럼 처리되므로,
+        이미지 다음 줄에 텍스트를 써도 불필요한 <br> 간격이 생기지 않는다.
+      */
       return linesBuf.map(l => renderInline(l)).join("\n");
-    };
+    }
 
-    text = text.replace(
-      /\{\{\s*숨김\s*시작\s*\|\s*제목\s*=\s*([^}]+?)\s*\}\}/g,
-      (m, titleRaw) => `\n{{HIDE_START:${encodeURIComponent(String(titleRaw).trim())}}}\n`
-    );
-    text = text.replace(/\{\{\s*숨김\s*끝\s*\}\}/g, "\n{{HIDE_END}}\n");
+    let __REFS = [];
 
-    text = restoreInlineCodeAll(text, iCodes);
+    function renderWiki(body) {
+      __REFS = [];
 
-    const lines = text.split("\n");
+      const originalLines = normalizeSmartQuotes(String(body || ""))
+        .replaceAll("\r\n", "\n").split("\n");
 
-    function renderFromLines(localLines) {
-      const out = [];
-      let i = 0;
+      const { lines: extracted, blocks: codeBlocks } = extractFencedCodeBlocks(originalLines);
+      const { text: iProtected, codes: iCodes } = protectInlineCodeAll(extracted.join("\n"));
+      let text = iProtected;
 
-      while (i < localLines.length) {
-        const line = localLines[i];
-        if (!line.trim()) {
-          i++;
-          continue;
-        }
+      text = stripHtmlComments(text);
 
-        const cbMatch = line.trim().match(/^\{\{CODEBLOCK:(\d+)\}\}$/);
-        if (cbMatch) {
-          const codeText = codeBlocks[Number(cbMatch[1])] ?? "";
-          out.push(`<pre class="code-block"><code>${escapeHtml(codeText)}</code></pre>`);
-          i++;
-          continue;
-        }
+      text = text.replace(/<ref>([\s\S]*?)<\/ref>/gi, (m, inner) => {
+        __REFS.push((inner || "").trim());
+        return `{{REF:${__REFS.length}}}`;
+      });
 
-        const hs = line.trim().match(/^\{\{HIDE_START:(.+)\}\}$/);
-        if (hs) {
-          const title = decodeURIComponent(hs[1] || "");
-          i++;
-          const inner = [];
-          let depth = 1;
-          while (i < localLines.length) {
-            const l = localLines[i];
-            if (l.trim().match(/^\{\{HIDE_START:/)) {
-              depth++;
-              inner.push(l);
-              i++;
-              continue;
-            }
-            if (l.trim() === "{{HIDE_END}}") {
-              depth--;
-              if (depth === 0) {
+      text = text.replace(
+        /\{\{\s*숨김\s*시작\s*\|\s*제목\s*=\s*([^}]+?)\s*\}\}/g,
+        (m, titleRaw) => `\n{{HIDE_START:${encodeURIComponent(String(titleRaw).trim())}}}\n`
+      );
+      text = text.replace(/\{\{\s*숨김\s*끝\s*\}\}/g, "\n{{HIDE_END}}\n");
+
+      text = restoreInlineCodeAll(text, iCodes);
+
+      const lines = text.split("\n");
+
+      function renderFromLines(localLines) {
+        const out = [];
+        let i = 0;
+
+        while (i < localLines.length) {
+          const line = localLines[i];
+          if (!line.trim()) {
+            i++;
+            continue;
+          }
+
+          const cbMatch = line.trim().match(/^\{\{CODEBLOCK:(\d+)\}\}$/);
+          if (cbMatch) {
+            const codeText = codeBlocks[Number(cbMatch[1])] ?? "";
+            out.push(`<pre class="code-block"><code>${escapeHtml(codeText)}</code></pre>`);
+            i++;
+            continue;
+          }
+
+          const hs = line.trim().match(/^\{\{HIDE_START:(.+)\}\}$/);
+          if (hs) {
+            const title = decodeURIComponent(hs[1] || "");
+            i++;
+            const inner = [];
+            let depth = 1;
+            while (i < localLines.length) {
+              const l = localLines[i];
+              if (l.trim().match(/^\{\{HIDE_START:/)) {
+                depth++;
+                inner.push(l);
                 i++;
-                break;
+                continue;
+              }
+              if (l.trim() === "{{HIDE_END}}") {
+                depth--;
+                if (depth === 0) {
+                  i++;
+                  break;
+                }
+                inner.push(l);
+                i++;
+                continue;
               }
               inner.push(l);
               i++;
-              continue;
             }
-            inner.push(l);
-            i++;
-          }
-          out.push(`
+            out.push(`
               <details class="mw-hide">
                 <summary>${escapeHtml(title)}</summary>
                 <div class="mw-hide-body">${renderFromLines(inner)}</div>
               </details>`);
-          continue;
-        }
+            continue;
+          }
 
-        if (line.trim() === "{{HIDE_END}}") {
-          i++;
-          continue;
-        }
+          if (line.trim() === "{{HIDE_END}}") {
+            i++;
+            continue;
+          }
 
-        if (/^<references\s*\/\s*>$/i.test(line.trim())) {
-          if (!__REFS.length) {
-            out.push(`<p class="muted">각주가 아직 없습니다.</p>`);
-          } else {
-            const items = __REFS.map((ref, idx) => {
-              const n = idx + 1;
-              return `
+          if (/^<references\s*\/\s*>$/i.test(line.trim())) {
+            if (!__REFS.length) {
+              out.push(`<p class="muted">각주가 아직 없습니다.</p>`);
+            } else {
+              const items = __REFS.map((ref, idx) => {
+                const n = idx + 1;
+                return `
                   <li id="ref-${n}">
                     ${renderInline(ref)}
                     <button
@@ -1806,97 +1833,97 @@
                       aria-label="본문의 각주 ${n}번 위치로 돌아가기"
                     >↩︎</button>
                   </li>`;
-            }).join("");
-            out.push(`<ol class="reflist">${items}</ol>`);
+              }).join("");
+              out.push(`<ol class="reflist">${items}</ol>`);
+            }
+            i++;
+            continue;
           }
-          i++;
-          continue;
-        }
 
-        const iframeEmbed = parseIframeEmbed(line);
-        if (iframeEmbed) {
-          out.push(renderIframeEmbed(iframeEmbed));
-          i++;
-          continue;
-        }
+          const iframeEmbed = parseIframeEmbed(line);
+          if (iframeEmbed) {
+            out.push(renderIframeEmbed(iframeEmbed));
+            i++;
+            continue;
+          }
 
-        const mwH = line.match(/^(={2,6})\s*(.+?)\s*\1\s*$/);
-        if (mwH) {
-          const level = Math.min(6, Math.max(2, mwH[1].length));
-          out.push(`<h${level}>${renderInline(mwH[2])}</h${level}>`);
-          i++;
-          continue;
-        }
+          const mwH = line.match(/^(={2,6})\s*(.+?)\s*\1\s*$/);
+          if (mwH) {
+            const level = Math.min(6, Math.max(2, mwH[1].length));
+            out.push(`<h${level}>${renderInline(mwH[2])}</h${level}>`);
+            i++;
+            continue;
+          }
 
-        if (line.startsWith("### ")) {
-          out.push(`<h4>${renderInline(line.slice(4))}</h4>`);
-          i++;
-          continue;
-        }
-        if (line.startsWith("## ")) {
-          out.push(`<h3>${renderInline(line.slice(3))}</h3>`);
-          i++;
-          continue;
-        }
-        if (line.startsWith("# ")) {
-          out.push(`<h2>${renderInline(line.slice(2))}</h2>`);
-          i++;
-          continue;
-        }
+          if (line.startsWith("### ")) {
+            out.push(`<h4>${renderInline(line.slice(4))}</h4>`);
+            i++;
+            continue;
+          }
+          if (line.startsWith("## ")) {
+            out.push(`<h3>${renderInline(line.slice(3))}</h3>`);
+            i++;
+            continue;
+          }
+          if (line.startsWith("# ")) {
+            out.push(`<h2>${renderInline(line.slice(2))}</h2>`);
+            i++;
+            continue;
+          }
 
-        if (isMarkdownTableStart(localLines, i)) {
-          const { html, nextIndex } = renderMarkdownTable(localLines, i);
-          out.push(html);
-          i = nextIndex;
-          continue;
-        }
+          if (isMarkdownTableStart(localLines, i)) {
+            const { html, nextIndex } = renderMarkdownTable(localLines, i);
+            out.push(html);
+            i = nextIndex;
+            continue;
+          }
 
-        if (line.trim() === "---") {
-          out.push("<hr />");
-          i++;
-          continue;
-        }
+          if (line.trim() === "---") {
+            out.push("<hr />");
+            i++;
+            continue;
+          }
 
-        if (/^[*#]+\s+/.test(line)) {
-          const { html, nextIndex } = consumeMwList(localLines, i);
-          out.push(html);
-          i = nextIndex;
-          continue;
-        }
+          if (/^[*#]+\s+/.test(line)) {
+            const { html, nextIndex } = consumeMwList(localLines, i);
+            out.push(html);
+            i = nextIndex;
+            continue;
+          }
 
-        if (line.startsWith(">")) {
+          if (line.startsWith(">")) {
+            const buf = [];
+            while (i < localLines.length && localLines[i].startsWith(">")) {
+              buf.push(localLines[i].replace(/^>\s?/, ""));
+              i++;
+            }
+            out.push(`<blockquote>${buf.map(l => `<p>${renderInline(l)}</p>`).join("")}</blockquote>`);
+            continue;
+          }
+
           const buf = [];
-          while (i < localLines.length && localLines[i].startsWith(">")) {
-            buf.push(localLines[i].replace(/^>\s?/, ""));
+          while (i < localLines.length && localLines[i].trim()) {
+            /*
+              문단을 모으는 중간에 표 시작 행을 만나면 문단을 끊는다.
+              이렇게 해야 아래처럼 빈 줄 없이 이어 써도 표가 적용된다.
+
+              설명 문장
+              | 이름 | 설명 |
+              | --- | --- |
+              | A | B |
+            */
+            if (buf.length > 0 && isMarkdownTableStart(localLines, i)) break;
+
+            buf.push(localLines[i]);
             i++;
           }
-          out.push(`<blockquote>${buf.map(l => `<p>${renderInline(l)}</p>`).join("")}</blockquote>`);
-          continue;
+          out.push(`<p>${renderParagraphBr(buf)}</p>`);
         }
 
-        const buf = [];
-        while (i < localLines.length && localLines[i].trim()) {
-          /*
-            문단을 모으는 중간에 표 시작 행을 만나면 문단을 끊는다.
-            이렇게 해야 아래처럼 빈 줄 없이 이어 써도 표가 적용된다.
-
-            설명 문장
-            | 이름 | 설명 |
-            | --- | --- |
-            | A | B |
-          */
-          if (buf.length > 0 && isMarkdownTableStart(localLines, i)) break;
-
-          buf.push(localLines[i]);
-          i++;
-        }
-        out.push(`<p>${renderParagraphBr(buf)}</p>`);
+        return out.join("\n");
       }
 
-      return out.join("\n");
-    }
-
-    return renderFromLines(lines);
+      return renderFromLines(lines);
     }
 
 
