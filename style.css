@@ -731,7 +731,7 @@ body {
 
 @media (max-width: 768px) {
   :root {
-    --bar-height: 1.8rem;
+    --bar-height: 1.6rem;
     --bar-font-size: 0.8rem;
     /* 모바일 마퀴바 글씨 크기 */
     --detail-page-side-padding: 0px;
@@ -741,10 +741,10 @@ body {
   }
 
   .title-container {
-    top: 32vh;
+    top: 2vh;
     left: 0;
     right: 3.5px;
-    width: 100vw;
+    width: 40vw;
   }
 
   #main-title-svg {
