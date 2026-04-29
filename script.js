@@ -152,10 +152,10 @@ function getMarqueeTuningByViewport(titleRect) {
   const isMobile = window.innerWidth <= 768;
 
   return {
-    GAP: isMobile ? 0 : 3,
+
+    GAP: isMobile ? 0 : 2,
 
     LEFT_NUDGE: isMobile ? 2.8 : 4.5,
-
     RIGHT_NUDGE: 0
   };
 }
@@ -166,14 +166,16 @@ function alignMarqueeToTitleUnderline() {
   const rect = getTextInkRect(mainTitle);
   if (!rect || !rect.width) return;
 
-  const { GAP, LEFT_NUDGE, RIGHT_NUDGE } = getMarqueeTuningByViewport(rect);
+  const { GAP } = getMarqueeTuningByViewport(rect);
 
-  const left = rect.left + LEFT_NUDGE;
-  const width = Math.max(0, rect.width - LEFT_NUDGE - RIGHT_NUDGE);
   const top = rect.bottom + GAP;
 
-  marqueeBar.style.left = `${left.toFixed(2)}px`;
-  marqueeBar.style.width = `${width.toFixed(2)}px`;
+  marqueeBar.style.left = '0';
+  marqueeBar.style.right = 'auto';
+  marqueeBar.style.marginLeft = '0';
+  marqueeBar.style.marginRight = '0';
+  marqueeBar.style.width = '100vw';
+
   marqueeBar.style.top = `${top.toFixed(2)}px`;
   marqueeBar.style.bottom = 'auto';
 

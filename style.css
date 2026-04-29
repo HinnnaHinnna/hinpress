@@ -205,6 +205,8 @@ body {
   bottom: auto;
   width: 100vw;
   height: var(--bar-height);
+  margin: 0;
+
   overflow: hidden;
   z-index: 100;
   display: flex;
