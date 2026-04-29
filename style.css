@@ -739,6 +739,8 @@ body {
   }
 
   .title-container {
+    top: 40vh;
+    /* 모바일에서 hinPress를 기존보다 조금 아래로 내림 */
     left: 0;
     right: 3;
     width: 100vw;
