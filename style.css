@@ -731,7 +731,7 @@ body {
 
 @media (max-width: 768px) {
   :root {
-    --bar-height: 3rem;
+    --bar-height: 2rem;
     --bar-font-size: 0.7rem;
     /* 모바일 마퀴바 글씨 크기 */
     --detail-page-side-padding: 0px;
@@ -741,10 +741,10 @@ body {
   }
 
   .title-container {
-    top: 38vh;
+    top: 34vh;
     /* 모바일에서 hinPress를 기존보다 조금 아래로 내림 */
     left: 0;
-    right: 4px;
+    right: 3.5px;
     width: 100vw;
   }
 
