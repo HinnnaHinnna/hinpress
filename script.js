@@ -154,7 +154,7 @@ function getTextInkRect(el) {
 function getMarqueeTuningByViewport(titleRect) {
   const isMobile = window.innerWidth <= 768;
 
-  const GAP_RATIO = isMobile ? -0.45 : -0.20;
+  const GAP_RATIO = isMobile ? -0.65 : -0.20;
 
   return {
     GAP: titleRect.height * GAP_RATIO,
