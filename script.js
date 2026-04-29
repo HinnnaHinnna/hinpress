@@ -143,21 +143,17 @@ let paddleVX = 0;
 
 function getTextInkRect(el) {
   if (!el) return null;
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const rect = range.getBoundingClientRect();
-  range.detach?.();
-  return rect;
+
+  return el.getBoundingClientRect();
 }
 
 
 function getMarqueeTuningByViewport(titleRect) {
   const isMobile = window.innerWidth <= 768;
 
-  const GAP_RATIO = isMobile ? -0.65 : -0.20;
-
   return {
-    GAP: titleRect.height * GAP_RATIO,
+
+    GAP: isMobile ? 0 : titleRect.height * -0.20,
 
     LEFT_NUDGE: isMobile ? 2.8 : 4.5,
 

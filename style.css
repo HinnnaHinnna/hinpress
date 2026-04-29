@@ -732,8 +732,7 @@ body {
 @media (max-width: 768px) {
   :root {
     --bar-height: 1.6rem;
-    --bar-font-size: 0.8rem;
-    /* 모바일 마퀴바 글씨 크기 */
+    --bar-font-size: 0.75rem;
     --detail-page-side-padding: 0px;
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
@@ -755,7 +754,7 @@ body {
   }
 
   #main-title-measure {
-    letter-spacing: 0em;
+    letter-spacing: -0.005em;
   }
 }
 
