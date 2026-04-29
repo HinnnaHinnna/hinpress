@@ -152,7 +152,7 @@ function getMarqueeTuningByViewport(titleRect) {
   const isMobile = window.innerWidth <= 768;
 
   return {
-    GAP: isMobile ? 0 : 6,
+    GAP: isMobile ? 0 : 3,
 
     LEFT_NUDGE: isMobile ? 2.8 : 4.5,
 
