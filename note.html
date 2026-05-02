@@ -310,17 +310,13 @@
       margin: 14px 0 0 0
     }
 
-    .page-bottom-meta {
-      margin-top: 22px;
-      margin-bottom: 0;
-    }
-
-    .page-bottom-tools {
-      margin-top: 6px;
+    .page-top-tools {
+      margin-top: -6px;
+      margin-bottom: 14px;
     }
 
     .page-bottom-rule {
-      margin: 14px 0 0 0;
+      margin: 22px 0 0 0;
     }
 
     .tool-link {
@@ -2137,7 +2133,7 @@
         </div>`;
 
       const pageToolsRow = `
-        <div class="tools-row page-bottom-tools">
+        <div class="tools-row page-top-tools">
           <button class="tool-link" type="button" id="edit-btn">편집</button>
           <button class="tool-link" type="button" id="history-btn">히스토리</button>
           ${canEdit ? `<button class="tool-link" type="button" id="delete-btn">문서 삭제</button>` : ""}
@@ -2148,13 +2144,11 @@
 
         ${renderPageMetaRow()}
 
+        ${pageToolsRow}
+
         <hr />
 
         <div class="doc">${renderWiki(body)}</div>
-
-        ${renderPageMetaRow("page-bottom-meta")}
-
-        ${pageToolsRow}
 
         <hr class="page-bottom-rule" />`;
 
