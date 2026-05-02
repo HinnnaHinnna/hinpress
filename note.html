@@ -43,9 +43,9 @@
 
     .doc,
     .doc * {
-      overflow-wrap: anywhere;
-      word-break: break-word;
-      line-height: 1.85
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      line-height: 1.85;
     }
 
     .doc a {
@@ -55,6 +55,7 @@
 
     .doc p {
       margin: 0 0 10px 0;
+      word-break: keep-all;
     }
 
     .doc h2,
@@ -64,6 +65,7 @@
     .doc h6 {
       margin-top: 22px;
       margin-bottom: 8px;
+      word-break: keep-all;
     }
 
     pre.code-block {
@@ -1718,14 +1720,6 @@
     }
 
     function renderParagraphBr(linesBuf) {
-      /*
-        편집모드에서 엔터로 줄을 바꾼 부분을 실제 화면에서도 보이게 한다.
-        HTML 안의 일반 줄바꿈(\n)은 브라우저에서 공백처럼 처리되므로,
-        화면에 줄바꿈을 보여주려면 <br> 태그로 변환해야 한다.
-
-        이미지와 텍스트 사이의 간격은 여기서 없애지 않고,
-        figure.wiki-figure / .doc p 같은 CSS margin 값으로 조절한다.
-      */
       return linesBuf.map(l => renderInline(l)).join("<br>");
     }
 
