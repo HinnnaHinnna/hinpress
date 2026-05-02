@@ -310,6 +310,19 @@
       margin: 14px 0 0 0
     }
 
+    .page-bottom-meta {
+      margin-top: 22px;
+      margin-bottom: 0;
+    }
+
+    .page-bottom-tools {
+      margin-top: 6px;
+    }
+
+    .page-bottom-rule {
+      margin: 14px 0 0 0;
+    }
+
     .tool-link {
       display: inline-flex;
       align-items: center;
@@ -1473,15 +1486,7 @@
 
       t = t.replace(/\{\{REF:(\d+)\}\}/g, (m, n) => {
         const num = Number(n);
-        return `
-          <sup class="ref" id="refback-${num}">
-            <button
-              type="button"
-              class="footnote-link"
-              data-footnote-target="ref-${num}"
-              aria-label="각주 ${num}번으로 이동"
-            >[${num}]</button>
-          </sup>`;
+        return `<sup class="ref" id="refback-${num}"><button type="button" class="footnote-link" data-footnote-target="ref-${num}" aria-label="각주 ${num}번으로 이동">[${num}]</button></sup>`;
       });
 
       t = t.replace(/(^|[\s>])(https?:\/\/[^\s<]+)/g,
@@ -1741,6 +1746,10 @@
         __REFS.push((inner || "").trim());
         return `{{REF:${__REFS.length}}}`;
       });
+
+      // 본문에서 각주 번호 바로 앞에 생기는 빈칸을 제거한다.
+      // 예: "문장 <ref>각주</ref>" → "문장[1]"처럼 붙어서 보이게 한다.
+      text = text.replace(/[ \t]+\{\{REF:/g, "{{REF:");
 
       text = text.replace(
         /\{\{\s*숨김\s*시작\s*\|\s*제목\s*=\s*([^}]+?)\s*\}\}/g,
@@ -2120,24 +2129,34 @@
       if (meta.tags) metaBits.push(`tags: ${meta.tags}`);
       metaBits.push(`visibility: ${getVisibility(page) === "private" ? "비공개" : "공개"}`);
 
-      viewEl.innerHTML = `
-        <h2 class="page-title">${escapeHtml(page.title)}</h2>
-
-        <div class="meta-row">
+      const renderPageMetaRow = (extraClass = "") => `
+        <div class="meta-row${extraClass ? ` ${extraClass}` : ""}">
           <span>최종 편집: ${escapeHtml(formatDate(page.updatedAt || page.createdAt))}</span>
           ${page.updatedBy ? `<span>·</span><span>by ${escapeHtml(page.updatedBy)}</span>` : ""}
           ${metaBits.length ? `<span>·</span><span>${escapeHtml(metaBits.join(" · "))}</span>` : ""}
-        </div>
+        </div>`;
+
+      const pageToolsRow = `
+        <div class="tools-row page-bottom-tools">
+          <button class="tool-link" type="button" id="edit-btn">편집</button>
+          <button class="tool-link" type="button" id="history-btn">히스토리</button>
+          ${canEdit ? `<button class="tool-link" type="button" id="delete-btn">문서 삭제</button>` : ""}
+        </div>`;
+
+      viewEl.innerHTML = `
+        <h2 class="page-title">${escapeHtml(page.title)}</h2>
+
+        ${renderPageMetaRow()}
 
         <hr />
 
         <div class="doc">${renderWiki(body)}</div>
 
-        <div class="tools-row">
-          <button class="tool-link" type="button" id="edit-btn">편집</button>
-          <button class="tool-link" type="button" id="history-btn">히스토리</button>
-          ${canEdit ? `<button class="tool-link" type="button" id="delete-btn">문서 삭제</button>` : ""}
-        </div>`;
+        ${renderPageMetaRow("page-bottom-meta")}
+
+        ${pageToolsRow}
+
+        <hr class="page-bottom-rule" />`;
 
       document.getElementById("edit-btn").addEventListener("click", () => {
         if (!canEdit) return alert("편집하려면 로그인해야 해.");
