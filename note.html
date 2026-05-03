@@ -297,22 +297,26 @@
     .meta-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      column-gap: 6px;
+      row-gap: 2px;
       color: var(--muted);
       font-size: 11px;
-      margin-bottom: 14px
+      line-height: 1.25;
+      margin-bottom: 4px
     }
 
     .tools-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 14px 0 0 0
+      gap: 6px;
+      margin: 8px 0 0 0;
+      line-height: 1
     }
 
     .page-top-tools {
-      margin-top: -6px;
-      margin-bottom: 14px;
+      justify-content: flex-end;
+      margin-top: 0;
+      margin-bottom: 10px;
     }
 
     .page-bottom-rule {
@@ -729,6 +733,24 @@
     }
 
     @media (max-width: 640px) {
+      .meta-row {
+        column-gap: 5px;
+        row-gap: 1px;
+        line-height: 1.2;
+        margin-bottom: 3px;
+      }
+
+      .page-top-tools {
+        justify-content: flex-end;
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
+
+      .tool-link {
+        padding: 6px 9px;
+        font-size: 12px;
+      }
+
       .visibility-toggle-wrap {
         width: 100%;
         justify-content: flex-end;
