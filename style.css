@@ -767,25 +767,11 @@ body {
   line-height: 1.4;
   word-break: keep-all;
   gap: 0;
+  margin: 0;
 }
 
-#cv-page .cv-section {
-  margin: 0;
-  padding: 0;
-}
-
-#cv-page .cv-section h3 {
-  margin: 0;
-  padding: 0;
+.cv-section h3 {
   font-size: 13px;
-}
-
-#cv-page .cv-section ul {
+  gap: 0;
   margin: 0;
-  padding: 0;
-}
-
-#cv-page .cv-section li {
-  margin: 0;
-  padding: 0;
 }
