@@ -1,0 +1,109 @@
+/*
+  hinPress portfolio — mobile Safari fix
+  ------------------------------------------------------------------
+  사용 방법
+  1) 이 파일을 기존 style.css 아래에 추가로 연결하거나,
+     기존 style.css의 맨 아래에 이 내용을 그대로 붙여 넣는다.
+
+     <link rel="stylesheet" href="style.css" />
+     <link rel="stylesheet" href="mobile-safari-fix.css" />
+
+  2) 이 파일은 기존 레이아웃 전체를 대체하는 CSS가 아니라,
+     모바일 Safari에서 다르게 보이는 부분만 보정하는 추가 CSS이다.
+*/
+
+/*
+  Safari의 자동 텍스트 확대를 100%로 고정한다.
+  - QR로 Safari에 처음 진입했을 때 Marquee Bar 글자가 Chrome보다 커 보이는 문제를 줄인다.
+  - none을 쓰면 접근성 확대까지 막을 수 있으므로, 우선 100%를 사용한다.
+*/
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+  상단 topbar 버튼 색 보정
+  - 모바일 Safari는 button/a의 기본 스타일을 파랗게 보이게 만들 때가 있다.
+  - color와 -webkit-text-fill-color를 함께 지정해 Safari에서도 검정색으로 고정한다.
+*/
+.top-bar,
+.top-bar *,
+.top-nav,
+.top-nav *,
+.top-nav-item,
+#top-logo {
+  color: #000;
+  -webkit-text-fill-color: #000;
+}
+
+.top-nav-item {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-decoration: none;
+}
+
+.top-nav-item:visited,
+.top-nav-item:active,
+.top-nav-item:focus,
+.top-nav-item:hover,
+#top-logo:visited,
+#top-logo:active,
+#top-logo:focus,
+#top-logo:hover {
+  color: #000;
+  -webkit-text-fill-color: #000;
+}
+
+/*
+  Marquee Bar 글자 크기 보정
+  - 기존 style.css에 --bar-font-size가 있으면 그 값을 그대로 사용한다.
+  - 값이 없으면 모바일에서는 0.8rem을 기본값으로 사용한다.
+*/
+.marquee-bar,
+.marquee-bar *,
+.marquee-inner,
+.marquee-text {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --bar-font-size: 0.8rem;
+  }
+
+  .marquee-bar,
+  .marquee-text {
+    font-size: var(--bar-font-size, 0.8rem) !important;
+    line-height: 1.1;
+  }
+
+  .top-nav-item,
+  #top-logo {
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+  }
+
+  /*
+    메인 페이지 전체가 클릭 가능한 진입 영역이라는 것을 브라우저에도 알려준다.
+    터치 지연과 탭 하이라이트를 줄인다.
+  */
+  #main-page {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #canvas {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}

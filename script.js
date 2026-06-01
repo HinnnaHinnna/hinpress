@@ -38,6 +38,14 @@ const detailStripRight = document.getElementById('detail-strip-right');
 
 let currentProjectIndex = -1;
 
+/*
+  포트폴리오 썸네일 생성 상태
+  - 예전에는 메인 페이지가 열릴 때도 createThumbnails()를 바로 실행했다.
+  - 모바일 Safari에서는 QR로 처음 접속할 때 이미지 로딩과 canvas 애니메이션이 동시에 실행되면 느려질 수 있다.
+  - 그래서 포트폴리오 페이지에 실제로 들어간 뒤 한 번만 썸네일을 만든다.
+*/
+let thumbnailsCreated = false;
+
 
 
 function getImageSrc(item) {
@@ -90,7 +98,13 @@ function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   page.classList.add('active');
 
-  if (page === portfolioPage) createThumbnails({ shuffle: false });
+  /*
+    포트폴리오 썸네일은 포트폴리오 페이지에 처음 들어갈 때만 만든다.
+    이렇게 하면 모바일 Safari 첫 로딩에서 이미지 로딩이 canvas 공 애니메이션을 방해하는 일을 줄일 수 있다.
+  */
+  if (page === portfolioPage && !thumbnailsCreated) {
+    createThumbnails({ shuffle: false });
+  }
 
   if (page === mainPage) topBar?.classList.add('hidden');
   else topBar?.classList.remove('hidden');
@@ -366,12 +380,19 @@ class Ball {
     ctx.restore();
   }
 
-  update() {
+  update(speedRatio = 1) {
     if (!canvas) return;
 
+    /*
+      Safari 최적화 핵심
+      - 이전 코드는 프레임마다 this.x += this.vx, this.y += this.vy만 실행했다.
+      - 그러면 브라우저가 60fps가 아니라 30fps로 떨어지는 순간, 공의 실제 속도도 절반처럼 느려진다.
+      - speedRatio는 현재 프레임 간격을 기준으로 보정하는 값이다.
+        60fps 기준 한 프레임은 약 16.67ms이므로, 그보다 느리게 그려진 프레임에서는 이동량을 조금 더 보정한다.
+    */
     const prevY = this.y;
-    this.x += this.vx;
-    this.y += this.vy;
+    this.x += this.vx * speedRatio;
+    this.y += this.vy * speedRatio;
 
     if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx = -Math.abs(this.vx); }
     else if (this.x - this.radius < 0) { this.x = this.radius; this.vx = Math.abs(this.vx); }
@@ -409,7 +430,7 @@ class Ball {
     if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy = -Math.abs(this.vy); }
     if (this.y + this.radius < 0) this.recycleBall();
 
-    this.rotation += this.rotationSpeed;
+    this.rotation += this.rotationSpeed * speedRatio;
     this.draw();
   }
 
@@ -425,9 +446,21 @@ class Ball {
 }
 
 const balls = [];
-const numBalls = 5;
 const ballColor = '#fd2af6';
-const MAX_BALLS = 10;
+
+/*
+  모바일 Safari에서는 이미지 로딩, 주소창 변화, canvas 애니메이션이 겹칠 때 프레임이 쉽게 떨어진다.
+  그래서 모바일 화면에서는 공 개수와 최대 증식 개수를 살짝 줄인다.
+  시각적 인상은 유지하면서 계산량을 줄이는 목적이다.
+*/
+function isMobileViewport() {
+  return window.innerWidth <= 768;
+}
+
+const INITIAL_BALL_COUNT = isMobileViewport() ? 4 : 5;
+const MAX_BALLS = isMobileViewport() ? 7 : 10;
+const BALL_RADIUS = isMobileViewport() ? 24 : 30;
+
 let lastSpawnTime = 0;
 
 
@@ -518,29 +551,53 @@ if (window.__hinpressBallRAF) {
 }
 
 if (canvas && ctx) {
-  for (let i = 0; i < numBalls; i++) {
-    const radius = 30;
+  for (let i = 0; i < INITIAL_BALL_COUNT; i++) {
+    const radius = BALL_RADIUS;
     const x = radius + Math.random() * (canvas.width - radius * 2);
     const y = radius + Math.random() * (canvas.height - radius * 2);
     balls.push(new Ball(x, y, radius, ballColor));
   }
 
-  function animate() {
+  let lastFrameTime = null;
+
+  function animate(timestamp) {
+    if (lastFrameTime === null) lastFrameTime = timestamp;
+
+    const delta = timestamp - lastFrameTime;
+    lastFrameTime = timestamp;
+
+    /*
+      16.67ms는 60fps 기준의 한 프레임 시간이다.
+      delta가 커질수록 speedRatio도 커져서 Safari에서 프레임이 조금 떨어져도 속도가 지나치게 느려지지 않는다.
+      단, 탭 전환/주소창 변화 후 delta가 너무 커질 수 있으므로 최대값을 제한한다.
+    */
+    const speedRatio = Math.min(delta / 16.67, 2.2);
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    syncPaddleFromDom();
 
-    balls.forEach(b => b.update());
+    /*
+      메인 페이지가 보일 때만 공의 물리 계산을 실행한다.
+      포트폴리오/CV/상세 페이지로 넘어간 뒤에도 canvas는 DOM에 남아 있으므로,
+      계속 계산하면 모바일 성능을 불필요하게 사용하게 된다.
+    */
+    const isMainVisible = mainPage?.classList.contains('active');
 
-    for (let i = 0; i < balls.length; i++) {
-      for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
+    if (isMainVisible) {
+      syncPaddleFromDom();
+
+      balls.forEach(b => b.update(speedRatio));
+
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
+      }
+
+      debugBallCount();
     }
-
-    debugBallCount();
 
     window.__hinpressBallRAF = requestAnimationFrame(animate);
   }
 
-  animate();
+  window.__hinpressBallRAF = requestAnimationFrame(animate);
 }
 
 function shuffleArray(inputArray) {
@@ -563,6 +620,14 @@ function createThumbnails(options = {}) {
     thumbnail.className = 'thumbnail';
 
     const img = document.createElement('img');
+
+    /*
+      모바일 Safari 첫 진입 최적화
+      - loading='lazy': 화면 밖의 이미지를 한꺼번에 불러오지 않는다.
+      - decoding='async': 이미지 디코딩이 메인 스레드를 오래 막지 않도록 한다.
+    */
+    img.loading = 'lazy';
+    img.decoding = 'async';
     const first = (project.images && project.images[0]) ? project.images[0] : '';
     setImageSrcWithFallback(img, getImageSrc(first));
     img.alt = project.title || '';
@@ -571,9 +636,14 @@ function createThumbnails(options = {}) {
     thumbnail.addEventListener('click', () => showProjectDetail(project.id));
     thumbnailsContainer.appendChild(thumbnail);
   });
+
+  thumbnailsCreated = true;
 }
 
-createThumbnails({ shuffle: false });
+/*
+  중요: 메인 페이지 첫 로딩 때 썸네일을 미리 만들지 않는다.
+  포트폴리오 페이지에 들어갈 때 showPage() 안에서 한 번만 생성된다.
+*/
 
 function normalizeMainImageSize(value) {
   const v = String(value || '').toLowerCase();
