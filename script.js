@@ -97,7 +97,39 @@ function showPage(page) {
 }
 showPage(mainPage);
 
-mainTitle?.addEventListener('click', () => showPage(portfolioPage));
+// 메인 페이지 전체를 클릭하면 포트폴리오 페이지로 이동하게 한다.
+// 기존에는 hinPress SVG 텍스트(mainTitle)만 클릭 가능했지만,
+// 이제 main-page 영역 전체가 진입 버튼처럼 작동한다.
+
+// 단, 모바일/웹에서 마퀴 바를 드래그할 때 실수로 페이지가 넘어가지 않도록
+// 손가락이나 마우스가 일정 거리 이상 움직이면 "클릭"이 아니라 "드래그"로 판단한다.
+
+let mainPageStartX = 0;
+let mainPageStartY = 0;
+let mainPageMoved = false;
+
+const MAIN_PAGE_CLICK_MOVE_LIMIT = 10;
+
+mainPage?.addEventListener('pointerdown', (e) => {
+  mainPageStartX = e.clientX;
+  mainPageStartY = e.clientY;
+  mainPageMoved = false;
+});
+
+mainPage?.addEventListener('pointermove', (e) => {
+  const dx = Math.abs(e.clientX - mainPageStartX);
+  const dy = Math.abs(e.clientY - mainPageStartY);
+
+  if (dx > MAIN_PAGE_CLICK_MOVE_LIMIT || dy > MAIN_PAGE_CLICK_MOVE_LIMIT) {
+    mainPageMoved = true;
+  }
+});
+
+mainPage?.addEventListener('click', () => {
+  if (mainPageMoved) return;
+  showPage(portfolioPage);
+});
+
 topLogo?.addEventListener('click', () => showPage(portfolioPage));
 aboutBtn?.addEventListener('click', () => showPage(mainPage));
 cvBtn?.addEventListener('click', () => showPage(cvPage));
