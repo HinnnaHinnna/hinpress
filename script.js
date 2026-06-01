@@ -254,10 +254,54 @@ function clampPaddleX() {
   if (paddleX > maxX) paddleX = maxX;
 }
 
-function resizeCanvas() {
+/*
+  모바일 직접 브라우저 진입 최적화
+  - Safari/Chrome 앱은 주소창이 보이거나 사라질 때 resize 이벤트를 여러 번 발생시킨다.
+  - canvas.width / canvas.height를 바꾸면 캔버스 버퍼가 즉시 초기화되므로,
+    작은 높이 변화마다 resizeCanvas()가 실행되면 공 움직임이 끊기는 것처럼 보인다.
+  - 그래서 모바일에서는 처음 잡은 높이를 안정값으로 사용하고,
+    실제 화면 방향이 바뀌는 큰 변화일 때만 다시 계산한다.
+*/
+let canvasStableWidth = 0;
+let canvasStableHeight = 0;
+let mobileStableCanvasHeight = 0;
+
+function getCanvasViewportSize(force = false) {
+  const width = Math.round(document.documentElement.clientWidth || window.innerWidth);
+  let height = Math.round(window.innerHeight);
+  const isMobile = width <= 768;
+
+  if (isMobile) {
+    const widthChanged = canvasStableWidth && Math.abs(width - canvasStableWidth) > 40;
+
+    if (force || !mobileStableCanvasHeight || widthChanged) {
+      mobileStableCanvasHeight = height;
+    }
+
+    height = mobileStableCanvasHeight;
+  }
+
+  return { width, height };
+}
+
+function resizeCanvas(options = {}) {
   if (!canvas) return;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+
+  const force = options.force === true;
+  const { width, height } = getCanvasViewportSize(force);
+
+  if (!force && canvasStableWidth && canvasStableHeight) {
+    const widthDiff = Math.abs(width - canvasStableWidth);
+    const heightDiff = Math.abs(height - canvasStableHeight);
+
+    // 1~2px 정도의 브라우저 보정값 변화는 무시한다.
+    if (widthDiff < 2 && heightDiff < 2) return;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  canvasStableWidth = width;
+  canvasStableHeight = height;
 }
 
 function setupMarqueeIntroOnce() {
@@ -279,7 +323,7 @@ function setupMarqueeIntroOnce() {
   marqueeInner.style.setProperty('--marquee-loop-duration', `${LOOP_SECONDS}s`);
 }
 
-resizeCanvas();
+resizeCanvas({ force: true });
 
 function initAfterFontsReady() {
   alignMarqueeToTitleUnderline();
@@ -294,13 +338,23 @@ if (document.fonts && document.fonts.ready) {
   window.addEventListener('load', initAfterFontsReady);
 }
 
+let resizeRAF = null;
 window.addEventListener('resize', () => {
-  resizeCanvas();
-  alignMarqueeToTitleUnderline();
-  setupMarqueeIntroOnce();
-  syncPaddleFromDom();
-  syncTopNavFontToLogo();
-});
+  /*
+    모바일 Safari/Chrome의 주소창 변화는 resize 이벤트를 짧은 시간에 여러 번 만든다.
+    매번 즉시 canvas를 다시 만들지 않고, 다음 프레임에 한 번만 정리한다.
+  */
+  if (resizeRAF) cancelAnimationFrame(resizeRAF);
+
+  resizeRAF = requestAnimationFrame(() => {
+    resizeCanvas();
+    alignMarqueeToTitleUnderline();
+    setupMarqueeIntroOnce();
+    syncPaddleFromDom();
+    syncTopNavFontToLogo();
+    resizeRAF = null;
+  });
+}, { passive: true });
 
 if (mainTitle && 'ResizeObserver' in window) {
   const ro = new ResizeObserver(() => {
@@ -387,7 +441,7 @@ class Ball {
       모바일에서는 Safari의 프레임 변동을 고려해서 초기 속도를 조금 낮춘다.
       이전 버전은 시간 보정을 강하게 넣으면서 QR 첫 진입 시 공이 빠르게 느껴질 수 있었다.
     */
-    const initialSpeed = isMobileViewport() ? 16 : 25;
+    const initialSpeed = isMobileViewport() ? 13 : 25;
     this.vx = (Math.random() - 0.5) * initialSpeed;
     this.vy = (Math.random() - 0.5) * initialSpeed;
 
@@ -401,7 +455,7 @@ class Ball {
       특히 모바일 Safari에서는 이런 순간 가속이 “덜 부드러운 움직임”처럼 보인다.
       그래서 화면 크기에 따라 최대 속도를 제한한다.
     */
-    const maxSpeed = isMobileViewport() ? 12 : 22;
+    const maxSpeed = isMobileViewport() ? 9.5 : 22;
     const speed = Math.hypot(this.vx, this.vy);
 
     if (speed > maxSpeed) {
@@ -514,7 +568,7 @@ function isMobileViewport() {
 }
 
 const INITIAL_BALL_COUNT = isMobileViewport() ? 4 : 5;
-const MAX_BALLS = isMobileViewport() ? 7 : 10;
+const MAX_BALLS = isMobileViewport() ? 6 : 10;
 const BALL_RADIUS = isMobileViewport() ? 24 : 30;
 
 let lastSpawnTime = 0;
@@ -529,7 +583,9 @@ function debugBallCount() {
     debugBallEl.textContent = `balls: ${balls.length} / ${MAX_BALLS}`;
   }
 
-  if (now - lastDebugLog > 1000) {
+  // 디버그 표시 요소가 있을 때만 로그를 남긴다.
+  // 모바일 브라우저에서 불필요한 console 작업이 애니메이션을 방해하지 않게 한다.
+  if (debugBallEl && now - lastDebugLog > 1000) {
     console.log(`[hinPress] balls: ${balls.length} / ${MAX_BALLS}`);
     lastDebugLog = now;
   }
@@ -595,7 +651,7 @@ function checkCollision(ball1, ball2) {
   ball2.vy += impulseY * invMass2;
 
   const now = performance.now();
-  if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
+  if (balls.length < MAX_BALLS && now - lastSpawnTime > (isMobileViewport() ? 480 : 200)) {
     balls.push(new Ball((ball1.x + ball2.x) / 2, (ball1.y + ball2.y) / 2, ball1.radius, ballColor));
     lastSpawnTime = now;
   }
@@ -629,10 +685,10 @@ if (canvas && ctx) {
       - MOBILE_SPEED_MULTIPLIER는 모바일에서 전체 속도를 조금 낮춰 QR 첫 진입 시 빠르게 보이는 문제를 줄인다.
     */
     const isMobile = isMobileViewport();
-    const clampedDelta = clamp(delta, 10, isMobile ? 34 : 42);
-    const targetSpeedRatio = clamp(clampedDelta / 16.67, 0.7, isMobile ? 1.45 : 1.8);
-    const smoothing = isMobile ? 0.10 : 0.16;
-    const mobileSpeedMultiplier = isMobile ? 0.76 : 1;
+    const clampedDelta = clamp(delta, 12, isMobile ? 24 : 42);
+    const targetSpeedRatio = clamp(clampedDelta / 16.67, isMobile ? 0.82 : 0.7, isMobile ? 1.18 : 1.8);
+    const smoothing = isMobile ? 0.08 : 0.16;
+    const mobileSpeedMultiplier = isMobile ? 0.82 : 1;
 
     smoothedSpeedRatio += (targetSpeedRatio - smoothedSpeedRatio) * smoothing;
     const speedRatio = smoothedSpeedRatio * mobileSpeedMultiplier;
@@ -646,8 +702,18 @@ if (canvas && ctx) {
     */
     const isMainVisible = mainPage?.classList.contains('active');
 
+    if (document.hidden) {
+      lastFrameTime = null;
+      window.__hinpressBallRAF = requestAnimationFrame(animate);
+      return;
+    }
+
     if (isMainVisible) {
-      syncPaddleFromDom();
+      /*
+        이전 버전은 매 프레임 getBoundingClientRect()로 marquee-bar 위치를 다시 읽었다.
+        모바일 직접 브라우저에서는 주소창 resize와 이 레이아웃 읽기가 겹치며 끊김이 생길 수 있다.
+        marquee-bar 위치는 resize/drag/font 로딩 시점에 이미 갱신하므로, 매 프레임 읽지 않는다.
+      */
 
       balls.forEach(b => b.update(speedRatio));
 
@@ -663,6 +729,14 @@ if (canvas && ctx) {
 
   window.__hinpressBallRAF = requestAnimationFrame(animate);
 }
+
+document.addEventListener('visibilitychange', () => {
+  // 다른 앱/탭에서 돌아왔을 때 긴 delta가 한 번에 반영되어 공이 튀지 않게 한다.
+  if (!document.hidden) {
+    resizeCanvas();
+    syncPaddleFromDom();
+  }
+}, { passive: true });
 
 function shuffleArray(inputArray) {
   const arr = inputArray.slice();

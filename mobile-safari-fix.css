@@ -124,3 +124,40 @@ body {
     text-transform: none;
   }
 }
+
+/*
+  Direct mobile browser smoothness fix
+  ------------------------------------------------------------------
+  Safari/Chrome 앱으로 직접 열 때 주소창이 나타나거나 사라지면서
+  viewport height가 계속 변하면 canvas가 다시 계산되어 움직임이 끊겨 보일 수 있다.
+  모바일에서는 메인 페이지와 canvas를 안정적인 small viewport 높이에 고정한다.
+*/
+@media (max-width: 768px) {
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
+  #main-page.active {
+    overflow: hidden;
+    min-height: 100vh;
+    height: 100vh;
+  }
+
+  #canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  @supports (height: 100svh) {
+    #main-page.active {
+      min-height: 100svh;
+      height: 100svh;
+    }
+
+    #canvas {
+      height: 100svh;
+    }
+  }
+}
