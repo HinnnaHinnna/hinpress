@@ -97,7 +97,14 @@ function showPage(page) {
 }
 showPage(mainPage);
 
-mainTitle?.addEventListener('click', () => showPage(portfolioPage));
+/*
+  메인 페이지에서 포트폴리오 페이지로 이동하는 방식
+  - 기존에는 hinPress SVG 이미지(mainTitle)를 직접 클릭해야만 이동했다.
+  - 이제는 main-page 영역 어디를 클릭해도 포트폴리오 페이지로 이동한다.
+  - click 이벤트는 데스크탑 마우스 클릭과 모바일 탭 모두에서 동작한다.
+*/
+mainPage?.addEventListener('click', () => showPage(portfolioPage));
+
 topLogo?.addEventListener('click', () => showPage(portfolioPage));
 aboutBtn?.addEventListener('click', () => showPage(mainPage));
 cvBtn?.addEventListener('click', () => showPage(cvPage));
