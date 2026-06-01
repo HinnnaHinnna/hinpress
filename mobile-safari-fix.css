@@ -171,3 +171,62 @@ body {
     gap: 0;
   }
 }
+
+/*
+  2026 mobile direct browser smooth fix
+  ------------------------------------------------------------------
+  topbar 폰트는 JS의 computedStyle 복사 방식 대신 CSS로만 통일한다.
+  Safari/Chrome 직접 접속에서는 주소창 변화로 resize가 자주 발생하므로,
+  JS에서 폰트를 계속 읽고 쓰면 canvas 애니메이션과 충돌할 수 있다.
+*/
+.top-nav-item,
+#top-logo {
+  font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-size: var(--bar-font-size) !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+/*
+  버튼의 기본 UI만 제거하고, 폰트 크기는 #top-logo와 동일한 변수로 맞춘다.
+*/
+.top-nav-item {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/*
+  모바일에서 CV 목록의 단어 단위 줄바꿈과 간격을 안정화한다.
+*/
+@media (max-width: 768px) {
+  #cv-page .cv-inner,
+  #cv-page .cv-section,
+  #cv-page .cv-section h3,
+  #cv-page .cv-section ul,
+  #cv-page .cv-section li {
+    word-break: keep-all;
+    overflow-wrap: normal;
+    white-space: normal;
+  }
+
+  #cv-page .cv-section,
+  #cv-page .cv-section h3,
+  #cv-page .cv-section ul,
+  #cv-page .cv-section li {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  #cv-page a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

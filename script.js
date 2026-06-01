@@ -102,22 +102,17 @@ function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
   - CSS에서 비슷하게 맞추는 것보다, 실제 보이는 값을 복사하는 방식이 더 안정적이다.
 */
 function syncTopNavFontToLogo() {
-  if (!topLogo) return;
+  /*
+    이전 버전에서는 여기서 getComputedStyle(topLogo)를 읽고
+    각 .top-nav-item에 inline style을 계속 써 넣었다.
 
-  const logoStyle = window.getComputedStyle(topLogo);
-  const navItems = document.querySelectorAll('.top-nav-item');
+    모바일 Safari/Chrome 앱 직접 접속에서는 주소창 변화로 resize가 자주 발생한다.
+    그때마다 폰트 계산 + inline style 쓰기가 반복되면 canvas 애니메이션과 충돌해서
+    smile ball이 끊기는 것처럼 보일 수 있다.
 
-  navItems.forEach((item) => {
-    item.style.fontFamily = logoStyle.fontFamily;
-    item.style.fontSize = logoStyle.fontSize;
-    item.style.fontWeight = logoStyle.fontWeight;
-    item.style.fontStyle = logoStyle.fontStyle;
-    item.style.lineHeight = logoStyle.lineHeight;
-    item.style.letterSpacing = logoStyle.letterSpacing;
-    item.style.textTransform = logoStyle.textTransform;
-    item.style.color = logoStyle.color;
-    item.style.webkitTextFillColor = logoStyle.color;
-  });
+    이제 topbar 폰트 통일은 CSS에서 처리한다.
+    이 함수는 기존 호출부와의 호환을 위해 남겨두지만, 레이아웃 계산은 하지 않는다.
+  */
 }
 
 function showPage(page) {
@@ -339,21 +334,47 @@ if (document.fonts && document.fonts.ready) {
 }
 
 let resizeRAF = null;
+let lastLayoutWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
+
 window.addEventListener('resize', () => {
   /*
-    모바일 Safari/Chrome의 주소창 변화는 resize 이벤트를 짧은 시간에 여러 번 만든다.
-    매번 즉시 canvas를 다시 만들지 않고, 다음 프레임에 한 번만 정리한다.
+    모바일 Safari/Chrome 앱에서는 주소창이 움직일 때 height만 바뀌는 resize가 자주 발생한다.
+    이때 marquee 위치/폭/폰트 계산을 다시 하면 레이아웃 계산이 canvas 애니메이션과 겹쳐서 끊김이 생긴다.
+
+    그래서 모바일에서는 width가 크게 바뀐 경우, 즉 회전/실제 레이아웃 변화일 때만
+    marquee 관련 계산을 다시 한다. height-only resize는 canvas 안정값만 유지하고 넘어간다.
   */
   if (resizeRAF) cancelAnimationFrame(resizeRAF);
 
   resizeRAF = requestAnimationFrame(() => {
+    const currentWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
+    const isMobile = currentWidth <= 768;
+    const widthChanged = Math.abs(currentWidth - lastLayoutWidth) > 40;
+
     resizeCanvas();
+
+    if (!isMobile || widthChanged) {
+      alignMarqueeToTitleUnderline();
+      setupMarqueeIntroOnce();
+      syncPaddleFromDom();
+      lastLayoutWidth = currentWidth;
+    }
+
+    resizeRAF = null;
+  });
+}, { passive: true });
+
+window.addEventListener('orientationchange', () => {
+  /*
+    화면 회전은 실제 레이아웃 변화이므로 한 번 강제로 다시 계산한다.
+  */
+  window.setTimeout(() => {
+    lastLayoutWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
+    resizeCanvas({ force: true });
     alignMarqueeToTitleUnderline();
     setupMarqueeIntroOnce();
     syncPaddleFromDom();
-    syncTopNavFontToLogo();
-    resizeRAF = null;
-  });
+  }, 250);
 }, { passive: true });
 
 if (mainTitle && 'ResizeObserver' in window) {
