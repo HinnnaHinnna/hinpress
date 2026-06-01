@@ -7,7 +7,6 @@
   <title>hinPress</title>
 
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="mobile-safari-fix.css" />
 
 
   <style>
@@ -47,34 +46,6 @@
 
     .note-shortcut-label {
       white-space: nowrap;
-    }
-
-
-
-    /*
-      상단 topbar 메뉴 색상 고정
-      - 모바일 Safari/Chrome에서는 button 요소가 브라우저 기본 색상으로 파랗게 보일 때가 있다.
-      - 그래서 topbar 안의 메뉴 버튼과 로고 텍스트 색을 검정으로 명시한다.
-      - -webkit-text-fill-color는 iOS 계열 브라우저에서 글자색이 계속 파랗게 남는 경우를 막기 위한 보강이다.
-    */
-    .top-nav-item,
-    .top-nav-item:hover,
-    .top-nav-item:active,
-    .top-nav-item:focus,
-    #top-logo,
-    #top-logo:hover,
-    #top-logo:active,
-    #top-logo:focus {
-      color: #000 !important;
-      -webkit-text-fill-color: #000 !important;
-    }
-
-    /*
-      메인 페이지 전체가 포트폴리오 진입 버튼처럼 작동한다는 것을 보여주기 위한 커서 처리.
-      실제 이동 기능은 script.js의 mainPage click 이벤트가 담당한다.
-    */
-    #main-page {
-      cursor: pointer;
     }
 
     @media (max-width: 768px) {
@@ -141,8 +112,8 @@
       <div class="cv-section">
         <h3>학력</h3>
         <ul>
-          <li>홍익대학교 도예유리학과 학사졸업</li>
           <li>서울시립대학교 시각디자인과 석사졸업</li>
+          <li>홍익대학교 도예유리학과 학사졸업</li>
         </ul>
       </div>
 

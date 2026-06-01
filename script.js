@@ -38,14 +38,6 @@ const detailStripRight = document.getElementById('detail-strip-right');
 
 let currentProjectIndex = -1;
 
-/*
-  포트폴리오 썸네일 생성 상태
-  - 예전에는 메인 페이지가 열릴 때도 createThumbnails()를 바로 실행했다.
-  - 모바일 Safari에서는 QR로 처음 접속할 때 이미지 로딩과 canvas 애니메이션이 동시에 실행되면 느려질 수 있다.
-  - 그래서 포트폴리오 페이지에 실제로 들어간 뒤 한 번만 썸네일을 만든다.
-*/
-let thumbnailsCreated = false;
-
 
 
 function getImageSrc(item) {
@@ -94,56 +86,18 @@ function setImageSrcWithFallback(imgEl, src) {
 
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-/*
-  상단 메뉴 폰트 동기화
-  - 모바일 Safari에서는 button 요소가 브라우저 기본 폰트처럼 보일 때가 있다.
-  - 그래서 #top-logo(작업들/Works)에 실제로 적용된 computed font 값을 읽어서
-    힌프레스 / CV / 사적 글쓰기 버튼에 그대로 복사한다.
-  - CSS에서 비슷하게 맞추는 것보다, 실제 보이는 값을 복사하는 방식이 더 안정적이다.
-*/
-function syncTopNavFontToLogo() {
-  /*
-    이전 버전에서는 여기서 getComputedStyle(topLogo)를 읽고
-    각 .top-nav-item에 inline style을 계속 써 넣었다.
-
-    모바일 Safari/Chrome 앱 직접 접속에서는 주소창 변화로 resize가 자주 발생한다.
-    그때마다 폰트 계산 + inline style 쓰기가 반복되면 canvas 애니메이션과 충돌해서
-    smile ball이 끊기는 것처럼 보일 수 있다.
-
-    이제 topbar 폰트 통일은 CSS에서 처리한다.
-    이 함수는 기존 호출부와의 호환을 위해 남겨두지만, 레이아웃 계산은 하지 않는다.
-  */
-}
-
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   page.classList.add('active');
 
-  /*
-    포트폴리오 썸네일은 포트폴리오 페이지에 처음 들어갈 때만 만든다.
-    이렇게 하면 모바일 Safari 첫 로딩에서 이미지 로딩이 canvas 공 애니메이션을 방해하는 일을 줄일 수 있다.
-  */
-  if (page === portfolioPage && !thumbnailsCreated) {
-    createThumbnails({ shuffle: false });
-  }
+  if (page === portfolioPage) createThumbnails({ shuffle: false });
 
-  if (page === mainPage) {
-    topBar?.classList.add('hidden');
-  } else {
-    topBar?.classList.remove('hidden');
-    syncTopNavFontToLogo();
-  }
+  if (page === mainPage) topBar?.classList.add('hidden');
+  else topBar?.classList.remove('hidden');
 }
 showPage(mainPage);
 
-/*
-  메인 페이지에서 포트폴리오 페이지로 이동하는 방식
-  - 기존에는 hinPress SVG 이미지(mainTitle)를 직접 클릭해야만 이동했다.
-  - 이제는 main-page 영역 어디를 클릭해도 포트폴리오 페이지로 이동한다.
-  - click 이벤트는 데스크탑 마우스 클릭과 모바일 탭 모두에서 동작한다.
-*/
-mainPage?.addEventListener('click', () => showPage(portfolioPage));
-
+mainTitle?.addEventListener('click', () => showPage(portfolioPage));
 topLogo?.addEventListener('click', () => showPage(portfolioPage));
 aboutBtn?.addEventListener('click', () => showPage(mainPage));
 cvBtn?.addEventListener('click', () => showPage(cvPage));
@@ -249,54 +203,10 @@ function clampPaddleX() {
   if (paddleX > maxX) paddleX = maxX;
 }
 
-/*
-  모바일 직접 브라우저 진입 최적화
-  - Safari/Chrome 앱은 주소창이 보이거나 사라질 때 resize 이벤트를 여러 번 발생시킨다.
-  - canvas.width / canvas.height를 바꾸면 캔버스 버퍼가 즉시 초기화되므로,
-    작은 높이 변화마다 resizeCanvas()가 실행되면 공 움직임이 끊기는 것처럼 보인다.
-  - 그래서 모바일에서는 처음 잡은 높이를 안정값으로 사용하고,
-    실제 화면 방향이 바뀌는 큰 변화일 때만 다시 계산한다.
-*/
-let canvasStableWidth = 0;
-let canvasStableHeight = 0;
-let mobileStableCanvasHeight = 0;
-
-function getCanvasViewportSize(force = false) {
-  const width = Math.round(document.documentElement.clientWidth || window.innerWidth);
-  let height = Math.round(window.innerHeight);
-  const isMobile = width <= 768;
-
-  if (isMobile) {
-    const widthChanged = canvasStableWidth && Math.abs(width - canvasStableWidth) > 40;
-
-    if (force || !mobileStableCanvasHeight || widthChanged) {
-      mobileStableCanvasHeight = height;
-    }
-
-    height = mobileStableCanvasHeight;
-  }
-
-  return { width, height };
-}
-
-function resizeCanvas(options = {}) {
+function resizeCanvas() {
   if (!canvas) return;
-
-  const force = options.force === true;
-  const { width, height } = getCanvasViewportSize(force);
-
-  if (!force && canvasStableWidth && canvasStableHeight) {
-    const widthDiff = Math.abs(width - canvasStableWidth);
-    const heightDiff = Math.abs(height - canvasStableHeight);
-
-    // 1~2px 정도의 브라우저 보정값 변화는 무시한다.
-    if (widthDiff < 2 && heightDiff < 2) return;
-  }
-
-  canvas.width = width;
-  canvas.height = height;
-  canvasStableWidth = width;
-  canvasStableHeight = height;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 
 function setupMarqueeIntroOnce() {
@@ -318,13 +228,12 @@ function setupMarqueeIntroOnce() {
   marqueeInner.style.setProperty('--marquee-loop-duration', `${LOOP_SECONDS}s`);
 }
 
-resizeCanvas({ force: true });
+resizeCanvas();
 
 function initAfterFontsReady() {
   alignMarqueeToTitleUnderline();
   setupMarqueeIntroOnce();
   syncPaddleFromDom();
-  syncTopNavFontToLogo();
 }
 
 if (document.fonts && document.fonts.ready) {
@@ -333,49 +242,12 @@ if (document.fonts && document.fonts.ready) {
   window.addEventListener('load', initAfterFontsReady);
 }
 
-let resizeRAF = null;
-let lastLayoutWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
-
 window.addEventListener('resize', () => {
-  /*
-    모바일 Safari/Chrome 앱에서는 주소창이 움직일 때 height만 바뀌는 resize가 자주 발생한다.
-    이때 marquee 위치/폭/폰트 계산을 다시 하면 레이아웃 계산이 canvas 애니메이션과 겹쳐서 끊김이 생긴다.
-
-    그래서 모바일에서는 width가 크게 바뀐 경우, 즉 회전/실제 레이아웃 변화일 때만
-    marquee 관련 계산을 다시 한다. height-only resize는 canvas 안정값만 유지하고 넘어간다.
-  */
-  if (resizeRAF) cancelAnimationFrame(resizeRAF);
-
-  resizeRAF = requestAnimationFrame(() => {
-    const currentWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
-    const isMobile = currentWidth <= 768;
-    const widthChanged = Math.abs(currentWidth - lastLayoutWidth) > 40;
-
-    resizeCanvas();
-
-    if (!isMobile || widthChanged) {
-      alignMarqueeToTitleUnderline();
-      setupMarqueeIntroOnce();
-      syncPaddleFromDom();
-      lastLayoutWidth = currentWidth;
-    }
-
-    resizeRAF = null;
-  });
-}, { passive: true });
-
-window.addEventListener('orientationchange', () => {
-  /*
-    화면 회전은 실제 레이아웃 변화이므로 한 번 강제로 다시 계산한다.
-  */
-  window.setTimeout(() => {
-    lastLayoutWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
-    resizeCanvas({ force: true });
-    alignMarqueeToTitleUnderline();
-    setupMarqueeIntroOnce();
-    syncPaddleFromDom();
-  }, 250);
-}, { passive: true });
+  resizeCanvas();
+  alignMarqueeToTitleUnderline();
+  setupMarqueeIntroOnce();
+  syncPaddleFromDom();
+});
 
 if (mainTitle && 'ResizeObserver' in window) {
   const ro = new ResizeObserver(() => {
@@ -458,32 +330,11 @@ class Ball {
     this.radius = radius;
     this.color = color;
 
-    /*
-      모바일에서는 Safari의 프레임 변동을 고려해서 초기 속도를 조금 낮춘다.
-      이전 버전은 시간 보정을 강하게 넣으면서 QR 첫 진입 시 공이 빠르게 느껴질 수 있었다.
-    */
-    const initialSpeed = isMobileViewport() ? 13 : 25;
-    this.vx = (Math.random() - 0.5) * initialSpeed;
-    this.vy = (Math.random() - 0.5) * initialSpeed;
+    this.vx = (Math.random() - 0.5) * 25;
+    this.vy = (Math.random() - 0.5) * 25;
 
     this.rotation = Math.random() * Math.PI * 3;
-    this.rotationSpeed = (Math.random() - 0.5) * (isMobileViewport() ? 0.35 : 0.6);
-  }
-
-  limitVelocity() {
-    /*
-      충돌이 여러 번 겹치면 속도가 갑자기 커질 수 있다.
-      특히 모바일 Safari에서는 이런 순간 가속이 “덜 부드러운 움직임”처럼 보인다.
-      그래서 화면 크기에 따라 최대 속도를 제한한다.
-    */
-    const maxSpeed = isMobileViewport() ? 9.5 : 22;
-    const speed = Math.hypot(this.vx, this.vy);
-
-    if (speed > maxSpeed) {
-      const scale = maxSpeed / speed;
-      this.vx *= scale;
-      this.vy *= scale;
-    }
+    this.rotationSpeed = (Math.random() - 0.5) * 0.6;
   }
 
   draw() {
@@ -508,19 +359,12 @@ class Ball {
     ctx.restore();
   }
 
-  update(speedRatio = 1) {
+  update() {
     if (!canvas) return;
 
-    /*
-      Safari 최적화 핵심
-      - 이전 코드는 프레임마다 this.x += this.vx, this.y += this.vy만 실행했다.
-      - 그러면 브라우저가 60fps가 아니라 30fps로 떨어지는 순간, 공의 실제 속도도 절반처럼 느려진다.
-      - speedRatio는 현재 프레임 간격을 기준으로 보정하는 값이다.
-        60fps 기준 한 프레임은 약 16.67ms이므로, 그보다 느리게 그려진 프레임에서는 이동량을 조금 더 보정한다.
-    */
     const prevY = this.y;
-    this.x += this.vx * speedRatio;
-    this.y += this.vy * speedRatio;
+    this.x += this.vx;
+    this.y += this.vy;
 
     if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx = -Math.abs(this.vx); }
     else if (this.x - this.radius < 0) { this.x = this.radius; this.vx = Math.abs(this.vx); }
@@ -558,8 +402,7 @@ class Ball {
     if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy = -Math.abs(this.vy); }
     if (this.y + this.radius < 0) this.recycleBall();
 
-    this.limitVelocity();
-    this.rotation += this.rotationSpeed * speedRatio;
+    this.rotation += this.rotationSpeed;
     this.draw();
   }
 
@@ -567,31 +410,17 @@ class Ball {
     if (!canvas) return;
     this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
     this.y = canvas.height - this.radius - 5;
-    const recycleSpeed = isMobileViewport() ? 1.4 : 2;
-    const recycleUpSpeed = isMobileViewport() ? 0.9 : 1;
-    this.vx = (Math.random() - 0.5) * recycleSpeed;
-    this.vy = -(Math.random() * recycleSpeed + recycleUpSpeed);
+    this.vx = (Math.random() - 0.5) * 2;
+    this.vy = -(Math.random() * 2 + 1);
     this.rotation = Math.random() * Math.PI * 2;
-    this.rotationSpeed = (Math.random() - 0.5) * (isMobileViewport() ? 0.1 : 0.15);
+    this.rotationSpeed = (Math.random() - 0.5) * 0.15;
   }
 }
 
 const balls = [];
+const numBalls = 5;
 const ballColor = '#fd2af6';
-
-/*
-  모바일 Safari에서는 이미지 로딩, 주소창 변화, canvas 애니메이션이 겹칠 때 프레임이 쉽게 떨어진다.
-  그래서 모바일 화면에서는 공 개수와 최대 증식 개수를 살짝 줄인다.
-  시각적 인상은 유지하면서 계산량을 줄이는 목적이다.
-*/
-function isMobileViewport() {
-  return window.innerWidth <= 768;
-}
-
-const INITIAL_BALL_COUNT = isMobileViewport() ? 4 : 5;
-const MAX_BALLS = isMobileViewport() ? 6 : 10;
-const BALL_RADIUS = isMobileViewport() ? 24 : 30;
-
+const MAX_BALLS = 10;
 let lastSpawnTime = 0;
 
 
@@ -604,9 +433,7 @@ function debugBallCount() {
     debugBallEl.textContent = `balls: ${balls.length} / ${MAX_BALLS}`;
   }
 
-  // 디버그 표시 요소가 있을 때만 로그를 남긴다.
-  // 모바일 브라우저에서 불필요한 console 작업이 애니메이션을 방해하지 않게 한다.
-  if (debugBallEl && now - lastDebugLog > 1000) {
+  if (now - lastDebugLog > 1000) {
     console.log(`[hinPress] balls: ${balls.length} / ${MAX_BALLS}`);
     lastDebugLog = now;
   }
@@ -672,7 +499,7 @@ function checkCollision(ball1, ball2) {
   ball2.vy += impulseY * invMass2;
 
   const now = performance.now();
-  if (balls.length < MAX_BALLS && now - lastSpawnTime > (isMobileViewport() ? 480 : 200)) {
+  if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
     balls.push(new Ball((ball1.x + ball2.x) / 2, (ball1.y + ball2.y) / 2, ball1.radius, ballColor));
     lastSpawnTime = now;
   }
@@ -684,80 +511,30 @@ if (window.__hinpressBallRAF) {
 }
 
 if (canvas && ctx) {
-  for (let i = 0; i < INITIAL_BALL_COUNT; i++) {
-    const radius = BALL_RADIUS;
+  for (let i = 0; i < numBalls; i++) {
+    const radius = 30;
     const x = radius + Math.random() * (canvas.width - radius * 2);
     const y = radius + Math.random() * (canvas.height - radius * 2);
     balls.push(new Ball(x, y, radius, ballColor));
   }
 
-  let lastFrameTime = null;
-  let smoothedSpeedRatio = 1;
-
-  function animate(timestamp) {
-    const delta = lastFrameTime === null ? 16.67 : timestamp - lastFrameTime;
-    lastFrameTime = timestamp;
-
-    /*
-      부드러운 모바일 움직임을 위한 시간 보정
-      - 시간 기반 애니메이션은 유지하되, Safari에서 프레임 간격이 갑자기 커지는 순간을 그대로 반영하면
-        공이 순간적으로 빨라지거나 튀는 것처럼 보인다.
-      - 그래서 delta를 적당한 범위로 제한하고, 이전 speedRatio와 섞어 천천히 따라가게 만든다.
-      - MOBILE_SPEED_MULTIPLIER는 모바일에서 전체 속도를 조금 낮춰 QR 첫 진입 시 빠르게 보이는 문제를 줄인다.
-    */
-    const isMobile = isMobileViewport();
-    const clampedDelta = clamp(delta, 12, isMobile ? 24 : 42);
-    const targetSpeedRatio = clamp(clampedDelta / 16.67, isMobile ? 0.82 : 0.7, isMobile ? 1.18 : 1.8);
-    const smoothing = isMobile ? 0.08 : 0.16;
-    const mobileSpeedMultiplier = isMobile ? 0.82 : 1;
-
-    smoothedSpeedRatio += (targetSpeedRatio - smoothedSpeedRatio) * smoothing;
-    const speedRatio = smoothedSpeedRatio * mobileSpeedMultiplier;
-
+  function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    syncPaddleFromDom();
 
-    /*
-      메인 페이지가 보일 때만 공의 물리 계산을 실행한다.
-      포트폴리오/CV/상세 페이지로 넘어간 뒤에도 canvas는 DOM에 남아 있으므로,
-      계속 계산하면 모바일 성능을 불필요하게 사용하게 된다.
-    */
-    const isMainVisible = mainPage?.classList.contains('active');
+    balls.forEach(b => b.update());
 
-    if (document.hidden) {
-      lastFrameTime = null;
-      window.__hinpressBallRAF = requestAnimationFrame(animate);
-      return;
+    for (let i = 0; i < balls.length; i++) {
+      for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
     }
 
-    if (isMainVisible) {
-      /*
-        이전 버전은 매 프레임 getBoundingClientRect()로 marquee-bar 위치를 다시 읽었다.
-        모바일 직접 브라우저에서는 주소창 resize와 이 레이아웃 읽기가 겹치며 끊김이 생길 수 있다.
-        marquee-bar 위치는 resize/drag/font 로딩 시점에 이미 갱신하므로, 매 프레임 읽지 않는다.
-      */
-
-      balls.forEach(b => b.update(speedRatio));
-
-      for (let i = 0; i < balls.length; i++) {
-        for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
-      }
-
-      debugBallCount();
-    }
+    debugBallCount();
 
     window.__hinpressBallRAF = requestAnimationFrame(animate);
   }
 
-  window.__hinpressBallRAF = requestAnimationFrame(animate);
+  animate();
 }
-
-document.addEventListener('visibilitychange', () => {
-  // 다른 앱/탭에서 돌아왔을 때 긴 delta가 한 번에 반영되어 공이 튀지 않게 한다.
-  if (!document.hidden) {
-    resizeCanvas();
-    syncPaddleFromDom();
-  }
-}, { passive: true });
 
 function shuffleArray(inputArray) {
   const arr = inputArray.slice();
@@ -779,14 +556,6 @@ function createThumbnails(options = {}) {
     thumbnail.className = 'thumbnail';
 
     const img = document.createElement('img');
-
-    /*
-      모바일 Safari 첫 진입 최적화
-      - loading='lazy': 화면 밖의 이미지를 한꺼번에 불러오지 않는다.
-      - decoding='async': 이미지 디코딩이 메인 스레드를 오래 막지 않도록 한다.
-    */
-    img.loading = 'lazy';
-    img.decoding = 'async';
     const first = (project.images && project.images[0]) ? project.images[0] : '';
     setImageSrcWithFallback(img, getImageSrc(first));
     img.alt = project.title || '';
@@ -795,14 +564,9 @@ function createThumbnails(options = {}) {
     thumbnail.addEventListener('click', () => showProjectDetail(project.id));
     thumbnailsContainer.appendChild(thumbnail);
   });
-
-  thumbnailsCreated = true;
 }
 
-/*
-  중요: 메인 페이지 첫 로딩 때 썸네일을 미리 만들지 않는다.
-  포트폴리오 페이지에 들어갈 때 showPage() 안에서 한 번만 생성된다.
-*/
+createThumbnails({ shuffle: false });
 
 function normalizeMainImageSize(value) {
   const v = String(value || '').toLowerCase();
