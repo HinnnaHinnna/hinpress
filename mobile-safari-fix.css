@@ -133,6 +133,7 @@ body {
   모바일에서는 메인 페이지와 canvas를 안정적인 small viewport 높이에 고정한다.
 */
 @media (max-width: 768px) {
+
   html,
   body {
     overscroll-behavior: none;
@@ -160,4 +161,23 @@ body {
       height: 100svh;
     }
   }
+}
+
+/* CV 페이지 줄바꿈 정리 */
+/* 한글 단어가 글자 단위로 잘리지 않고, 단어 단위로 줄바꿈되게 한다. */
+#cv-page,
+#cv-page .cv-inner,
+#cv-page .cv-section,
+#cv-page .cv-section h3,
+#cv-page .cv-section ul,
+#cv-page .cv-section li {
+  word-break: keep-all;
+  overflow-wrap: normal;
+  white-space: normal;
+}
+
+/* CV 안의 이메일, 인스타그램 주소처럼 긴 영문/URL은 화면 밖으로 넘치지 않게 예외 처리 */
+#cv-page a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }

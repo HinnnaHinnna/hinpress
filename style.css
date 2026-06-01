@@ -770,3 +770,20 @@ body {
 .cv-section h3 {
   font-size: 13px;
 }
+
+
+#cv-page,
+#cv-page .cv-inner,
+#cv-page .cv-section,
+#cv-page .cv-section h3,
+#cv-page .cv-section ul,
+#cv-page .cv-section li {
+  word-break: keep-all;
+  overflow-wrap: normal;
+  white-space: normal;
+}
+
+#cv-page a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
