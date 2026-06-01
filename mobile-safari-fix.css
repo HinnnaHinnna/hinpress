@@ -170,27 +170,5 @@ body {
     word-break: keep-all;
   }
 
-  #cv-page .cv-inner {
-    gap: 0;
-  }
 
-  #cv-page .cv-section {
-    margin: 0;
-    padding: 0;
-  }
-
-  #cv-page .cv-section h3 {
-    margin: 0;
-    padding: 0;
-  }
-
-  #cv-page .cv-section ul {
-    margin: 0;
-    padding: 0;
-  }
-
-  #cv-page .cv-section li {
-    margin: 0;
-    padding: 0;
-  }
 }
