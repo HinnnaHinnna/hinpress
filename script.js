@@ -94,6 +94,32 @@ function setImageSrcWithFallback(imgEl, src) {
 
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
+/*
+  상단 메뉴 폰트 동기화
+  - 모바일 Safari에서는 button 요소가 브라우저 기본 폰트처럼 보일 때가 있다.
+  - 그래서 #top-logo(작업들/Works)에 실제로 적용된 computed font 값을 읽어서
+    힌프레스 / CV / 사적 글쓰기 버튼에 그대로 복사한다.
+  - CSS에서 비슷하게 맞추는 것보다, 실제 보이는 값을 복사하는 방식이 더 안정적이다.
+*/
+function syncTopNavFontToLogo() {
+  if (!topLogo) return;
+
+  const logoStyle = window.getComputedStyle(topLogo);
+  const navItems = document.querySelectorAll('.top-nav-item');
+
+  navItems.forEach((item) => {
+    item.style.fontFamily = logoStyle.fontFamily;
+    item.style.fontSize = logoStyle.fontSize;
+    item.style.fontWeight = logoStyle.fontWeight;
+    item.style.fontStyle = logoStyle.fontStyle;
+    item.style.lineHeight = logoStyle.lineHeight;
+    item.style.letterSpacing = logoStyle.letterSpacing;
+    item.style.textTransform = logoStyle.textTransform;
+    item.style.color = logoStyle.color;
+    item.style.webkitTextFillColor = logoStyle.color;
+  });
+}
+
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   page.classList.add('active');
@@ -106,8 +132,12 @@ function showPage(page) {
     createThumbnails({ shuffle: false });
   }
 
-  if (page === mainPage) topBar?.classList.add('hidden');
-  else topBar?.classList.remove('hidden');
+  if (page === mainPage) {
+    topBar?.classList.add('hidden');
+  } else {
+    topBar?.classList.remove('hidden');
+    syncTopNavFontToLogo();
+  }
 }
 showPage(mainPage);
 
@@ -255,6 +285,7 @@ function initAfterFontsReady() {
   alignMarqueeToTitleUnderline();
   setupMarqueeIntroOnce();
   syncPaddleFromDom();
+  syncTopNavFontToLogo();
 }
 
 if (document.fonts && document.fonts.ready) {
@@ -268,6 +299,7 @@ window.addEventListener('resize', () => {
   alignMarqueeToTitleUnderline();
   setupMarqueeIntroOnce();
   syncPaddleFromDom();
+  syncTopNavFontToLogo();
 });
 
 if (mainTitle && 'ResizeObserver' in window) {
@@ -351,11 +383,32 @@ class Ball {
     this.radius = radius;
     this.color = color;
 
-    this.vx = (Math.random() - 0.5) * 25;
-    this.vy = (Math.random() - 0.5) * 25;
+    /*
+      모바일에서는 Safari의 프레임 변동을 고려해서 초기 속도를 조금 낮춘다.
+      이전 버전은 시간 보정을 강하게 넣으면서 QR 첫 진입 시 공이 빠르게 느껴질 수 있었다.
+    */
+    const initialSpeed = isMobileViewport() ? 16 : 25;
+    this.vx = (Math.random() - 0.5) * initialSpeed;
+    this.vy = (Math.random() - 0.5) * initialSpeed;
 
     this.rotation = Math.random() * Math.PI * 3;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.6;
+    this.rotationSpeed = (Math.random() - 0.5) * (isMobileViewport() ? 0.35 : 0.6);
+  }
+
+  limitVelocity() {
+    /*
+      충돌이 여러 번 겹치면 속도가 갑자기 커질 수 있다.
+      특히 모바일 Safari에서는 이런 순간 가속이 “덜 부드러운 움직임”처럼 보인다.
+      그래서 화면 크기에 따라 최대 속도를 제한한다.
+    */
+    const maxSpeed = isMobileViewport() ? 12 : 22;
+    const speed = Math.hypot(this.vx, this.vy);
+
+    if (speed > maxSpeed) {
+      const scale = maxSpeed / speed;
+      this.vx *= scale;
+      this.vy *= scale;
+    }
   }
 
   draw() {
@@ -430,6 +483,7 @@ class Ball {
     if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy = -Math.abs(this.vy); }
     if (this.y + this.radius < 0) this.recycleBall();
 
+    this.limitVelocity();
     this.rotation += this.rotationSpeed * speedRatio;
     this.draw();
   }
@@ -438,10 +492,12 @@ class Ball {
     if (!canvas) return;
     this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
     this.y = canvas.height - this.radius - 5;
-    this.vx = (Math.random() - 0.5) * 2;
-    this.vy = -(Math.random() * 2 + 1);
+    const recycleSpeed = isMobileViewport() ? 1.4 : 2;
+    const recycleUpSpeed = isMobileViewport() ? 0.9 : 1;
+    this.vx = (Math.random() - 0.5) * recycleSpeed;
+    this.vy = -(Math.random() * recycleSpeed + recycleUpSpeed);
     this.rotation = Math.random() * Math.PI * 2;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.15;
+    this.rotationSpeed = (Math.random() - 0.5) * (isMobileViewport() ? 0.1 : 0.15);
   }
 }
 
@@ -559,19 +615,27 @@ if (canvas && ctx) {
   }
 
   let lastFrameTime = null;
+  let smoothedSpeedRatio = 1;
 
   function animate(timestamp) {
-    if (lastFrameTime === null) lastFrameTime = timestamp;
-
-    const delta = timestamp - lastFrameTime;
+    const delta = lastFrameTime === null ? 16.67 : timestamp - lastFrameTime;
     lastFrameTime = timestamp;
 
     /*
-      16.67ms는 60fps 기준의 한 프레임 시간이다.
-      delta가 커질수록 speedRatio도 커져서 Safari에서 프레임이 조금 떨어져도 속도가 지나치게 느려지지 않는다.
-      단, 탭 전환/주소창 변화 후 delta가 너무 커질 수 있으므로 최대값을 제한한다.
+      부드러운 모바일 움직임을 위한 시간 보정
+      - 시간 기반 애니메이션은 유지하되, Safari에서 프레임 간격이 갑자기 커지는 순간을 그대로 반영하면
+        공이 순간적으로 빨라지거나 튀는 것처럼 보인다.
+      - 그래서 delta를 적당한 범위로 제한하고, 이전 speedRatio와 섞어 천천히 따라가게 만든다.
+      - MOBILE_SPEED_MULTIPLIER는 모바일에서 전체 속도를 조금 낮춰 QR 첫 진입 시 빠르게 보이는 문제를 줄인다.
     */
-    const speedRatio = Math.min(delta / 16.67, 2.2);
+    const isMobile = isMobileViewport();
+    const clampedDelta = clamp(delta, 10, isMobile ? 34 : 42);
+    const targetSpeedRatio = clamp(clampedDelta / 16.67, 0.7, isMobile ? 1.45 : 1.8);
+    const smoothing = isMobile ? 0.10 : 0.16;
+    const mobileSpeedMultiplier = isMobile ? 0.76 : 1;
+
+    smoothedSpeedRatio += (targetSpeedRatio - smoothedSpeedRatio) * smoothing;
+    const speedRatio = smoothedSpeedRatio * mobileSpeedMultiplier;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 

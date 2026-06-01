@@ -1,5 +1,5 @@
 /*
-  hinPress portfolio — mobile Safari fix
+  hinPress portfolio — mobile Safari / QR entry fix
   ------------------------------------------------------------------
   사용 방법
   1) 이 파일을 기존 style.css 아래에 추가로 연결하거나,
@@ -27,9 +27,11 @@ body {
 }
 
 /*
-  상단 topbar 버튼 색 보정
-  - 모바일 Safari는 button/a의 기본 스타일을 파랗게 보이게 만들 때가 있다.
-  - color와 -webkit-text-fill-color를 함께 지정해 Safari에서도 검정색으로 고정한다.
+  상단 topbar 공통 보정
+  - 모바일 Safari는 button 요소에 브라우저 기본 폰트/색을 끼워 넣는 경우가 있다.
+  - 기본 색상은 검정으로 고정한다.
+  - 실제 폰트 크기/두께/자간은 script.js에서 #top-logo(작업들/Works)의 computed style을 읽어
+    .top-nav-item에 복사한다. 즉, CSS는 기본값을 정리하고 JS는 실제 값을 맞춘다.
 */
 .top-bar,
 .top-bar *,
@@ -41,13 +43,23 @@ body {
   -webkit-text-fill-color: #000;
 }
 
+.top-nav {
+  align-items: center;
+}
+
 .top-nav-item {
   appearance: none;
   -webkit-appearance: none;
   background: transparent;
   border: 0;
-  font: inherit;
+  margin: 0;
+  padding: 0;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
   text-decoration: none;
+  text-transform: none;
+  border-radius: 0;
+  cursor: pointer;
 }
 
 .top-nav-item:visited,
@@ -58,8 +70,8 @@ body {
 #top-logo:active,
 #top-logo:focus,
 #top-logo:hover {
-  color: #000;
-  -webkit-text-fill-color: #000;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
 }
 
 /*
@@ -75,6 +87,19 @@ body {
   text-size-adjust: 100%;
 }
 
+/*
+  canvas가 모바일에서 불필요한 터치 하이라이트/더블탭 지연을 만들지 않도록 한다.
+*/
+#main-page,
+#canvas {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+#main-page {
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   :root {
     --bar-font-size: 0.8rem;
@@ -86,24 +111,16 @@ body {
     line-height: 1.1;
   }
 
+  /*
+    모바일 topbar에서 메뉴 버튼과 Works가 다른 폰트처럼 보이는 것을 막기 위한 1차 보정.
+    최종 동기화는 script.js의 syncTopNavFontToLogo()가 처리한다.
+  */
   .top-nav-item,
   #top-logo {
     color: #000 !important;
     -webkit-text-fill-color: #000 !important;
-  }
-
-  /*
-    메인 페이지 전체가 클릭 가능한 진입 영역이라는 것을 브라우저에도 알려준다.
-    터치 지연과 탭 하이라이트를 줄인다.
-  */
-  #main-page {
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  #canvas {
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    font-family: inherit;
+    font-style: inherit;
+    text-transform: none;
   }
 }
