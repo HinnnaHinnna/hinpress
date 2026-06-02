@@ -382,7 +382,7 @@ class Ball {
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
-    ctx.strokeStyle = '#fd2af6';
+    ctx.strokeStyle = '#ff56f9';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.arc(0, this.radius * 0.2, this.radius * 0.7, 0, Math.PI);
@@ -451,7 +451,7 @@ class Ball {
 
 const balls = [];
 const numBalls = 5;
-const ballColor = '#fd2af6';
+const ballColor = '#ff56f9';
 const MAX_BALLS = 10;
 let lastSpawnTime = 0;
 

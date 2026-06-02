@@ -5,10 +5,10 @@
   --color-desc-bg: #000000;
 
   --color-text-main: #000000;
-  --color-muted: #fd2af6;
+  --color-muted: #ff56f9;
   --color-main-gray: #f5f5f5;
 
-  --color-arrow: #fd2af6;
+  --color-arrow: #ff56f9;
   --color-maque: #daffa2;
 
   --bar-height: 20px;
@@ -118,7 +118,7 @@ body {
 #top-logo {
   font-family: "Pretendard", sans-serif;
   font-size: var(--bar-font-size);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -261,7 +261,7 @@ body {
 
 .marquee-text {
   font-family: "Pretendard", sans-serif;
-  font-weight: 600;
+  font-weight: 400;
   font-size: var(--bar-font-size);
   line-height: .7;
   word-break: keep-all;
