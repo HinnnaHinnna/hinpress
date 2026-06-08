@@ -13,11 +13,11 @@
   --color-arrow: #ff56f9;
   --color-maque: #daffa2;
 
-  --bar-height: 20px;
+  --bar-height: 30px;
 
   --bar-font-size: 0.8rem;
 
-  --page-side-padding: 1rem;
+  --page-side-padding: 1.5rem;
   --detail-page-side-padding: 10vw;
 
   --detail-main-img-s: 250px;
@@ -64,7 +64,7 @@ body {
   left: 0;
   width: 100%;
   height: var(--bar-height);
-  background: var(--color-brand);
+  background: var(--color-bg-main);
   color: var(--color-text-main);
   display: flex;
   align-items: center;
