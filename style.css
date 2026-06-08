@@ -693,7 +693,7 @@ body {
   max-width: none;
 }
 
-/* 왼쪽 칼럼: 실장 */
+/* 왼쪽 칼럼: 실장  */
 .cv-section:nth-child(1) {
   grid-column: 1;
   grid-row: 1;
