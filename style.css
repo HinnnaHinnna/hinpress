@@ -1,14 +1,14 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 :root {
-  --color-bg-main: #ffffff;
-  --color-brand: #ffffff;
+  --color-bg-main: #f5f3f3;
+  --color-brand: #f5f3f3;
   --color-portfolio-bg: #000000;
   --color-desc-bg: #000000;
 
   --color-text-main: #000000;
   --color-muted: #ff56f9;
-  --color-main-gray: #ffffff;
+  --color-main-gray: #f5f3f3;
 
   --color-arrow: #ff56f9;
 
