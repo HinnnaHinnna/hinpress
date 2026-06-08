@@ -736,10 +736,6 @@ body {
   padding-left: 0;
 }
 
-.cv-section li {
-  margin-bottom: 0.25rem;
-}
-
 #cv-page a {
   color: var(--color-muted);
   text-decoration: none;
