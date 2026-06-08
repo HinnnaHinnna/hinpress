@@ -661,7 +661,7 @@ body {
 
 #cv-page {
   background: var(--color-main-gray);
-  color: var(--color-arrow);
+  color: var(--color-text-main);
   overflow-y: auto;
 }
 
@@ -731,6 +731,20 @@ body {
 
 .cv-section li {
   margin-bottom: 0.25rem;
+}
+
+#cv-page a {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+#cv-page a:hover {
+  opacity: 0.6;
+  text-decoration: underline;
+}
+
+#cv-page a:visited {
+  color: var(--color-muted);
 }
 
 #detail-description a {
