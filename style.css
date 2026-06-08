@@ -65,6 +65,7 @@ body {
   width: 100%;
   height: var(--bar-height);
   background: var(--color-brand);
+  color: var(--color-muted);
   display: flex;
   align-items: center;
   padding: 0 var(--page-side-padding);
