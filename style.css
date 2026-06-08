@@ -661,7 +661,7 @@ body {
 
 #cv-page {
   background: var(--color-main-gray);
-  color: var(--color-text-main);
+  color: var(--color-arrow);
   overflow-y: auto;
 }
 
@@ -677,7 +677,7 @@ body {
 
   font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 36px;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.4;
   word-break: keep-all;
 
@@ -720,7 +720,7 @@ body {
 .cv-section h3 {
   font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 36px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.4;
 }
 
