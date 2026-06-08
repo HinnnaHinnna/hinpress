@@ -65,7 +65,6 @@ body {
   width: 100%;
   height: var(--bar-height);
   background: var(--color-brand);
-  color: var(--color-muted);
   display: flex;
   align-items: center;
   padding: 0 var(--page-side-padding);
@@ -662,7 +661,7 @@ body {
 
 #cv-page {
   background: var(--color-main-gray);
-  color: var(--color-text-main);
+  color: var(--color-muted);
   overflow-y: auto;
 }
 
