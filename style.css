@@ -790,6 +790,12 @@ body {
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
     --detail-strip-active-outline: 2px;
+    --page-side-padding: 10px;
+  }
+
+  #portfolio-page,
+  #detail-page {
+    scrollbar-gutter: auto;
   }
 
   .title-container {
@@ -800,9 +806,9 @@ body {
   }
 
   #main-title-svg {
-    width: 94vw;
-    max-width: 100vw;
-    margin-left: 10px;
+    width: calc(100vw - (var(--page-side-padding) * 2));
+    max-width: none;
+    margin-left: var(--page-side-padding);
     animation: mobileTitleBlink 1.2s ease-in-out infinite;
   }
 
