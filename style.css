@@ -90,6 +90,10 @@ body {
   width: 100%;
 }
 
+#about-btn {
+  margin-right: 1rem;
+}
+
 #contact-btn {
   margin-left: auto;
 }
@@ -824,7 +828,7 @@ body {
   .cv-inner {
     max-width: 100%;
     padding: 4.5rem 1rem 2rem;
-    font-size: 20px;
+    font-size: 28px;
     line-height: 1.45;
 
     display: block;
