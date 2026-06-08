@@ -828,7 +828,7 @@ body {
   .cv-inner {
     max-width: 100%;
     padding: 4.5rem 1rem 2rem;
-    font-size: 28px;
+    font-size: 18px;
     line-height: 1.45;
 
     display: block;
@@ -839,6 +839,6 @@ body {
   }
 
   .cv-section h3 {
-    font-size: 14px;
+    font-size: 10px;
   }
 }
