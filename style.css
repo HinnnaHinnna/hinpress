@@ -102,8 +102,14 @@ body {
   cursor: pointer;
 }
 
-.top-nav-item:hover {
-  opacity: 0.6;
+.top-nav-item:hover,
+.top-nav-item:focus-visible,
+#top-logo:hover {
+  opacity: 1;
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .top-nav-item,
