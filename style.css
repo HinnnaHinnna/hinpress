@@ -430,7 +430,7 @@ body {
 }
 
 .detail-info h2 {
-  font-family: "Pretendard", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 18px;
   line-height: 1.4;
   font-weight: 500;
@@ -661,30 +661,68 @@ body {
 
 #cv-page {
   background: var(--color-main-gray);
-  color: var(--color-muted);
+  color: var(--color-text-main);
   overflow-y: auto;
 }
 
+/*
+  CV 페이지 전체 영역
+  - 데스크톱에서는 1:1 비율의 두 칼럼으로 배치한다.
+  - HTML 구조는 그대로 두고, CSS Grid의 nth-child만으로 위치를 나눈다.
+*/
 .cv-inner {
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 5rem 1.5rem 3rem;
-  font-family: "Pretendard", sans-serif;
+
+  font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;
   font-weight: 400;
+  line-height: 1.6;
+  word-break: keep-all;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 3rem;
+  row-gap: 2rem;
+  align-items: start;
 }
 
 .cv-section {
-  margin-bottom: 2rem;
-  max-width: 820px;
+  margin-bottom: 0;
+  max-width: none;
+}
+
+/* 왼쪽 칼럼: 실장 */
+.cv-section:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* 왼쪽 칼럼: 학력 */
+.cv-section:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+/* 오른쪽 칼럼: 프로젝트 */
+.cv-section:nth-child(3) {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+
+/* 왼쪽 칼럼: 연락처 */
+.cv-section:nth-child(4) {
+  grid-column: 1;
+  grid-row: 3;
 }
 
 .cv-section h3 {
-  font-family: "Pretendard", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;
   font-weight: 500;
   margin-bottom: 0.75rem;
-  line-height: 0;
+  line-height: 1.2;
 }
 
 .cv-section ul {
@@ -753,12 +791,22 @@ body {
     letter-spacing: -0.005em;
   }
 
+  /*
+    모바일 CV
+    - 화면 폭이 좁아지면 2칼럼을 유지하지 않고 1칼럼으로 되돌린다.
+    - 기존 섹션 순서: 실장 → 학력 → 프로젝트 → 연락처
+  */
   .cv-inner {
     max-width: 100%;
     padding: 4.5rem 1rem 2rem;
     font-size: 13px;
     line-height: 1.65;
-    word-break: keep-all;
+
+    display: block;
+  }
+
+  .cv-section {
+    margin-bottom: 2rem;
   }
 
   .cv-section h3 {
