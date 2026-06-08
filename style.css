@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
 :root {
   --color-bg-main: #f5f5f5;
   --color-brand: #f5f5f5;
@@ -45,16 +47,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
-
-/* @font-face {
-  font-family: 'Susa60';
-  src: url('./Susa60-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: optional;
-} */
 
 body {
   font-family: "Pretendard Variable", "Pretendard", 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -116,7 +108,7 @@ body {
 
 .top-nav-item,
 #top-logo {
-  font-family: "Pretendard", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: var(--bar-font-size);
   font-weight: 400;
   line-height: 1;
@@ -260,7 +252,7 @@ body {
 }
 
 .marquee-text {
-  font-family: "Pretendard", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 400;
   font-size: var(--bar-font-size);
   line-height: .7;
@@ -330,7 +322,7 @@ body {
 }
 
 #detail-page {
-  background: var(#ffffff);
+  background: #ffffff;
   overflow-y: auto;
   padding-left: var(--detail-page-side-padding);
   padding-right: var(--detail-page-side-padding);
@@ -760,16 +752,16 @@ body {
   #main-title-measure {
     letter-spacing: -0.005em;
   }
-}
 
-.cv-inner {
-  max-width: 100%;
-  padding: 4.5rem 1rem 2rem;
-  font-size: 13px;
-  line-height: 1.65;
-  word-break: keep-all;
-}
+  .cv-inner {
+    max-width: 100%;
+    padding: 4.5rem 1rem 2rem;
+    font-size: 13px;
+    line-height: 1.65;
+    word-break: keep-all;
+  }
 
-.cv-section h3 {
-  font-size: 13px;
+  .cv-section h3 {
+    font-size: 13px;
+  }
 }
