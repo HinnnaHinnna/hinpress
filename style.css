@@ -336,7 +336,7 @@ body {
 }
 
 #detail-page {
-  background: #ffffff;
+  background: var(--color-bg-main);
   overflow-y: auto;
   padding-left: var(--detail-page-side-padding);
   padding-right: var(--detail-page-side-padding);
