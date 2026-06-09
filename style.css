@@ -47,6 +47,11 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: "Pretendard Variable", "Pretendard", 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 300;
@@ -54,7 +59,8 @@ body {
   color: var(--color-text-main);
   overflow: hidden;
   width: 100vw;
-  height: 100vh;
+  min-height: 100svh;
+  height: 100svh;
 }
 
 .top-bar {
@@ -790,11 +796,35 @@ body {
   :root {
     --bar-height: 1.6rem;
     --bar-font-size: 14px;
+    --page-side-padding: 10px;
     --detail-page-side-padding: 0px;
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
     --detail-strip-active-outline: 2px;
-    --page-side-padding: 10px;
+  }
+
+  .title-container {
+    top: 10px;
+    left: 0;
+    right: auto;
+    width: 100%;
+  }
+
+  #main-title-svg {
+    display: block;
+
+    width: calc(100vw - (var(--page-side-padding) * 2));
+    max-width: none;
+    margin-left: var(--page-side-padding);
+
+    aspect-ratio: 1000 / 171;
+    height: auto;
+
+    animation: none;
+  }
+
+  #main-title-measure {
+    letter-spacing: -0.005em;
   }
 
   #portfolio-page,
@@ -802,29 +832,6 @@ body {
     scrollbar-gutter: auto;
   }
 
-  .title-container {
-    top: 2vh;
-    left: 0;
-    right: 3.5px;
-    width: 40vw;
-  }
-
-  #main-title-svg {
-    width: calc(100vw - (var(--page-side-padding) * 2));
-    max-width: none;
-    margin-left: var(--page-side-padding);
-    animation: mobileTitleBlink 1.2s ease-in-out infinite;
-  }
-
-  #main-title-measure {
-    letter-spacing: -0.005em;
-  }
-
-  /*
-    모바일 CV
-    - 화면 폭이 좁아지면 2칼럼을 유지하지 않고 1칼럼으로 되돌린다.
-    - 기존 섹션 순서: 실장 → 학력 → 프로젝트 → 연락처
-  */
   .cv-inner {
     max-width: 100%;
     padding: 4.5rem var(--page-side-padding) 2rem;

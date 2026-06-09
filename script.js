@@ -262,10 +262,26 @@ function setupMarqueeIntroOnce() {
 
 resizeCanvas();
 
+function reflowMainStage() {
+  resizeCanvas();
+
+  requestAnimationFrame(() => {
+    alignMarqueeToTitleUnderline();
+    setupMarqueeIntroOnce();
+    syncPaddleFromDom();
+  });
+}
+
+function reflowMainStageSoon() {
+  reflowMainStage();
+
+  setTimeout(reflowMainStage, 100);
+  setTimeout(reflowMainStage, 400);
+  setTimeout(reflowMainStage, 900);
+}
+
 function initAfterFontsReady() {
-  alignMarqueeToTitleUnderline();
-  setupMarqueeIntroOnce();
-  syncPaddleFromDom();
+  reflowMainStageSoon();
 }
 
 if (document.fonts && document.fonts.ready) {
@@ -274,12 +290,22 @@ if (document.fonts && document.fonts.ready) {
   window.addEventListener('load', initAfterFontsReady);
 }
 
-window.addEventListener('resize', () => {
-  resizeCanvas();
-  alignMarqueeToTitleUnderline();
-  setupMarqueeIntroOnce();
-  syncPaddleFromDom();
-});
+/* SVG 이미지가 완전히 로드된 뒤 다시 위치 계산 */
+mainTitle?.addEventListener('load', reflowMainStageSoon);
+
+/* 일반 load 이후에도 한 번 더 계산 */
+window.addEventListener('load', reflowMainStageSoon);
+
+/* iOS Safari에서 뒤로가기/새로고침 후 레이아웃이 꼬이는 경우 보정 */
+window.addEventListener('pageshow', reflowMainStageSoon);
+
+window.addEventListener('resize', reflowMainStageSoon);
+window.addEventListener('orientationchange', reflowMainStageSoon);
+
+/* 모바일 브라우저 주소창 높이 변화 대응 */
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', reflowMainStageSoon);
+}
 
 if (mainTitle && 'ResizeObserver' in window) {
   const ro = new ResizeObserver(() => {
