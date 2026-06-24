@@ -148,6 +148,21 @@ const rawProjects = [
   },
   {
     id: 8,
+    title: '유네스코 등제위원회 보고서',
+    subtitle: ['보고서'],
+    year: '2023-',
+    description: '한양도성과 탕춘대성을 유네스코 유산으로 추진하기 위한 등제 보고서.',
+    category: 'Book Design',
+    client: ['서울시'],
+    imageFolder: '2024/unesco',
+    imageBaseName: 'unesco',
+    imageCount: 5,
+    imageExt: ['jpg'],
+    padLength: 2,
+    mainImageSize: 'l'
+  },
+  {
+    id: 9,
     title: '여주, 영릉을 품다',
     subtitle: ['포스터', '책'],
     year: '2022',
@@ -159,14 +174,13 @@ const rawProjects = [
     client: ['국립민속박물관'],
     imageFolder: 'bc/yeuju',
     imageBaseName: 'yeuju',
-    imageCount: 8,
+    imageCount: 4,
     imageExt: 'jpg',
     padLength: 2,
-
     mainImageSize: 'm'
-  },
+  }
   {
-    id: 9,
+    id: 10,
     title: 'U+1D177 : 슬러의 대모험',
     subtitle: ['포스터'],
     year: '2025',
@@ -183,7 +197,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 10,
+    id: 11,
     title: '스마일 딩벳폰트',
     subtitle: ['폰트'],
     year: '2022',
@@ -200,7 +214,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 11,
+    id: 12,
     title: '잊혀진 모든 것들을 위하여',
     subtitle: ['홍보물'],
     year: '2022',
@@ -216,7 +230,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 12,
+    id: 13,
     title: '한국인의 일생',
     subtitle: ['책'],
     year: '2025',
@@ -233,7 +247,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 13,
+    id: 14,
     title: '훈민정음 천년의 문자계획',
     subtitle: ['책', '타이백'],
     year: '2020',
@@ -251,7 +265,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 14,
+    id: 15,
     title: '북촌 지역 보고서',
     subtitle: ['책'],
     year: '2020',
@@ -269,7 +283,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 15,
+    id: 16,
     title: '2025 새해 인사',
     subtitle: ['그래픽'],
     year: '2025',
@@ -285,7 +299,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 16,
+    id: 17,
     title: 'xyz 워크샵 포스터',
     subtitle: ['포스터'],
     year: '2024',
@@ -301,7 +315,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 17,
+    id: 18,
     title: '입고 꾸미기 위한 공예',
     subtitle: ['포스터', '홍보물', '배너'],
     year: '2023',
@@ -317,7 +331,7 @@ const rawProjects = [
     mainImageSize: 'l'
   },
   {
-    id: 18,
+    id: 19,
     title: '6699프레스 특강',
     subtitle: ['포스터', '배너'],
     year: '2022',
@@ -328,21 +342,6 @@ const rawProjects = [
     imageBaseName: '6699',
     imageCount: 4,
     imageExt: ['gif', 'jpg'],
-    padLength: 2,
-    mainImageSize: 'l'
-  },
-  {
-    id: 19,
-    title: '유네스코 등제위원회 보고서',
-    subtitle: ['보고서'],
-    year: '2023-',
-    description: '한양도성과 탕춘대성을 유네스코 유산으로 추진하기 위한 등제 보고서.',
-    category: 'Book Design',
-    client: ['서울시'],
-    imageFolder: '2024/unesco',
-    imageBaseName: 'unesco',
-    imageCount: 5,
-    imageExt: ['jpg'],
     padLength: 2,
     mainImageSize: 'l'
   }
