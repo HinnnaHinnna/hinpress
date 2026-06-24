@@ -156,7 +156,7 @@ const rawProjects = [
     client: ['서울시'],
     imageFolder: '2024/unesco',
     imageBaseName: 'unesco',
-    imageCount: 5,
+    imageCount: 7,
     imageExt: ['jpg'],
     padLength: 2,
     mainImageSize: 'l'
