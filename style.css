@@ -273,7 +273,7 @@ body {
 
 .marquee-text {
   font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-size: var(--bar-font-size);
   line-height: .7;
   word-break: keep-all;
