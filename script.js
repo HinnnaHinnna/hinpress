@@ -561,7 +561,7 @@ function checkCollision(ball1, ball2) {
   ball2.vy += impulseY * invMass2;
 
   const now = performance.now();
-  if (balls.length < MAX_BALLS && now - lastSpawnTime > 200) {
+  if (balls.length < MAX_BALLS && now - lastSpawnTime > 2000) {
     balls.push(new Ball((ball1.x + ball2.x) / 2, (ball1.y + ball2.y) / 2, ball1.radius, ballColor));
     lastSpawnTime = now;
   }
