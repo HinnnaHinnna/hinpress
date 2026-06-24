@@ -151,7 +151,7 @@ const rawProjects = [
     title: '유네스코 등제위원회 보고서',
     subtitle: ['보고서'],
     year: '2023-',
-    description: '한양도성과 탕춘대성을 유네스코 유산으로 추진하기 위한 등제 보고서.',
+    description: '한양도성, 북한산성, 탕춘대성을 포함한 ‘한양의 수도성곽’ 유네스코 세계유산 등재를 위한 보고서.',
     category: 'Book Design',
     client: ['서울시'],
     imageFolder: '2024/unesco',
