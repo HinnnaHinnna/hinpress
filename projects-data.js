@@ -178,7 +178,7 @@ const rawProjects = [
     imageExt: 'jpg',
     padLength: 2,
     mainImageSize: 'm'
-  }
+  },
   {
     id: 10,
     title: 'U+1D177 : 슬러의 대모험',
