@@ -404,12 +404,12 @@ class Ball {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 0.7;
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
     ctx.strokeStyle = '#ff56f9';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 0.7;
     ctx.beginPath();
     ctx.arc(0, this.radius * 0.2, this.radius * 0.7, 0, Math.PI);
     ctx.stroke();
@@ -740,10 +740,17 @@ function scrollStripBy(direction) {
 detailStripLeft?.addEventListener('click', () => scrollStripBy(-1));
 detailStripRight?.addEventListener('click', () => scrollStripBy(1));
 
-// buildDetailBottomStrip();
+let detailStripBuilt = false;
+
 
 function showProjectDetail(projectId) {
   if (!Array.isArray(projects)) return;
+
+  if (!detailStripBuilt) {
+    buildDetailBottomStrip();
+    detailStripBuilt = true;
+  }
+
   const index = projects.findIndex(p => p.id === projectId);
   if (index === -1) return;
 
