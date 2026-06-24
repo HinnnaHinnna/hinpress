@@ -404,12 +404,12 @@ class Ball {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.lineWidth = 0.9;
+    ctx.lineWidth = 1;
     ctx.strokeStyle = this.color;
     ctx.stroke();
 
     ctx.strokeStyle = '#ff56f9';
-    ctx.lineWidth = 0.9;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(0, this.radius * 0.2, this.radius * 0.7, 0, Math.PI);
     ctx.stroke();
