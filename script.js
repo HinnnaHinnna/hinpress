@@ -388,8 +388,8 @@ class Ball {
     this.radius = radius;
     this.color = color;
 
-    this.vx = (Math.random() - 0.5) * 25;
-    this.vy = (Math.random() - 0.5) * 25;
+    this.vx = (Math.random() - 0.5) * 10;
+    this.vy = (Math.random() - 0.5) * 10;
 
     this.rotation = Math.random() * Math.PI * 3;
     this.rotationSpeed = (Math.random() - 0.5) * 0.6;
@@ -466,19 +466,23 @@ class Ball {
 
   recycleBall() {
     if (!canvas) return;
+
     this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
     this.y = canvas.height - this.radius - 5;
-    this.vx = (Math.random() - 0.5) * 2;
-    this.vy = -(Math.random() * 2 + 1);
+
+    this.vx = (Math.random() - 0.5) * 1;
+
+    this.vy = -(Math.random() * 1 + 0.5);
+
     this.rotation = Math.random() * Math.PI * 2;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.15;
+    this.rotationSpeed = (Math.random() - 0.5) * 0.08;
   }
 }
 
 const balls = [];
-const numBalls = 3;
+const numBalls = 2;
 const ballColor = '#ff56f9';
-const MAX_BALLS = 5;
+const MAX_BALLS = 4;
 let lastSpawnTime = 0;
 
 
