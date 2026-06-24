@@ -628,7 +628,7 @@ function createThumbnails(options = {}) {
   });
 }
 
-createThumbnails({ shuffle: false });
+// createThumbnails({ shuffle: false });
 
 function normalizeMainImageSize(value) {
   const v = String(value || '').toLowerCase();
@@ -740,7 +740,7 @@ function scrollStripBy(direction) {
 detailStripLeft?.addEventListener('click', () => scrollStripBy(-1));
 detailStripRight?.addEventListener('click', () => scrollStripBy(1));
 
-buildDetailBottomStrip();
+// buildDetailBottomStrip();
 
 function showProjectDetail(projectId) {
   if (!Array.isArray(projects)) return;
