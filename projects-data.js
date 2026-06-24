@@ -330,6 +330,21 @@ const rawProjects = [
     imageExt: ['gif', 'jpg'],
     padLength: 2,
     mainImageSize: 'l'
+  },
+  {
+    id: 19,
+    title: '유네스코 등제위원회 보고서',
+    subtitle: ['보고서'],
+    year: '2023-',
+    description: '한양도성과 탕춘대성을 유네스코 유산으로 추진하기 위한 등제 보고서.',
+    category: 'Book Design',
+    client: ['서울시'],
+    imageFolder: '2024/unesco',
+    imageBaseName: 'unesco',
+    imageCount: 5,
+    imageExt: ['jpg'],
+    padLength: 2,
+    mainImageSize: 'l'
   }
 ];
 
