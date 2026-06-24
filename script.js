@@ -586,11 +586,11 @@ if (canvas && ctx) {
 
     balls.forEach(b => b.update());
 
-    for (let i = 0; i < balls.length; i++) {
-      for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
-    }
+    // for (let i = 0; i < balls.length; i++) {
+    //   for (let j = i + 1; j < balls.length; j++) checkCollision(balls[i], balls[j]);
+    // }
 
-    debugBallCount();
+    // debugBallCount();
 
     window.__hinpressBallRAF = requestAnimationFrame(animate);
   }
