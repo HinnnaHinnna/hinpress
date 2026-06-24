@@ -148,7 +148,7 @@ const rawProjects = [
   },
   {
     id: 8,
-    title: '유네스코 등제위원회 보고서',
+    title: 'Capital Fortifications of Hanyang',
     subtitle: ['보고서'],
     year: '2023-',
     description: '한양도성, 북한산성, 탕춘대성을 포함한 ‘한양의 수도성곽’ 유네스코 세계유산 등재를 위한 보고서.',
