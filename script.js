@@ -395,6 +395,7 @@ class Ball {
     this.rotationSpeed = (Math.random() - 0.5) * 0.6;
   }
 
+
   draw() {
     if (!ctx) return;
     ctx.save();
