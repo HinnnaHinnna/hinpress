@@ -24,6 +24,10 @@
 
       /* 문서 목록 한 항목의 높이: 모바일 5줄 / 데스크탑 15줄 계산에 사용 */
       --page-item-row-h: 50px;
+
+      /* hinPress 포트폴리오와 같은 스크롤바 굵기 */
+      --scrollbar-size: 10px;
+
       --radius: 12px;
     }
 
@@ -253,6 +257,31 @@
       overflow-x: hidden;
       overscroll-behavior: contain;
       scrollbar-gutter: stable;
+
+      /* Firefox: hinPress 포트폴리오와 같은 얇은 파란 스크롤바 */
+      scrollbar-width: thin;
+      scrollbar-color: var(--link) transparent;
+    }
+
+    /* Chrome, Edge, Safari: hinPress 포트폴리오와 같은 스크롤바 */
+    .page-list::-webkit-scrollbar {
+      width: var(--scrollbar-size);
+      height: var(--scrollbar-size);
+    }
+
+    .page-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .page-list::-webkit-scrollbar-thumb {
+      background-color: var(--link);
+      border-radius: 999px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .page-list::-webkit-scrollbar-corner {
+      background: transparent;
     }
 
     .page-item {
@@ -264,14 +293,12 @@
       cursor: pointer;
     }
 
-    .page-item:not(:last-child)::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 1px;
-      background: var(--line);
+    /*
+      가상 요소로 1px 막대를 그리지 않고 실제 border를 사용한다.
+      다른 UI의 1px 테두리와 같은 방식으로 렌더링되어 굵기가 균일해진다.
+    */
+    .page-item:not(:last-child) {
+      border-bottom: 1px solid var(--line);
     }
 
     .page-item:hover {
@@ -755,9 +782,12 @@
         order: 2;
       }
 
-      /* 모바일에서는 목록 5개 높이까지만 보여주고 이후 항목은 내부 스크롤한다. */
+      /*
+        모바일에서는 다섯 번째 항목까지 보이게 한다.
+        전체 높이에서 1px을 빼 다섯 번째 항목 아래의 구분선은 잘려 보이지 않게 한다.
+      */
       .page-list {
-        max-height: calc(var(--page-item-row-h) * 5);
+        max-height: calc((var(--page-item-row-h) * 5) - 1px);
       }
 
       .auth-pill {
