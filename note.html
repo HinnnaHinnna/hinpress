@@ -280,6 +280,7 @@
     }
 
     .content {
+      width: 100%;
       padding: 18px 16px
     }
 
@@ -771,8 +772,12 @@
 
     @media (min-width: 961px) {
       .layout {
-        max-width: 1200px;
-        margin: 0 auto;
+        grid-template-columns:
+          var(--side-w) minmax(0, calc(var(--content-max) + 32px));
+        max-width: calc(var(--side-w) + var(--content-max) + 80px);
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
         padding-left: 24px;
         padding-right: 24px;
       }
