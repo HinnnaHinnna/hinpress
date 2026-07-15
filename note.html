@@ -1895,10 +1895,15 @@
       text = text.replace(/[ \t]+\{\{REF:/g, "{{REF:");
 
       text = text.replace(
-        /\{\{\s*숨김\s*시작\s*\|\s*제목\s*=\s*([^}]+?)\s*\}\}/g,
-        (m, titleRaw) => `\n{{HIDE_START:${encodeURIComponent(String(titleRaw).trim())}}}\n`
+        /^[ \t]*\{\{\s*숨김\s*시작\s*\|\s*제목\s*=\s*([^}]+?)\s*\}\}[ \t]*$/gm,
+        (m, titleRaw) =>
+          `{{HIDE_START:${encodeURIComponent(String(titleRaw).trim())}}}`
       );
-      text = text.replace(/\{\{\s*숨김\s*끝\s*\}\}/g, "\n{{HIDE_END}}\n");
+
+      text = text.replace(
+        /^[ \t]*\{\{\s*숨김\s*끝\s*\}\}[ \t]*$/gm,
+        "{{HIDE_END}}"
+      );
 
       text = restoreInlineCodeAll(text, iCodes);
 
