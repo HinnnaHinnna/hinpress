@@ -16,8 +16,14 @@
       --links: #001eff;
       --chip-bg: #f3f3f3;
       --chip-active: #a3a3a3;
+      /* 긴 글의 한 줄 길이를 줄이기 위한 본문 최대 폭 */
       --content-max: 580px;
+
+      /* 왼쪽 문서 목록의 폭 */
       --side-w: 280px;
+
+      /* 문서 목록 한 항목의 높이: 모바일 5줄 / 데스크탑 15줄 계산에 사용 */
+      --page-item-row-h: 50px;
       --radius: 12px;
     }
 
@@ -239,13 +245,22 @@
       position: relative;
       margin: 12px 0 0 0;
       padding: 0;
+      padding-right: 4px;
       list-style: none;
+
+      /* 목록이 길어질 때 페이지 전체가 지나치게 길어지지 않도록 한다. */
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
     }
 
     .page-item {
       position: relative;
-      padding: 10px 0;
-      padding-left: 10px;
+
+      /* 한 항목의 높이를 일정하게 만들어 5줄/15줄 높이를 정확히 계산한다. */
+      height: var(--page-item-row-h);
+      padding: 10px 0 10px 10px;
       cursor: pointer;
     }
 
@@ -268,6 +283,7 @@
     .page-item .t {
       font-weight: 700;
       font-size: 13px;
+      line-height: 18px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -276,16 +292,17 @@
     .page-item .m {
       color: var(--muted);
       font-size: 9px;
+      line-height: 12px;
       letter-spacing: 0.01em
     }
 
     .content {
-      width: 100%;
       padding: 18px 16px
     }
 
     #view {
-      max-width: var(--content-max)
+      width: 100%;
+      max-width: var(--content-max);
     }
 
     a {
@@ -702,6 +719,15 @@
       background: #fff;
     }
 
+    /*
+      화면 맨 아래에 내용 없는 여백을 만든다.
+      footer 안에는 텍스트나 링크를 넣지 않고 공간만 유지한다.
+    */
+    .page-footer {
+      width: 100%;
+      height: clamp(96px, 12vh, 160px);
+    }
+
     @media (max-width: 960px) {
       .site-title {
         font-size: 16px;
@@ -709,9 +735,8 @@
       }
 
       /*
-        모바일/태블릿에서는 HTML 구조상 .side가 먼저 있어도
-        화면에서는 본문(.content)을 먼저 보여주고,
-        문서 목록(.side)은 그 아래에 오도록 순서를 바꾼다.
+        모바일/태블릿에서는 문서 목록(.side)을 본문(.content) 위에 둔다.
+        HTML에서도 .side가 먼저 있지만 order를 명시해 배치를 확실하게 고정한다.
       */
       .layout {
         display: flex;
@@ -719,15 +744,20 @@
         min-height: auto;
       }
 
-      .content {
+      .side {
         order: 1;
+        border-right: none;
+        border-top: none;
+        border-bottom: 1px solid var(--line);
       }
 
-      .side {
+      .content {
         order: 2;
-        border-right: none;
-        border-top: 1px solid var(--line);
-        border-bottom: none;
+      }
+
+      /* 모바일에서는 목록 5개 높이까지만 보여주고 이후 항목은 내부 스크롤한다. */
+      .page-list {
+        max-height: calc(var(--page-item-row-h) * 5);
       }
 
       .auth-pill {
@@ -772,14 +802,23 @@
 
     @media (min-width: 961px) {
       .layout {
+        /*
+          왼쪽 사이드바 280px + 오른쪽 본문 580px와 .content 좌우 패딩 32px.
+          남는 빈 칸 없이 실제 콘텐츠 폭에 맞춰 전체 레이아웃을 가운데 배치한다.
+        */
         grid-template-columns:
           var(--side-w) minmax(0, calc(var(--content-max) + 32px));
-        max-width: calc(var(--side-w) + var(--content-max) + 80px);
+
         width: 100%;
-        margin-left: auto;
-        margin-right: auto;
+        max-width: calc(var(--side-w) + var(--content-max) + 80px);
+        margin: 0 auto;
         padding-left: 24px;
         padding-right: 24px;
+      }
+
+      /* 데스크탑에서는 목록 15개 높이까지만 보여주고 이후 항목은 내부 스크롤한다. */
+      .page-list {
+        max-height: calc(var(--page-item-row-h) * 15);
       }
     }
   </style>
@@ -827,6 +866,9 @@
       <div id="view"></div>
     </section>
   </main>
+
+  <!-- 화면 하단에 여백만 만들기 위한 빈 footer -->
+  <footer class="page-footer" aria-hidden="true"></footer>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
