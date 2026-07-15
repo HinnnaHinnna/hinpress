@@ -425,7 +425,7 @@
       margin: 0;
 
       /* 왼쪽 세로선과 글자 사이를 5px 띄운다. */
-      padding: 0 0 0 20px;
+      padding: 0 0 0 5px;
 
       /* 다른 경계선과 같은 1px 선을 사용한다. */
       border-left: 1px solid var(--line);
@@ -825,7 +825,7 @@
         전체 높이에서 1px을 빼 다섯 번째 항목 아래의 구분선은 잘려 보이지 않게 한다.
       */
       .page-list {
-        max-height: calc((var(--page-item-row-h) * 4) - 1px);
+        max-height: calc((var(--page-item-row-h) * 5) - 1px);
       }
 
       .auth-pill {
@@ -1894,12 +1894,17 @@
       // 예: "문장 <ref>각주</ref>" → "문장[1]"처럼 붙어서 보이게 한다.
       text = text.replace(/[ \t]+\{\{REF:/g, "{{REF:");
 
+      /*
+        숨김 문법은 한 줄 전체가 해당 문법일 때 내부 토큰으로 바꾼다.
+
+        이전에는 토큰 앞뒤에 \n을 강제로 추가했는데,
+        빈 줄 표시 기능이 추가된 뒤 그 줄바꿈이 실제 공백으로 보였다.
+        이제 기존 줄 구조는 그대로 두고 문법 문자열만 교체한다.
+      */
       text = text.replace(
         /^[ \t]*\{\{\s*숨김\s*시작\s*\|\s*제목\s*=\s*([^}]+?)\s*\}\}[ \t]*$/gm,
-        (m, titleRaw) =>
-          `{{HIDE_START:${encodeURIComponent(String(titleRaw).trim())}}}`
+        (m, titleRaw) => `{{HIDE_START:${encodeURIComponent(String(titleRaw).trim())}}}`
       );
-
       text = text.replace(
         /^[ \t]*\{\{\s*숨김\s*끝\s*\}\}[ \t]*$/gm,
         "{{HIDE_END}}"
