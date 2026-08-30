@@ -1048,8 +1048,20 @@
         id,
         title: data?.title || id,
         content: data?.content || "",
-        createdAt: Number(data?.createdAt || Date.now()),
-        updatedAt: Number(data?.updatedAt || data?.createdAt || Date.now()),
+        /*
+          createdAt = 문서가 최초로 만들어진 시각.
+          왼쪽 사이드 목록의 고정 순서를 결정하는 기준이다.
+
+          예전 문서에 createdAt이 없는 경우에는 updatedAt을
+          안정적인 보조값으로 사용한다.
+        */
+        createdAt: Number(data?.createdAt || data?.updatedAt || 0),
+
+        /*
+          updatedAt = 마지막 수정 시각.
+          '최근' 페이지에서는 이 값을 계속 사용한다.
+        */
+        updatedAt: Number(data?.updatedAt || data?.createdAt || 0),
         updatedBy: data?.updatedBy || "",
         aliases: Array.isArray(data?.aliases) ? data.aliases : [],
         visibility: data?.visibility === "private" ? "private" : "public"
@@ -2169,12 +2181,28 @@
 
       if (currentFilter !== "all") list = list.filter(p => getCategory(p) === currentFilter);
       if (q) list = list.filter(p => (p.title || "").toLowerCase().includes(q));
-      list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      /*
+        왼쪽 사이드 목록은 '최초 생성 시각(createdAt)' 기준 최신순이다.
+
+        - 새 문서를 만들면 맨 위에 나타난다.
+        - 기존 문서를 수정해도 목록 위치는 바뀌지 않는다.
+        - 생성시각이 같은 경우에는 id를 기준으로 고정 정렬한다.
+      */
+      list.sort((a, b) => {
+        const createdDiff = (b.createdAt || 0) - (a.createdAt || 0);
+        if (createdDiff !== 0) return createdDiff;
+
+        return String(a.id || "").localeCompare(String(b.id || ""), "ko");
+      });
 
       pageListEl.innerHTML = list.map(p => {
         const cat = getCategory(p);
         const visibilityText = getVisibility(p) === "private" ? "비공개" : "공개";
-        const hint = `${cat ? cat + " · " : ""}${visibilityText} · ${formatDate(p.updatedAt || p.createdAt)}`;
+
+        /*
+          사이드 목록의 날짜도 정렬 기준과 맞게 최초 생성일을 표시한다.
+        */
+        const hint = `${cat ? cat + " · " : ""}${visibilityText} · ${formatDate(p.createdAt || p.updatedAt)}`;
         return `
           <li class="page-item" data-id="${escapeHtml(p.id)}">
             <div class="t">${escapeHtml(p.title)}</div>
