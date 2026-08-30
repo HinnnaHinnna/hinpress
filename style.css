@@ -7,10 +7,10 @@
   --color-desc-bg: #000000;
 
   --color-text-main: #000000;
-  --color-muted: #0b33fc;
+  --color-muted: #060606;
   --color-main-gray: #f5f3f3;
 
-  --color-arrow: #0b33fc;
+  --color-arrow: #060606;
 
 
   --bar-height: 30px;
@@ -74,7 +74,12 @@ body {
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+  /*
+    hinPress.svg의 데스크탑 margin-left: 1rem과 같은 시작선에 맞춘다.
+    기존 1.5rem 때문에 생기던 추가 왼쪽 들여쓰기를 제거한다.
+  */
   padding: 0 var(--page-side-padding);
+  padding-left: 1rem;
   z-index: 300;
   transform: translateY(0);
   transition: transform 0.3s ease;
@@ -196,7 +201,11 @@ body {
 }
 
 .title-container {
-  position: absolute;
+  /*
+    마퀴바와 마찬가지로 viewport에 고정한다.
+    따라서 메인 → 포트폴리오로 스크롤해도 hinPress.svg가 함께 따라온다.
+  */
+  position: fixed;
 
   /*
     데스크탑에서도 모바일처럼 화면 상단에 배치한다.
@@ -205,7 +214,7 @@ body {
   top: calc(var(--bar-height) + 10px);
   left: 0;
   transform: none;
-  z-index: 10;
+  z-index: 110;
   padding: 0;
   width: calc(100% - (var(--page-side-padding) * 2));
   text-align: left;
@@ -221,7 +230,7 @@ body {
 
 #main-title-svg {
   display: block;
-  width: 68rem;
+  width: 60rem;
   height: auto;
   max-width: 100%;
   cursor: pointer;
@@ -230,7 +239,7 @@ body {
 }
 
 #main-title-svg:hover {
-  opacity: 0.8;
+  opacity: 0.5;
 }
 
 #main-title-measure {
@@ -873,6 +882,13 @@ body {
     --detail-strip-thumb-maxh: 72px;
     --detail-strip-arrow-zone: 42px;
     --detail-strip-active-outline: 2px;
+  }
+
+  /*
+    모바일에서도 top-nav와 hinPress.svg의 왼쪽 시작선을 동일하게 한다.
+  */
+  .top-bar {
+    padding-left: var(--page-side-padding);
   }
 
   .title-container {

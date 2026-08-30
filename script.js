@@ -258,24 +258,21 @@ function getMarqueeTuningByViewport(titleRect) {
 }
 
 function alignMarqueeToTitleUnderline() {
-  if (!mainTitle || !marqueeBar || !mainHero) return;
+  if (!mainTitle || !marqueeBar) return;
 
   const rect = getTextInkRect(mainTitle);
-  const heroRect = mainHero.getBoundingClientRect();
-
   if (!rect || !rect.width) return;
 
   const { GAP } = getMarqueeTuningByViewport(rect);
 
   /*
-    getBoundingClientRect()는 현재 스크롤 위치를 반영한 '화면 좌표'를 준다.
-    하지만 marqueeBar는 이제 mainHero 안의 absolute 요소이므로
-    hero의 화면 좌표를 빼서 'mainHero 내부 좌표'로 바꿔야 한다.
+    hinPress.svg와 marqueeBar가 모두 position: fixed이므로
+    둘 다 같은 viewport 좌표계를 사용한다.
 
-    이렇게 해두면 포트폴리오까지 내려간 상태에서 브라우저 크기가 바뀌어도
-    다시 위로 올라왔을 때 마퀴 위치가 틀어지지 않는다.
+    따라서 이전처럼 mainHero의 top 값을 빼지 않고
+    SVG의 실제 화면상 bottom 위치 바로 아래에 마퀴를 놓는다.
   */
-  const top = (rect.bottom - heroRect.top) + GAP;
+  const top = rect.bottom + GAP;
 
   marqueeBar.style.left = '0';
   marqueeBar.style.right = 'auto';
