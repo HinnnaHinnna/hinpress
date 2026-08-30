@@ -506,41 +506,25 @@ class Ball {
   update() {
     if (!canvas) return;
 
-    const prevY = this.y;
+    /*
+      마퀴바는 이제 스마일 볼의 충돌 대상이 아니다.
+
+      이전에는 이 위치에서 마퀴바의 위/아래 경계를 검사해
+      볼의 vy를 반전시키고, 마퀴바를 드래그한 속도까지 vx에 더했다.
+
+      그 충돌 계산을 제거했기 때문에
+      볼은 마퀴바를 그대로 통과하며 운동 방향이나 속도가 바뀌지 않는다.
+    */
     this.x += this.vx;
     this.y += this.vy;
 
-    if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx = -Math.abs(this.vx); }
-    else if (this.x - this.radius < 0) { this.x = this.radius; this.vx = Math.abs(this.vx); }
-
-    if (paddleHeight > 0) {
-      const withinPaddleX =
-        this.x >= (paddleX - this.radius) &&
-        this.x <= (paddleX + paddleWidth + this.radius);
-
-      if (this.vy < 0 && withinPaddleX) {
-        const prevTop = (prevY - this.radius);
-        const currTop = (this.y - this.radius);
-        const crossedBottom = (prevTop > paddleBottom) && (currTop <= paddleBottom);
-
-        if (crossedBottom) {
-          this.y = paddleBottom + this.radius;
-          this.vy = Math.abs(this.vy);
-          this.vx += paddleVX * 0.8;
-        }
-      }
-
-      if (this.vy > 0 && withinPaddleX) {
-        const prevBottom = (prevY + this.radius);
-        const currBottom = (this.y + this.radius);
-        const crossedTop = (prevBottom < paddleTop) && (currBottom >= paddleTop);
-
-        if (crossedTop) {
-          this.y = paddleTop - this.radius;
-          this.vy = -Math.abs(this.vy);
-          this.vx += paddleVX * 0.2;
-        }
-      }
+    // 화면의 좌우 벽과는 기존처럼 충돌한다.
+    if (this.x + this.radius > canvas.width) {
+      this.x = canvas.width - this.radius;
+      this.vx = -Math.abs(this.vx);
+    } else if (this.x - this.radius < 0) {
+      this.x = this.radius;
+      this.vx = Math.abs(this.vx);
     }
 
     if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy = -Math.abs(this.vy); }

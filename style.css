@@ -1,14 +1,17 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 :root {
+  /* 전체 메인 / CV / 상세페이지의 밝은 배경 */
   --color-bg-main: #f5f3f3;
-  --color-brand: #f5f3f3;
+
+  /* 포트폴리오 영역의 어두운 배경 */
   --color-portfolio-bg: #212121;
 
+  /* 본문 기본 검정 */
   --color-text-main: #000000;
+
+  /* 내비게이션, 마퀴, 화살표, 스크롤바 등에 사용하는 짙은 회색 */
   --color-muted: #060606;
-  --color-main-gray: #f5f3f3;
-  --color-arrow: #060606;
 
 
   --bar-height: 30px;
@@ -369,7 +372,15 @@ body {
     배경보다 위, 실제 콘텐츠(타이틀/썸네일/상단바)보다 아래에 둔다.
     클릭/스크롤을 방해하지 않도록 pointer-events를 끈다.
   */
-  z-index: 5;
+  /*
+    top-nav의 z-index가 300이므로 그보다 높은 값으로 둔다.
+    이렇게 하면 스마일 볼이 top-nav 배경 뒤에 가려지지 않고
+    내비게이션 글자 위/아래를 시각적으로 통과해 보인다.
+
+    pointer-events: none은 그대로 유지하므로
+    볼이 위에 있어도 top-nav 버튼 클릭은 정상적으로 가능하다.
+  */
+  z-index: 350;
   pointer-events: none;
 }
 
@@ -445,7 +456,7 @@ body {
 .detail-nav-arrow {
   cursor: pointer;
   user-select: none;
-  color: var(--color-arrow);
+  color: var(--color-muted);
   width: 44px;
   height: 44px;
   display: flex;
@@ -472,7 +483,7 @@ body {
 }
 
 .detail-nav-arrow.disabled {
-  color: var(--color-brand);
+  color: var(--color-bg-main);
   cursor: default;
   pointer-events: none;
   opacity: 0;
@@ -686,7 +697,7 @@ body {
   background: transparent;
   cursor: pointer;
 
-  color: var(--color-arrow);
+  color: var(--color-muted);
   font-size: 30px;
   z-index: 5;
 
@@ -759,7 +770,7 @@ body {
 }
 
 #cv-page {
-  background: var(--color-main-gray);
+  background: var(--color-bg-main);
   color: var(--color-text-main);
   overflow-y: auto;
 }
