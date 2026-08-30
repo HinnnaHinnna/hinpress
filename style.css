@@ -239,10 +239,6 @@ body {
   margin-left: 1rem;
 }
 
-#main-title-svg:hover {
-  opacity: 0.5;
-}
-
 #main-title-measure {
   position: absolute;
   top: 0;
@@ -448,7 +444,8 @@ body {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 0 var(--page-side-padding);
+  padding-left: 1rem;
+  padding-right: var(--page-side-padding);
   font-size: 20px;
   z-index: 210;
 }
@@ -474,7 +471,16 @@ body {
 }
 
 .detail-nav-arrow--mirrored {
-  transform: scaleX(-1) translateX(30px);
+  transform: none;
+  font-size: 0;
+}
+
+.detail-nav-arrow--mirrored::before {
+  content: "➔";
+  display: inline-block;
+  font-size: 20px;
+  line-height: 1;
+  transform: scaleX(-1);
   transform-origin: center;
 }
 
@@ -783,17 +789,18 @@ body {
 .cv-inner {
   max-width: 2000px;
   margin: 0 auto;
-  padding: 5rem 1.5rem 3rem;
+  padding: 5rem 1.5rem 3rem 1rem;
 
   font-family: "Pretendard Variable", "Pretendard", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 36px;
+  font-size: 35px;
   font-weight: 300;
-  line-height: 1.45;
+  line-height: 1.43;
   word-break: keep-all;
+  letter-spacing: 0.5px;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: 3rem;
+  column-gap: 2.5rem;
   row-gap: 2rem;
   align-items: start;
 }
@@ -953,5 +960,10 @@ body {
 
   .cv-section h3 {
     font-size: 12px;
+  }
+
+  .detail-nav {
+    padding-left: var(--page-side-padding);
+    padding-right: var(--page-side-padding);
   }
 }
