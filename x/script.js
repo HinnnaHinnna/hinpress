@@ -1,6 +1,5 @@
 const mainPage = document.getElementById('main-page');
-const mainHero = document.getElementById('main-hero');
-const portfolioSection = document.getElementById('portfolio-section');
+const portfolioPage = document.getElementById('portfolio-page');
 const detailPage = document.getElementById('detail-page');
 const cvPage = document.getElementById('cv-page');
 
@@ -87,116 +86,52 @@ function setImageSrcWithFallback(imgEl, src) {
 
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-/*
-  ------------------------------------------------------------
-  페이지 전환 + 메인/포트폴리오 통합 스크롤
-  ------------------------------------------------------------
-
-  이전 구조:
-  main-page -> 클릭 -> portfolio-page 로 화면을 교체했다.
-
-  현재 구조:
-  main-page 안에
-  1) main-hero
-  2) portfolio-section
-  이 세로로 이어져 있다.
-
-  따라서 메인 화면에서 클릭하면 페이지를 바꾸지 않고
-  main-page의 스크롤 위치만 portfolio-section으로 이동한다.
-*/
-
-function updateTopBarForMainScroll() {
-  /*
-    이번 버전에서는 top-nav를 페이지 상단에 항상 유지한다.
-    메인/포트폴리오의 스크롤 위치와 관계없이 숨기지 않는다.
-  */
-  topBar?.classList.remove('hidden');
-}
-
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   page.classList.add('active');
 
-  if (page === mainPage) {
-    updateTopBarForMainScroll();
-  } else {
-    topBar?.classList.remove('hidden');
-  }
+  if (page === portfolioPage) createThumbnails({ shuffle: false });
+
+  if (page === mainPage) topBar?.classList.add('hidden');
+  else topBar?.classList.remove('hidden');
 }
-
-/*
-  메인 페이지의 원하는 위치로 돌아오는 함수.
-  target이 'top'이면 맨 위,
-  target이 'portfolio'이면 포트폴리오 시작점으로 이동한다.
-*/
-function showMainPage(target = 'top', behavior = 'auto') {
-  showPage(mainPage);
-
-  requestAnimationFrame(() => {
-    if (!mainPage) return;
-
-    const top = (target === 'portfolio' && portfolioSection)
-      ? portfolioSection.offsetTop
-      : 0;
-
-    mainPage.scrollTo({
-      top,
-      behavior
-    });
-
-    // 스크롤 위치가 바뀐 뒤 상단바 상태도 다시 계산한다.
-    requestAnimationFrame(updateTopBarForMainScroll);
-  });
-}
-
 showPage(mainPage);
 
-// 썸네일은 이제 별도 포트폴리오 페이지 진입 시 만드는 것이 아니라,
-// 사이트가 열릴 때 한 번 생성한다.
-createThumbnails({ shuffle: false });
+// 메인 페이지 전체를 클릭하면 포트폴리오 페이지로 이동하게 한다.
+// 기존에는 hinPress SVG 텍스트(mainTitle)만 클릭 가능했지만,
+// 이제 main-page 영역 전체가 진입 버튼처럼 작동한다.
 
-/*
-  메인 첫 화면을 클릭하면 아래의 포트폴리오로 이동한다.
-  단, 마퀴 바를 드래그하는 동작은 클릭으로 처리하지 않는다.
-*/
-let mainHeroStartX = 0;
-let mainHeroStartY = 0;
-let mainHeroMoved = false;
+// 단, 모바일/웹에서 마퀴 바를 드래그할 때 실수로 페이지가 넘어가지 않도록
+// 손가락이나 마우스가 일정 거리 이상 움직이면 "클릭"이 아니라 "드래그"로 판단한다.
 
-const MAIN_HERO_CLICK_MOVE_LIMIT = 10;
+let mainPageStartX = 0;
+let mainPageStartY = 0;
+let mainPageMoved = false;
 
-mainHero?.addEventListener('pointerdown', (e) => {
-  mainHeroStartX = e.clientX;
-  mainHeroStartY = e.clientY;
-  mainHeroMoved = false;
+const MAIN_PAGE_CLICK_MOVE_LIMIT = 10;
+
+mainPage?.addEventListener('pointerdown', (e) => {
+  mainPageStartX = e.clientX;
+  mainPageStartY = e.clientY;
+  mainPageMoved = false;
 });
 
-mainHero?.addEventListener('pointermove', (e) => {
-  const dx = Math.abs(e.clientX - mainHeroStartX);
-  const dy = Math.abs(e.clientY - mainHeroStartY);
+mainPage?.addEventListener('pointermove', (e) => {
+  const dx = Math.abs(e.clientX - mainPageStartX);
+  const dy = Math.abs(e.clientY - mainPageStartY);
 
-  if (dx > MAIN_HERO_CLICK_MOVE_LIMIT || dy > MAIN_HERO_CLICK_MOVE_LIMIT) {
-    mainHeroMoved = true;
+  if (dx > MAIN_PAGE_CLICK_MOVE_LIMIT || dy > MAIN_PAGE_CLICK_MOVE_LIMIT) {
+    mainPageMoved = true;
   }
 });
 
-mainHero?.addEventListener('click', () => {
-  if (mainHeroMoved) return;
-
-  portfolioSection?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
+mainPage?.addEventListener('click', () => {
+  if (mainPageMoved) return;
+  showPage(portfolioPage);
 });
 
-// top-nav는 고정되어 있으므로 메인 스크롤에 따라 숨김/표시를 바꾸지 않는다.
-
-// 상단 가운데 '작업들' -> 같은 페이지의 포트폴리오 위치
-topLogo?.addEventListener('click', () => showMainPage('portfolio', 'smooth'));
-
-// '힌프레스' -> 같은 페이지의 맨 위
-aboutBtn?.addEventListener('click', () => showMainPage('top', 'smooth'));
-
+topLogo?.addEventListener('click', () => showPage(portfolioPage));
+aboutBtn?.addEventListener('click', () => showPage(mainPage));
 cvBtn?.addEventListener('click', () => showPage(cvPage));
 contactBtn?.addEventListener('click', () => window.open('note.html', '_blank'));
 
@@ -258,24 +193,14 @@ function getMarqueeTuningByViewport(titleRect) {
 }
 
 function alignMarqueeToTitleUnderline() {
-  if (!mainTitle || !marqueeBar || !mainHero) return;
+  if (!mainTitle || !marqueeBar) return;
 
   const rect = getTextInkRect(mainTitle);
-  const heroRect = mainHero.getBoundingClientRect();
-
   if (!rect || !rect.width) return;
 
   const { GAP } = getMarqueeTuningByViewport(rect);
 
-  /*
-    getBoundingClientRect()는 현재 스크롤 위치를 반영한 '화면 좌표'를 준다.
-    하지만 marqueeBar는 이제 mainHero 안의 absolute 요소이므로
-    hero의 화면 좌표를 빼서 'mainHero 내부 좌표'로 바꿔야 한다.
-
-    이렇게 해두면 포트폴리오까지 내려간 상태에서 브라우저 크기가 바뀌어도
-    다시 위로 올라왔을 때 마퀴 위치가 틀어지지 않는다.
-  */
-  const top = (rect.bottom - heroRect.top) + GAP;
+  const top = rect.bottom + GAP;
 
   marqueeBar.style.left = '0';
   marqueeBar.style.right = 'auto';
@@ -291,13 +216,7 @@ function alignMarqueeToTitleUnderline() {
 
 function syncPaddleFromDom() {
   if (!marqueeBar) return;
-
   const rect = marqueeBar.getBoundingClientRect();
-
-  /*
-    canvas가 viewport 전체에 fixed 되었으므로
-    마퀴 바도 별도의 좌표 변환 없이 화면 좌표를 그대로 사용한다.
-  */
   paddleWidth = rect.width;
   paddleHeight = rect.height;
   paddleX = rect.left;
@@ -318,13 +237,6 @@ function clampPaddleX() {
 
 function resizeCanvas() {
   if (!canvas) return;
-
-  /*
-    캔버스는 viewport에 고정되어 있으므로
-    현재 브라우저 화면 크기만큼만 만든다.
-    이렇게 해야 포트폴리오가 길어져도 거대한 캔버스를 만들지 않아
-    애니메이션 성능이 유지된다.
-  */
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
