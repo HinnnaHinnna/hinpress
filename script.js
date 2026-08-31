@@ -550,9 +550,9 @@ class Ball {
 }
 
 const balls = [];
-const numBalls = 3;
+const numBalls = 1;
 const ballColor = '#023dff';
-const MAX_BALLS = 3;
+const MAX_BALLS = 2;
 let lastSpawnTime = 0;
 
 
