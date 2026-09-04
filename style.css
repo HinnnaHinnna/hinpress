@@ -2,7 +2,7 @@
 
 :root {
   /* 전체 메인 / CV / 상세페이지의 밝은 배경 */
-  --color-bg-main: #f5f3f3;
+  --color-bg-main: #f0edf0;
 
   /* 포트폴리오 영역의 어두운 배경 */
   --color-portfolio-bg: #212121;
@@ -231,7 +231,7 @@ body {
 
 #main-title-svg {
   display: block;
-  width: 60rem;
+  width: 40rem;
   height: auto;
   max-width: 100%;
   cursor: pointer;
