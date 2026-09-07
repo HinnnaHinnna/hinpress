@@ -2,10 +2,10 @@
 
 :root {
   /* 전체 메인 / CV / 상세페이지의 밝은 배경 */
-  --color-bg-main: #f0edf0;
+  --color-bg-main: #e2e2e2;
 
   /* 포트폴리오 영역의 어두운 배경 */
-  --color-portfolio-bg: #212121;
+  --color-portfolio-bg: #e2e2e2;
 
   /* 본문 기본 검정 */
   --color-text-main: #000000;
@@ -194,8 +194,8 @@ body {
     기존 100svh에서 약 1/3 줄인 높이.
     즉 화면 높이의 약 2/3만 흰 메인 영역으로 사용한다.
   */
-  height: 33.3334svh;
-  min-height: 33.3334svh;
+  height: 15svh;
+  min-height: 15svh;
   overflow: hidden;
   background: var(--color-bg-main);
   cursor: pointer;
