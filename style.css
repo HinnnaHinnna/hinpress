@@ -2,10 +2,10 @@
 
 :root {
   /* 전체 메인 / CV / 상세페이지의 밝은 배경 */
-  --color-bg-main: #e2e2e2;
+  --color-bg-main: #e6e4e2;
 
   /* 포트폴리오 영역의 어두운 배경 */
-  --color-portfolio-bg: #e2e2e2;
+  --color-portfolio-bg: #e6e4e2;
 
   /* 본문 기본 검정 */
   --color-text-main: #000000;
