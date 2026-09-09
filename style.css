@@ -324,7 +324,7 @@ body {
   font-size: var(--bar-font-size);
   line-height: .7;
   word-break: keep-all;
-  color: var(--color-muted);
+  color: #fd60f7;
   letter-spacing: 0.03cap;
 
   flex: 0 0 auto;
