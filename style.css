@@ -194,7 +194,7 @@ body {
     기존 100svh에서 약 1/3 줄인 높이.
     즉 화면 높이의 약 2/3만 흰 메인 영역으로 사용한다.
   */
-  height: 20svh;
+  height: 30svh;
   min-height: 20svh;
   overflow: hidden;
   background: var(--color-bg-main);
@@ -231,7 +231,7 @@ body {
 
 #main-title-svg {
   display: block;
-  width: 26rem;
+  width: 42rem;
   height: auto;
   max-width: 100%;
   cursor: pointer;
