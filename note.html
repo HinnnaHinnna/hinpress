@@ -17,7 +17,7 @@
       --chip-bg: #f3f3f3;
       --chip-active: #a3a3a3;
       /* 긴 글의 한 줄 길이를 줄이기 위한 본문 최대 폭 */
-      --content-max: 580px;
+      --content-max: 680px;
 
       /* 왼쪽 문서 목록의 폭 */
       --side-w: 280px;
@@ -360,7 +360,7 @@
 
     #view {
       width: 100%;
-      max-width: var(--content-max);
+      max-width: none;
     }
 
     a {
@@ -895,7 +895,7 @@
           남는 빈 칸 없이 실제 콘텐츠 폭에 맞춰 전체 레이아웃을 가운데 배치한다.
         */
         grid-template-columns:
-          var(--side-w) minmax(0, calc(var(--content-max) + 32px));
+          var(--side-w) minmax(0, 1fr);
 
         width: 100%;
         max-width: calc(var(--side-w) + var(--content-max) + 80px);
