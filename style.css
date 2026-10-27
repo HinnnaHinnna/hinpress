@@ -231,7 +231,7 @@ body {
 
 #main-title-svg {
   display: block;
-  width: 20rem;
+  width: 10rem;
   height: auto;
   max-width: 100%;
   cursor: pointer;
@@ -921,8 +921,8 @@ body {
   #main-title-svg {
     display: block;
 
-    width: calc(100vw - (var(--page-side-padding) * 2));
-    max-width: none;
+    width: 10rem;
+    max-width: 100%;
     margin-left: var(--page-side-padding);
 
     aspect-ratio: 1000 / 171;
