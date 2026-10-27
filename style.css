@@ -923,7 +923,7 @@ body {
 
     width: 8rem;
     max-width: 100%;
-    margin-left: var(--page-side-padding);
+    margin-left: 7px;
 
     aspect-ratio: 1000 / 171;
     height: auto;
